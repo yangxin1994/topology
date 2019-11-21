@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "target": "es5",
+    "module": "commonjs",
+    "outDir": "../../dist/topology-tools",
+    "sourceMap": true,
+    "lib": ["es2018", "dom"],
+    "paths": {
+      "topology-core": ["../topology"],
+      "topology-core/*": ["../topology/*"]
+      // "topology-flow-diagram": ["../topology-flow-diagram"],
+      // "topology-activity-diagram": ["../topology-activity-diagram"],
+      // "topology-class-diagram": ["../topology-class-diagram"],
+      // "topology-sequence-diagram": ["../topology-sequence-diagram"]
+    }
+  },
+  "exclude": ["node_modules"]
+}

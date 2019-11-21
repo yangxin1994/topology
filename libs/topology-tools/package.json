@@ -1,0 +1,22 @@
+{
+    "name": "topology-core",
+    "version": "0.0.6",
+    "description": "A diagram/topology tool by js.",
+    "main": "index.js",
+    "scripts": {
+        "copy": "copyfiles  package.json ../../dist/topology-tools/",
+        "build": "tsc && npm run copy"
+    },
+    "styles": [
+        "styles.scss"
+    ],
+    "keywords": [
+        "topology",
+        "diagram",
+        "canvas"
+    ],
+    "devDependencies": {
+        "typescript": "~3.4.3",
+        "copyfiles": "latest"
+    }
+}

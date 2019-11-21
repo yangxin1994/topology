@@ -1,0 +1,5 @@
+html从网页中复制
+
+src/app/home/home.service.ts 复制配置常量到profile.ts中
+
+src/app/home/props/propos.component.ts 复制配置常量到profile.ts中
