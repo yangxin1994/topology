@@ -7,6 +7,7 @@ import { Line } from 'topology-core/models/line';
 import { Rect } from 'topology-core/models/rect';
 import { Store, Observer } from 'le5le-store';
 import { s8 } from 'topology-core/uuid/uuid';
+import { Shape } from 'topology-tools';
 
 import {
   flowData,
@@ -133,5 +134,6 @@ registerNode('sequenceFocus', sequenceFocus, sequenceFocusAnchors, sequenceFocus
   Rect,
   Store,
   Observer,
-  s8
+  s8,
+  Shape
 };

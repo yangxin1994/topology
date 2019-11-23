@@ -1,4 +1,5 @@
-import {Tools} from './profile';
+import {Tools} from './config/tools';
+import './config/props';
 
 export class Shape {
   parentElem: HTMLElement;

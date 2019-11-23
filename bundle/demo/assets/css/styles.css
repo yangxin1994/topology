@@ -1,0 +1,256 @@
+.flex {
+    height: 100%;
+    display: flex;
+}
+
+.tools {
+    flex-shrink: 0;
+    width: 1.65rem;
+    background-color: #f8f8f8;
+    border-right: 1px solid #ddd;
+    overflow-y: auto;
+}
+
+.tools .title {
+    padding: 0.05rem 0.1rem;
+    border-top: 1px solid #ccc;
+    border-bottom: 1px solid #ccc;
+}
+
+.tools .title:first-child {
+    border-top: none;
+}
+
+.tools .buttons {
+    padding: 0.1rem 0;
+}
+
+.tools .buttons a {
+    display: inline-block;
+    color: #314659;
+    line-height: 1;
+    width: 0.4rem;
+    height: 0.4rem;
+    text-align: center;
+    vertical-align: middle;
+    text-decoration: none !important;
+}
+
+.tools .buttons a .iconfont {
+    font-size: 0.24rem;
+}
+
+.full {
+    flex: 1;
+    width: initial;
+    position: relative;
+    overflow: auto;
+}
+
+.props {
+    flex-shrink: 0;
+    width: 2.4rem;
+    background-color: #f8f8f8;
+    border-left: 1px solid #ddd;
+    overflow-y: auto;
+}
+
+.props .title,
+.props .popup-title {
+    padding: 0.05rem 0.15rem;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+}
+
+.context-menus {
+    position: fixed;
+    z-index: 100;
+    color: #000;
+    background-color: #fff;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+    min-width: 1.5rem;
+    text-align: left;
+    padding: 0.08rem 0;
+}
+
+.context-menus>div {
+    line-height: 2.2;
+}
+
+.context-menus>div a {
+    color: #314659;
+    display: block;
+    padding: 0 0.2rem;
+    text-decoration: none;
+}
+
+.context-menus>div a.flex {
+    display: flex;
+}
+
+.context-menus>div a.disabled {
+    color: #ccc !important;
+    cursor: default;
+}
+
+.context-menus .line {
+    background-color: transparent !important;
+    padding: 0;
+    margin: 0.05rem 0;
+    border-top: 1px solid #eee;
+}
+
+.page {
+    height: 100vh;
+    overflow: hidden;
+}
+
+.page .menus {
+    height: 0.4rem;
+    line-height: 0.4rem;
+    background: #f8f8f8;
+    display: flex;
+    font-size: 0.13rem;
+}
+
+.page .menus img {
+    height: 0.22rem;
+    margin: 0.1rem 0 0.1rem 0.1rem;
+}
+
+.page .menus a {
+    color: #314659;
+    padding: 0 0.1rem;
+}
+
+.page .menus a .iconfont {
+    font-size: 0.16rem;
+    line-height: 0.28rem;
+    padding: 0;
+}
+
+.page .menus a .icon-angle-right {
+    position: relative;
+    left: 0.2rem;
+}
+
+.page .menus a:hover {
+    text-decoration: none;
+}
+
+.page .menus .disabled a {
+    cursor: default;
+    background: transparent !important;
+    color: #ccc !important;
+}
+
+.page .menus .disabled:hover,
+.page .menus .disabled .item:hover {
+    background: transparent !important;
+}
+
+.page .menus .separator {
+    border-left: 1px solid #e8e8e8;
+    margin: 0 0.1rem;
+}
+
+.page .menus .item {
+    position: relative;
+}
+
+.page .menus .item>.dropdown {
+    padding: 0.08rem 0;
+}
+
+.page .menus .item>.dropdown .item {
+    padding: 0 0.1rem;
+}
+
+.page .menus .item>.dropdown .item a {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 0.15rem;
+    font-size: 0.13rem !important;
+    min-width: 2rem;
+}
+
+.page .menus .item>.dropdown .item.line {
+    background-color: transparent !important;
+    padding: 0;
+    margin: 0.05rem 0.1rem;
+    border-top: 1px solid #ccc;
+}
+
+.page .menus .item:hover>.dropdown {
+    display: block;
+    background: #fff !important;
+}
+
+.page .menus .item.lines a i {
+    font-size: 0.3rem !important;
+}
+
+.page .menus .item.lines .dropdown .item a {
+    min-width: 1.5rem;
+    padding: 0.05rem 0;
+}
+
+.page .menus .item.lines .dropdown .item a i {
+    font-size: 0.4rem !important;
+}
+
+.page .menus .full {
+    flex-grow: 1;
+    width: inherit !important;
+}
+
+.page .menus input {
+    display: inline-block;
+    width: 3rem;
+}
+
+.page .body {
+    display: flex;
+    height: calc(100vh - 0.4rem);
+    border-top: 1px solid #ddd;
+}
+
+.body {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.clicked .dropdown {
+    display: none !important;
+}
+
+figure {
+    padding: 0 0.25rem;
+    width: 7rem;
+}
+
+figure .topo {
+    margin: 0.1rem 0.1rem 0 0;
+    border: 1px solid #ddd !important;
+    cursor: pointer;
+    min-width: 1.2rem !important;
+    width: 1.2rem !important;
+    height: 1.2rem !important;
+    padding: 0.1rem !important;
+}
+
+figure .topo:nth-child(5n+0) {
+    margin-right: 0;
+}
+
+figure .topo:hover {
+    border-color: #1890ff !important;
+}
+
+figure .topo img {
+    margin: 0 !important;
+    width: 1rem !important;
+    height: 1rem !important;
+    pointer-events: none;
+}

@@ -1,35 +1,56 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <title i18n>Topology Demo</title>
     <meta charset="UTF-8" />
     <meta name="format-detection" content="telephone=no" />
     <meta name="msapplication-tap-highlight" content="no" />
-    <meta
-      name="viewport"
-      content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width"
-    />
-    <style>
-      * {
-        padding: 0;
-        margin: 0;
-        outline: none;
-        box-sizing: border-box;
-        word-break: break-all;
-        word-break: break-word;
-      }
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+    <link href="./assets/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+    <link href="./assets/font/iconfont.css" rel="stylesheet" />
+    <!-- <link href="//at.alicdn.com/t/font_1113798_ojwxem1mnui.css" rel="stylesheet" /> -->
+    <link href="//at.alicdn.com/t/font_1331132_5lvbai88wkb.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./assets/css/styles.css">
+    <link rel="stylesheet" href="./assets/css/common.css">
+    <script src="./js/jquery-3.3.1.js"></script>
+    <script src="./js/require-2.3.6.js"></script>
+    <script src="./js/core.js"></script>
+    <script src="./js/jasmine-patch-0.9.1.js"></script>
+    <script src="./js/topology-core.js"></script>
+    <script src="./js/runtime-es2015.js"></script>
+    <script src="./js/runtime-es5.js"></script>
+    <script src="./js/polyfills-es2015.js"></script>
+    <script src="./js/polyfills-es5.js"></script>
+    <script src="./js/main-es2015.js"></script>
+    <script src="./js/main-es5.js"></script>
+    <script src="./js/4-es2015.js"></script>
+    <script src="./js/4-es5.js"></script>
+    <script src="./js/5-es2015.js"></script>
+    <script src="./js/3-es5.js"></script>
+    <script src="./js/demo.js"></script>
+    <script src="./js/canvas2svg.js"></script>
+</head>
 
-      body,
-      .canvas {
-        width: 100vw;
-        height: 100vh;
-      }
-    </style>
-  </head>
+<body>
+    <div class="body">
+        <div class="flex">
+            <div class="tools" id="topo-shape"></div>
+            <div class="full" id="topo-canvas"></div>
+            <div class="props"></div>
+        </div>
+    </div>
+    <div id="css-font" class="topology topology-home" style="width: 0;height: 0;overflow: hidden;"></div>
+    <!-- <script src="../../dist/topology/runtime-es2015.ea35e8591b3cd3fe0915.js" type="module"></script>
+    <script src="../../dist/topology/runtime-es5.72a8c4aa4635370a48ba.js" nomodule></script> -->
+    <!-- <script src="../../dist/topology/polyfills-es2015.831afbd93661549dfd06.js" type="module"></script>
+    <script src="../../dist/topology/polyfills-es5.457d9c9a352c36a9067f.js" nomodule></script> -->
+    <!-- <script src="../../dist/topology/main-es2015.96a419c0e409f50830bd.js" type="module"></script>
+    <script src="../../dist/topology/main-es5.9512e73e8039a09be8f1.js" nomodule></script> -->
+    <!-- <script src="../../dist/topology/4-es2015.33335875fbebfe6cf568.js" type="module"></script>
+    <script src="../../dist/topology/4-es5.e9677f8b14b43da980fb.js" nomodule></script>
+    <script src="../../dist/topology/5-es2015.39283d9700d0a0b6b409.js" type="module"></script>
+    <script src="../../dist/topology/3-es5.b887b089d04f3bd99cb3.js" nomodule></script> -->
+</body>
 
-  <body>
-    <div class="canvas" id="topo-canvas"></div>
-    <script src="./topology.bundle.js"></script>
-    <script src="./demo.js"></script>
-  </body>
 </html>

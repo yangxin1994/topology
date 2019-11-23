@@ -1,5 +1,5 @@
 {
-    "name": "topology-core",
+    "name": "topology-tools",
     "version": "0.0.6",
     "description": "A diagram/topology tool by js.",
     "main": "index.js",
@@ -8,13 +8,15 @@
         "build": "tsc && npm run copy"
     },
     "styles": [
-        "styles.scss"
+        "./scss/styles.scss","./scss/variables.scss"
     ],
     "keywords": [
         "topology",
         "diagram",
         "canvas"
     ],
+    "author": "yx",
+    "license": "ISC",
     "devDependencies": {
         "typescript": "~3.4.3",
         "copyfiles": "latest"

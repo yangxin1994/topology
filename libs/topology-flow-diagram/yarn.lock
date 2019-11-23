@@ -297,11 +297,6 @@ through2@^2.0.1:
     readable-stream "~2.3.6"
     xtend "~4.0.1"
 
-topology-core@^0.0.2:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/topology-core/-/topology-core-0.0.2.tgz#ed84aad61178cae69a0d2d43e02b96acbcec306b"
-  integrity sha512-02fVEbcDqANxLaLNR4WlqYiRGGs2OZ7ZjgUOGzu2kNqOAYHqCkSLdrvvRtJe6/Bbg6t0FYlrkWv0UeSwMD06dA==
-
 typescript@~3.4.3:
   version "3.4.5"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.4.5.tgz#2d2618d10bb566572b8d7aad5180d84257d70a99"

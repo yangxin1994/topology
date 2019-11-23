@@ -6,7 +6,7 @@ module.exports = {
   entry: './src',
   output: {
     path: path.resolve(__dirname, '.'),
-    filename: './demo/topology.bundle.js',
+    filename: './demo/js/topology-core.js',
     library: 'MA',
     libraryTarget: 'umd'
   },

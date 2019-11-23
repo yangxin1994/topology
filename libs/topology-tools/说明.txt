@@ -1,5 +1,44 @@
 html从网页中复制
 
-src/app/home/home.service.ts 复制配置常量到profile.ts中
+常量配置
+src/app/app.component.ts 复制配置常量到profile.ts中
 
+图元列表
+src/app/home/tools/config.ts 复制配置常量到config/tools.ts
+
+属性配置
 src/app/home/props/propos.component.ts 复制配置常量到profile.ts中
+
+js文件复制
+/dist/topology/assets/js/canvas2svg.js
+
+
+编译绘图官网前端源码
+1.  源码根目录<root>/，安装依赖库
+npm install
+2. 本地开发模式(本地开发模式无法使用登录状态)
+npm start
+4. 编译生产文件
+npm run build
+5. 本地调试生产环境【首先】修改host文件，把local.le5le.com代理到127.0.0.1。  windows下host文件修改
+npm run build
+
+编译核心库源码 topology-core
+[源码根目录]cd libs/topology
+[libs/topology#] yarn
+[libs/topology#] npm run build
+
+编译图形图源码 例如： topology-flow-diagram
+# 切换到图形库目录
+[源码根目录]cd libs/topology-flow-diagram
+[libs/topology-flow-diagram#] yarn
+[libs/topology-flow-diagram#] npm run build
+其他图形库类似。
+
+编译打包文件bundle.js
+# 切换bundle目录
+[源码根目录]cd bundle
+# 安装依赖包
+[bundle#] yarn
+[bundle#] npm run build
+# bundle下topology.bundle.js就是html可以引入的bundle.js

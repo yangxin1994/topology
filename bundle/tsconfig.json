@@ -12,9 +12,10 @@
       "topology-flow-diagram": ["../libs/topology-flow-diagram"],
       "topology-activity-diagram": ["../libs/topology-activity-diagram"],
       "topology-class-diagram": ["../libs/topology-class-diagram"],
-      "topology-sequence-diagram": ["../libs/topology-sequence-diagram"]
+      "topology-sequence-diagram": ["../libs/topology-sequence-diagram"],
+      "topology-tools": ["../libs/topology-tools"]
     }
   },
-  "include": ["src/**/*.ts"],
+  // "include": ["../libs/**/*.ts"],
   "exclude": ["node_modules"]
 }
