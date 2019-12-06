@@ -5,6 +5,7 @@ import { Line } from './models/line';
 import { Rect } from './models/rect';
 import { Point } from './models/point';
 import { TopologyData } from './models/data';
+import { Lock } from './models/status';
 
 import { Options } from './options';
 
@@ -395,7 +396,7 @@ export class ActiveLayer {
   }
 
   render(ctx: CanvasRenderingContext2D) {
-    if (this.data.locked < -1) {
+    if (this.data.locked > Lock.Readonly) {
       return;
     }
 
@@ -435,13 +436,17 @@ export class ActiveLayer {
       if (!item.to) {
         continue;
       }
-      const tmp = new Line(item);
-      tmp.strokeStyle = '#ffffff';
-      tmp.lineWidth += 1;
-      tmp.render(ctx);
 
+      const tmp = new Line(item);
+      tmp.text = '';
+      if (tmp.lineWidth < 3) {
+        const bk = new Line(item);
+        bk.strokeStyle = '#ffffff';
+        bk.render(ctx);
+      }
       tmp.strokeStyle = '#d4380d';
-      tmp.lineWidth -= 1;
+      tmp.fromArrowColor = '#d4380d';
+      tmp.toArrowColor = '#d4380d';
       tmp.render(ctx);
     }
 

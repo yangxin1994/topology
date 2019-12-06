@@ -32,7 +32,7 @@ import {
   calcPolylineControlPoints,
   dockPolylineControlPoint
 } from './lines/polyline';
-import { curve, curveControlPoints, pointInCurve, calcCurveControlPoints } from './lines/curve';
+import { curve, curveControlPoints, pointInCurve, calcCurveControlPoints, calcMindControlPoints } from './lines/curve';
 import { triangleSolid, triangle as arrowTriangle } from './arrows/triangle';
 import { diamondSolid, diamond as arrowDiamond } from './arrows/diamond';
 import { circleSolid, circle as arrowCircle } from './arrows/circle';
@@ -160,7 +160,7 @@ function init() {
   // Text
   drawNodeFns.text = text;
   iconRectFns.text = lineIconRect;
-  anchorsFns.text = (node: Rect) => {};
+  anchorsFns.text = (node: Rect) => { };
 
   // Line
   drawNodeFns.line = nodeLine;
@@ -169,7 +169,7 @@ function init() {
   textRectFns.line = lineTextRect;
 
   // Image
-  drawNodeFns.image = (ctx: CanvasRenderingContext2D, node: Rect) => {};
+  drawNodeFns.image = (ctx: CanvasRenderingContext2D, node: Rect) => { };
   iconRectFns.image = imageIconRect;
   textRectFns.image = imageTextRect;
 
@@ -203,6 +203,12 @@ function init() {
     drawFn: curve,
     drawControlPointsFn: curveControlPoints,
     controlPointsFn: calcCurveControlPoints,
+    pointIn: pointInCurve
+  };
+  drawLineFns.mind = {
+    drawFn: curve,
+    drawControlPointsFn: curveControlPoints,
+    controlPointsFn: calcMindControlPoints,
     pointIn: pointInCurve
   };
   // ********end********
@@ -289,7 +295,7 @@ export function registerLine(
 // force - Overwirte the node if exists.
 export function registerArrow(
   name: string,
-  drawFn: (ctx: CanvasRenderingContext2D, from: Point, to: Point, scale?: number) => void,
+  drawFn: (ctx: CanvasRenderingContext2D, from: Point, to: Point, size: number) => void,
   force?: boolean
 ) {
   // Exist

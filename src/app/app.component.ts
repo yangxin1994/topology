@@ -15,14 +15,13 @@ export class AppComponent implements OnInit, OnDestroy {
   urls = environment.urls;
   file = {
     id: '',
-    fileId: '',
+    version: '',
     data: { nodes: [], lines: [] },
     name: '',
     desc: '',
     image: '',
     shared: false
   };
-  filename = '';
   list = {
     recently: []
   };
@@ -30,7 +29,19 @@ export class AppComponent implements OnInit, OnDestroy {
   fromArrowType = '';
   toArrowType = 'triangleSolid';
 
-  lineNames = ['curve', 'polyline', 'line'];
+  lineNames = [{
+    name: '曲线',
+    value: 'curve'
+  }, {
+    name: '线段',
+    value: 'polyline'
+  }, {
+    name: '直线',
+    value: 'line'
+  }, {
+    name: '脑图曲线',
+    value: 'mind'
+  }];
   arrowTypes = [
     '',
     'triangleSolid',
@@ -46,7 +57,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
   menuClicked = false;
   showFigure = false;
-  editFilename = false;
   editMode = false;
   locked = 0;
   scale = 100;
@@ -64,9 +74,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
     Store.subscribe('file', (file: any) => {
       this.locked = 0;
+      if (file && file.data) {
+        this.locked = file.data.locked || 0;
+      }
       this.file = file;
-      this.filename = file.name;
-      this.editFilename = false;
     });
 
     Store.subscribe('lineName', (lineName: string) => {
@@ -95,11 +106,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
     Store.subscribe('recently', (item: any) => {
       for (let i = 0; i < this.list.recently.length; ++i) {
-        if (this.list.recently[i].id === item.id || i > 18) {
+        if (this.list.recently[i].id === item.id || i > 19) {
           this.list.recently.splice(i, 1);
         }
       }
-
       this.list.recently.unshift(item);
       if (this.user) {
         localStorage.setItem('recently_' + this.user.id, JSON.stringify(this.list.recently));
@@ -113,7 +123,7 @@ export class AppComponent implements OnInit, OnDestroy {
         this.editMode = false;
         this.file = {
           id: '',
-          fileId: '',
+          version: '',
           data: { nodes: [], lines: [] },
           name: '',
           desc: '',
@@ -122,6 +132,13 @@ export class AppComponent implements OnInit, OnDestroy {
         };
       }
     });
+  }
+
+  onRemoveRecently(event: MouseEvent, i: number) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.list.recently.splice(i, 1);
+    localStorage.setItem('recently_' + this.user.id, JSON.stringify(this.list.recently));
   }
 
   getRecently() {
@@ -147,7 +164,7 @@ export class AppComponent implements OnInit, OnDestroy {
       const queryParams: any = {};
       if (data) {
         queryParams.id = this.activateRoute.snapshot.queryParamMap.get('id');
-        queryParams.fileId = this.activateRoute.snapshot.queryParamMap.get('fileId');
+        queryParams.version = this.activateRoute.snapshot.queryParamMap.get('version');
       }
       this.router.navigate(['/workspace'], {
         queryParams
@@ -198,31 +215,6 @@ export class AppComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.showFigure = false;
     }, 800);
-  }
-
-  onEditFile(input: HTMLElement) {
-    this.editFilename = true;
-    setTimeout(() => {
-      input.focus();
-    });
-  }
-
-  async onSubmit(invalid: boolean) {
-    if (invalid) {
-      return;
-    }
-
-    Store.set('clickMenu', {
-      event: 'filename',
-      data: this.filename
-    });
-  }
-
-  onClick() {
-    if (this.editFilename) {
-      this.onSubmit(!this.filename);
-    }
-    this.editFilename = false;
   }
 
   onHome() {

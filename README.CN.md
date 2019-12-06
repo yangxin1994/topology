@@ -4,12 +4,13 @@
 
 Le5le-topology 是一个可视化在线绘图工具，使用 Canvas + Typescript。支持 topology, UML、微服务架构、动态流量、SCADA 场景等。
 
-- [→ 在线画图官网](http://topology.le5le.com) ，网站可能比较慢，个人申请的云服务器带宽仅仅 1M。
-- [→ 在线 Demo](https://le5le-com.github.io/topology/examples/index.html)
-- [→ Topology 核心库接口文档](https://le5le-com.github.io/topology/)
-- [→ js 压缩包下载](https://github.com/le5le-com/topology/releases)
+- [→ 在线使用](http://topology.le5le.com) ，网站可能比较慢，个人申请的云服务器带宽仅仅 1M。
+- [→ 开发文档](https://le5le-com.github.io/topology/)
+- [→ 压缩包下载](https://github.com/le5le-com/topology/releases)
 
+- [→ Vue 入门教程](https://juejin.im/post/5dd73e85518825731c34b2ca)
 - [→ React 入门教程](https://juejin.im/post/5dcc074151882559c8061905)
+- [→ Es5 ](https://github.com/johnnyhhj/topolofy-es5)
 
 ![topology](https://img2018.cnblogs.com/blog/328506/201909/328506-20190904144733715-530893726.png)
 
@@ -109,102 +110,29 @@ $ npm run prod
 
 ```
 
-## Demo
+# 贡献者
 
-demo 源码
+- [Nickbing Lao](https://github.com/giscafer)
+- [ivanZzzz](https://github.com/ivan135)
+- [johnnyhhj](https://github.com/johnnyhhj)
+- [顽强的小强](https://github.com/FxLsoft)
+- [sunnyguohua](https://github.com/sunnyguohua)
 
-```
-[demo#] yarn or npm install
+# 如何贡献
 
-# build
-[demo#] npm run build
+- PR
+- Docs
+- Translate
+- Share
+- Writing (articles, demos, videos and so on)
+- Social networks
 
-```
+微信：alsmile123  
+邮箱：alsmile123@qq.com
 
-## 扩展定制自己的图
+# 核心维护者
 
-- 第 1 步: 绘制节点 node 的样式
-
-```
-// 节点node绘图函数
-export function diagram(ctx: CanvasRenderingContext2D, node: Node) {
-  ctx.beginPath();
-  // ...
-  ctx.fill();
-  ctx.stroke();
-}
-
-// [可选] 计算节点node图标区域，默认使用矩形相关函数.
-export function diagramIconRect(node: Node) {
-  let w = node.rect.width / 3;
-  let h = node.rect.height / 3;
-  if (w > h) {
-    w = h;
-  } else {
-    h = w;
-  }
-  let top = node.rect.width / 5;
-  if (top < 10) {
-    top = 10;
-  }
-  node.iconRect = new Rect(node.rect.x + (node.rect.width - w) / 2, node.rect.y + top, w, h);
-}
-
-// [可选] 计算节点node文字区域，默认使用矩形相关函数.
-// fullTextRect - Only text.
-// iconTextRect - Incloud icon and text.
-export function diagramTextRect(node: Node) {
-  let bottom = node.rect.height / 10;
-  if (bottom < 5) {
-    bottom = 0;
-  }
-  node.iconTextRect = new Rect(
-    node.rect.x + node.rect.width / 3,
-    node.rect.y + (node.rect.height * 2) / 3 - bottom,
-    node.rect.width / 3,
-    node.rect.height / 3 - 5
-  );
-
-  const w = node.rect.width / 2;
-  const h = (node.rect.height * 1) / 2;
-  node.fullTextRect = new Rect(node.rect.x + (node.rect.width - w) / 2, node.rect.y + node.rect.height / 4, w, h);
-}
-
-// [可选] 计算节点node可连线的锚点，默认使用矩形相关函数.
-export function diagramAnchors(node: Node) {
-  node.anchors.push(new Point(node.rect.x + node.rect.width / 2, node.rect.y, Direction.Up));
-  node.anchors.push(new Point(node.rect.x + node.rect.width, node.rect.y + node.rect.height / 2, Direction.Right));
-  node.anchors.push(new Point(node.rect.x + node.rect.width / 2, node.rect.y + node.rect.height, Direction.Bottom));
-  node.anchors.push(new Point(node.rect.x, node.rect.y + node.rect.height / 2, Direction.Left));
-}
-```
-
-- 第 2 步: 注册节点 node
-
-```
-// registerNode: Register a custom node.
-// name - The name of node.
-// drawFn - How to draw.
-// anchorsFn - How to get the anchors.
-// iconRectFn - How to get the icon rect.
-// textRectFn - How to get the text rect.
-// force - Overwirte the node if exists.
-registerNode(
-name: string,
-drawFn: (ctx: CanvasRenderingContext2D, node: Node) => void,
-anchorsFn?: (node: Node) => void,
-iconRectFn?: (node: Node) => void,
-textRectFn?: (node: Node) => void,
-force?: boolean
-);
-
-```
-
-# 贡献
-
-有任何建议或问题可以在 issue 提出；或提供一个 pr。
-
-alsmile123@qq.com
+- [Alsmile](https://github.com/Alsmile)
 
 # License
 

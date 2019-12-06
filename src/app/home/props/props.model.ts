@@ -34,6 +34,7 @@ export interface Props {
     animateColor: string;
     animateSpan: number;
     animateType?: string;
+    animateDotSize?: number;
     animateDuration?: number;
     animateFrames?: {
       duration: number;
@@ -45,6 +46,9 @@ export interface Props {
     tags: string[];
     data?: any;
     locked?: boolean;
+    link?: string;
+    markdown?: string;
+    elementId?: string;
 
     // Node
     rect?: Rect;
@@ -65,6 +69,8 @@ export interface Props {
     imageAlign?: string;
     text?: string;
     textMaxLine?: number;
+    textOffsetX?: number;
+    textOffsetY?: number;
     paddingTop?: number | string;
     paddingBottom?: number | string;
     paddingLeft?: number | string;
@@ -82,6 +88,12 @@ export interface Props {
     to?: Point;
     fromArrow?: string;
     toArrow?: string;
+    fromArrowSize?: number;
+    toArrowSize?: number;
+    fromArrowColor?: string;
+    toArrowColor?: string;
+    borderWidth?: number;
+    borderColor?: string;
     // End
 
     nodes?: Node[];

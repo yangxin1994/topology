@@ -39,9 +39,9 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   data = {
     id: '',
-    fileId: '',
+    version: '',
     data: { nodes: [], lines: [] },
-    name: '',
+    name: '空白文件',
     desc: '',
     image: '',
     userId: '',
@@ -58,6 +58,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   contextmenu: any;
   selNodes: any;
   locked = false;
+
+  editFilename = false;
 
   divNode: any;
 
@@ -126,9 +128,6 @@ export class HomeComponent implements OnInit, OnDestroy {
         case 'parse':
           this.canvas.parse();
           break;
-        case 'filename':
-          this.onSaveFilename(menu.data);
-          break;
         case 'share':
           this.onShare();
           break;
@@ -163,13 +162,13 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.canvas = new Topology(this.workspace.nativeElement, this.canvasOptions);
       this.subRoute = this.activateRoute.queryParamMap.subscribe(params => {
         if (params.get('id')) {
-          this.onOpen({ id: params.get('id'), fileId: params.get('fileId') });
+          this.onOpen({ id: params.get('id'), version: params.get('version') });
         } else {
           this.data = {
             id: '',
-            fileId: '',
+            version: '',
             data: { nodes: [], lines: [] },
-            name: '',
+            name: '空白文件',
             desc: '',
             image: '',
             userId: '',
@@ -267,9 +266,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   onNew() {
     this.data = {
       id: '',
-      fileId: '',
+      version: '',
       data: { nodes: [], lines: [] },
-      name: '',
+      name: '空白文件',
       desc: '',
       image: '',
       userId: '',
@@ -279,7 +278,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.canvas.open(this.data.data);
   }
 
-  async onOpen(data: { id: string; fileId?: string }) {
+  async onOpen(data: { id: string; version?: string }) {
     const ret = await this.service.Get(data);
     if (!ret) {
       this.router.navigateByUrl('/workspace');
@@ -287,7 +286,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
     Store.set('recently', {
       id: ret.id,
-      fileId: ret.fileId || '',
+      version: ret.version,
       image: ret.image,
       name: ret.name,
       desc: ret.desc
@@ -306,18 +305,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.canvas.open(ret.data);
 
     Store.set('file', this.data);
-
-    this.animate();
-  }
-
-  animate() {
-    const n = Date.now();
-    for (const item of this.canvas.data.nodes) {
-      if (item.animatePlay) {
-        item.animateStart = n;
-      }
-    }
-    this.canvas.animate();
   }
 
   onOpenLocal() {
@@ -340,7 +327,7 @@ export class HomeComponent implements OnInit, OnDestroy {
               Store.set('toArrowType', data.toArrowType);
               this.data = {
                 id: '',
-                fileId: '',
+                version: '',
                 data,
                 name: name,
                 desc: '',
@@ -361,6 +348,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   save() {
+    if (!this.canvas) {
+      return;
+    }
     this.data.data = this.canvas.data;
     this.canvas.toImage(null, null, async blob => {
       if (this.data.id && !this.coreService.isVip(this.user)) {
@@ -376,7 +366,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.data.image = file.url;
       const ret = await this.service.Save(this.data);
       if (ret) {
-        this.data.id = ret.id;
         Store.set('file', this.data);
         const _noticeService: NoticeService = new NoticeService();
         _noticeService.notice({
@@ -384,38 +373,43 @@ export class HomeComponent implements OnInit, OnDestroy {
           theme: 'success'
         });
 
-        Store.set('recently', {
-          id: this.data.id,
-          image: this.data.image,
-          name: this.data.name,
-          desc: this.data.desc
-        });
-
-        this.router.navigate(['/workspace'], { queryParams: { id: this.data.id } });
+        if (!this.data.id) {
+          this.data.id = ret.id;
+          this.router.navigate(['/workspace'], { queryParams: { id: this.data.id } });
+        } else {
+          Store.set('recently', {
+            id: this.data.id,
+            image: this.data.image,
+            name: this.data.name,
+            desc: this.data.desc
+          });
+        }
       }
     });
   }
 
-  async onSaveFilename(filename: string) {
-    this.data.name = filename;
-    Store.set('file', this.data);
+  onEditFile(input: HTMLElement) {
+    this.editFilename = true;
+    setTimeout(() => {
+      input.focus();
+    });
+  }
 
-    if (this.data.id) {
-      if (
-        !(await this.service.Patch({
-          id: this.data.id,
-          name: filename
-        }))
-      ) {
-        return;
-      }
+  async onSaveFilename() {
+    if (!this.data.name) {
+      return;
+    }
 
-      Store.set('recently', {
-        id: this.data.id,
-        fileId: this.data.fileId || '',
-        image: this.data.image,
-        name: filename
-      });
+    if (!this.data.id) {
+      this.editFilename = false;
+      return;
+    }
+
+    if (await this.service.Patch({
+      id: this.data.id,
+      name: this.data.name
+    })) {
+      this.editFilename = false;
     }
   }
 
@@ -474,7 +468,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           data
         };
         this.locked = data.locked;
-        this.readonly = this.locked;
+        this.readonly = this.locked || !!this.canvas.data.locked;
         break;
       case 'line':
       case 'addLine':
@@ -483,7 +477,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           data
         };
         this.locked = data.locked;
-        this.readonly = this.locked;
+        this.readonly = this.locked || !!this.canvas.data.locked;
         break;
       case 'multi':
         this.locked = true;

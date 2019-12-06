@@ -52,11 +52,6 @@ export class Node extends Pen {
   iconRect: Rect;
   fullIconRect: Rect;
 
-  text: string;
-  textMaxLine: number;
-  textRect: Rect;
-  fullTextRect: Rect;
-
   anchors: Point[] = [];
   rotatedAnchors: Point[] = [];
   parentId: string;
@@ -80,8 +75,6 @@ export class Node extends Pen {
   // nodes移动时，停靠点的参考位置
   dockWatchers: Point[];
 
-  // animateType仅仅是辅助标识
-  animateType = 0;
   animateDuration = 0;
   animateFrames: {
     duration: number;
@@ -101,7 +94,7 @@ export class Node extends Pen {
   iframe: string;
   nextPlay: string;
 
-  private imgLoaded = false;
+  imgLoaded = false;
   constructor(json: any) {
     super(json);
 
@@ -146,10 +139,6 @@ export class Node extends Pen {
     this.paddingLeft = json.paddingLeft || 0;
     this.paddingRight = json.paddingRight || 0;
 
-    this.text = json.text;
-    if (json.textMaxLine) {
-      this.textMaxLine = +json.textMaxLine || 0;
-    }
 
     if (json.children && json.children[0] && json.children[0].parentRect) {
       this.paddingLeft = json.children[0].parentRect.offsetX;
@@ -224,9 +213,25 @@ export class Node extends Pen {
 
     this.calcAnchors();
 
-    if (this.audio || this.video || this.iframe || this.gif) {
+    if (this.audio || this.video || this.iframe || this.hasGif()) {
       Store.set('LT:addDiv', this);
     }
+  }
+
+  hasGif() {
+    if (this.gif) {
+      return true;
+    }
+
+    if (this.children) {
+      for (const item of this.children) {
+        if (item.hasGif()) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
   calcAbsPadding() {
@@ -254,6 +259,9 @@ export class Node extends Pen {
 
   // 根据父节点rect计算自己（子节点）的rect
   calcChildRect(parent: Node) {
+    if (!this.rectInParent) {
+      return;
+    }
     const parentW = parent.rect.width - parent.paddingLeftNum - parent.paddingRightNum;
     const parentH = parent.rect.height - parent.paddingTopNum - parent.paddingBottomNum;
     let x =
@@ -302,11 +310,7 @@ export class Node extends Pen {
 
     // Draw text.
     if (this.name !== 'text' && this.text) {
-      ctx.save();
-      ctx.shadowColor = '';
-      ctx.shadowBlur = 0;
       text(ctx, this);
-      ctx.restore();
     }
 
     // Draw image.
@@ -427,7 +431,6 @@ export class Node extends Pen {
 
       if (!this.imgLoaded) {
         this.imgLoaded = true;
-        Store.set('LT:render', true);
       }
 
       return;
@@ -441,8 +444,8 @@ export class Node extends Pen {
       this.gif = true;
       Store.set('LT:addDiv', this);
     }
+    this.imgLoaded = false;
     this.img.onload = () => {
-      this.imgLoaded = false;
       this.lastImage = this.image;
       this.imgNaturalWidth = this.img.naturalWidth;
       this.imgNaturalHeight = this.img.naturalHeight;
@@ -502,10 +505,6 @@ export class Node extends Pen {
   getDockWatchers() {
     this.dockWatchers = this.rect.toPoints();
     this.dockWatchers.unshift(this.rect.center);
-  }
-
-  clearImg() {
-    this.img = null;
   }
 
   updateAnimateProps() {
@@ -625,6 +624,7 @@ export class Node extends Pen {
     }
     this.rect.x = center.x - (center.x - this.rect.x) * scale;
     this.rect.y = center.y - (center.y - this.rect.y) * scale;
+    this.z *= scale;
     this.rect.width *= scale;
     this.rect.height *= scale;
     this.rect.ex = this.rect.x + this.rect.width;

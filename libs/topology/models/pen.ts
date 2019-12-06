@@ -15,6 +15,7 @@ export abstract class Pen {
 
   dash = 0;
   lineDash: number[];
+  lineDashOffset: number;
   strokeStyle = '';
   fillStyle = '';
   lineCap: string;
@@ -29,6 +30,15 @@ export abstract class Pen {
     textBaseline: 'middle'
   };
 
+  text: string;
+  textMaxLine: number;
+  textRect: Rect;
+  fullTextRect: Rect;
+  textOffsetX: number;
+  textOffsetY: number;
+
+  // animateType仅仅是辅助标识
+  animateType: string;
   // Date.getTime
   animateStart = 0;
   // Cycle count. Infinite if <= 0.
@@ -38,6 +48,10 @@ export abstract class Pen {
   animatePlay: boolean;
 
   locked = false;
+
+  link: string;
+  markdown: string;
+  elementId: string;
 
   // User data.
   data: any;
@@ -53,6 +67,7 @@ export abstract class Pen {
       }
       this.dash = json.dash || 0;
       this.lineDash = json.lineDash;
+      this.lineDashOffset = json.lineDashOffset || 0;
       this.lineWidth = json.lineWidth || 1;
       this.strokeStyle = json.strokeStyle || '';
       this.fillStyle = json.fillStyle || '';
@@ -63,13 +78,27 @@ export abstract class Pen {
       if (json.font) {
         Object.assign(this.font, json.font);
       }
+      this.text = json.text;
+      if (json.textMaxLine) {
+        this.textMaxLine = +json.textMaxLine || 0;
+      }
+      this.textOffsetX = json.textOffsetX || 0;
+      this.textOffsetY = json.textOffsetY || 0;
+
+
+      this.animateType = json.animateType;
       this.animateCycle = json.animateCycle;
       this.nextAnimate = json.nextAnimate;
       this.animatePlay = json.animatePlay;
       this.data = json.data || '';
       this.locked = json.locked;
+      this.link = json.link;
+      this.markdown = json.markdown;
+      this.elementId = json.elementId;
     } else {
       this.id = s8();
+      this.textOffsetX = 0;
+      this.textOffsetY = 0;
     }
   }
   render(ctx: CanvasRenderingContext2D) {
@@ -85,17 +114,8 @@ export abstract class Pen {
       ctx.lineWidth = this.lineWidth;
     }
 
-    if (this.strokeStyle) {
-      ctx.strokeStyle = this.strokeStyle;
-    } else {
-      ctx.strokeStyle = '#333';
-    }
-
-    if (this.fillStyle) {
-      ctx.fillStyle = this.fillStyle;
-    } else {
-      ctx.fillStyle = 'transparent';
-    }
+    ctx.strokeStyle = this.strokeStyle || '#222';
+    ctx.fillStyle = this.fillStyle || 'transparent';
 
     if (this.lineCap) {
       ctx.lineCap = this.lineCap as CanvasLineCap;
@@ -119,6 +139,9 @@ export abstract class Pen {
 
     if (this.lineDash) {
       ctx.setLineDash(this.lineDash);
+    }
+    if (this.lineDashOffset) {
+      ctx.lineDashOffset = this.lineDashOffset;
     }
 
     this.draw(ctx);

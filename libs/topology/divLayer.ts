@@ -2,6 +2,7 @@ import { Store, Observer } from 'le5le-store';
 import { Options } from './options';
 import { Node } from './models/node';
 import { TopologyData } from './models/data';
+import { Lock } from './models/status';
 
 export class DivLayer {
   protected data: TopologyData = Store.get('topology-data');
@@ -106,10 +107,22 @@ export class DivLayer {
       this.setElemPosition(node, this.iframes[node.id] || this.addIframe(node));
     }
     if (node.gif) {
-      if (this.gifs[node.id] && this.gifs[node.id].src !== node.image) {
-        this.gifs[node.id].src = node.image;
+      if (node.image.indexOf('.gif') < 0) {
+        node.gif = false;
+        this.canvas.removeChild(this.gifs[node.id]);
+        this.gifs[node.id] = null;
+      } else {
+        if (this.gifs[node.id] && this.gifs[node.id].src !== node.image) {
+          this.gifs[node.id].src = node.image;
+        }
+        this.setElemPosition(node, this.gifs[node.id] || this.addGif(node));
       }
-      this.setElemPosition(node, this.gifs[node.id] || this.addGif(node));
+    }
+
+    if (node.children) {
+      for (const child of node.children) {
+        this.addDiv(child);
+      }
     }
   };
 
@@ -326,7 +339,7 @@ export class DivLayer {
       this.videos[node.id].media.style.width = '100%';
       this.videos[node.id].media.style.height = '100%';
     }
-    if (this.data.locked > -1) {
+    if (this.data.locked < Lock.Readonly) {
       elem.style.userSelect = 'none';
       elem.style.pointerEvents = 'none';
     } else {
@@ -356,6 +369,12 @@ export class DivLayer {
     if (item.gif) {
       this.canvas.removeChild(this.gifs[item.id]);
       this.gifs[item.id] = null;
+    }
+
+    if (item.children) {
+      for (const child of item.children) {
+        this.removeDiv(child);
+      }
     }
   }
 
