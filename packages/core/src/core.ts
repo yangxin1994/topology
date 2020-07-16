@@ -95,6 +95,7 @@ export class Topology {
   needCache = false;
 
   private tip = "";
+  private raf: number;
   tipMarkdown: HTMLElement;
   tipElem: HTMLElement;
 
@@ -586,6 +587,13 @@ export class Topology {
       return;
     }
 
+    // https://caniuse.com/#feat=mdn-api_mouseevent_buttons
+    if (this.mouseDown && e.buttons !== 1) {
+      // 防止异常情况导致mouseup事件没有触发
+      this.onmouseup(e);
+      return;
+    }
+
     if (this.mouseDown && this.moveIn.type === MoveInType.None) {
       let b = false;
       switch (this.options.translateKey) {
@@ -634,7 +642,11 @@ export class Topology {
     this.scheduledAnimationFrame = true;
     const canvasPos = this.divLayer.canvas.getBoundingClientRect() as DOMRect;
     const pos = new Point(e.x - canvasPos.x, e.y - canvasPos.y);
-    requestAnimationFrame(() => {
+
+    if (this.raf) cancelAnimationFrame(this.raf);
+    this.raf = requestAnimationFrame(() => {
+      this.raf = null;
+
       if (!this.mouseDown) {
         this.getMoveIn(pos);
 
@@ -938,7 +950,7 @@ export class Topology {
     }
 
     this.render();
-  };
+  }
 
   private onmouseup = (e: MouseEvent) => {
     if (!this.mouseDown) return;
