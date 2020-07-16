@@ -2015,11 +2015,27 @@ export class Topology {
     });
   }
 
+  up(pen: Pen) {
+    const i = this.findIndex(pen);
+    if (i > -1 && i !== this.data.pens.length - 1) {
+      this.data.pens.splice(i + 2, 0, this.data.pens[i]);
+      this.data.pens.splice(i, 1);
+    }
+  }
+
   top(pen: Pen) {
     const i = this.findIndex(pen);
     if (i > -1) {
       this.data.pens.push(this.data.pens[i]);
       this.data.pens.splice(i, 1);
+    }
+  }
+
+  down(pen: Pen) {
+    const i = this.findIndex(pen);
+    if (i > -1 && i !== 0) {
+      this.data.pens.splice(i - 1, 0, this.data.pens[i]);
+      this.data.pens.splice(i + 1, 1);
     }
   }
 
