@@ -853,7 +853,7 @@ export class Topology {
       // Click a line.
       case MoveInType.Line:
       case MoveInType.LineControlPoint:
-        if (e.ctrlKey) {
+        if (e.ctrlKey || e.shiftKey) {
           this.activeLayer.add(this.moveIn.hoverLine);
           this.dispatch("multi", this.activeLayer.pens);
         } else {
@@ -909,7 +909,7 @@ export class Topology {
           break;
         }
 
-        if (e.ctrlKey) {
+        if (e.ctrlKey || e.shiftKey) {
           if (
             this.moveIn.hoverNode &&
             this.activeLayer.hasInAll(this.moveIn.hoverNode)
@@ -924,7 +924,7 @@ export class Topology {
               this.dispatch("node", this.moveIn.activeNode);
             }
           }
-        } else if (e.shiftKey || e.altKey) {
+        } else if (e.altKey) {
           if (this.moveIn.hoverNode) {
             this.activeLayer.setPens([this.moveIn.hoverNode]);
             this.dispatch("node", this.moveIn.hoverNode);
