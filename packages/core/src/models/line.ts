@@ -307,7 +307,7 @@ export class Line extends Pen {
     const height =
       this.font.lineHeight *
       this.font.fontSize *
-      (this.textMaxLine || this.text.split("\n").length || 1);
+      (this.textMaxLine || (this.text && this.text.split("\n").length) || 1);
     this.textRect = new Rect(
       center.x - width / 2,
       center.y - height / 2,
@@ -317,9 +317,8 @@ export class Line extends Pen {
   }
 
   getTextRect() {
-    if (!this.textRect) {
-      this.calcTextRect();
-    }
+    // calc every time just in case text line is changed.
+    this.calcTextRect();
     return this.textRect;
   }
 
