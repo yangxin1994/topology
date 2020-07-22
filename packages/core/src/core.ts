@@ -1516,7 +1516,7 @@ export class Topology {
     return angle;
   }
 
-  private showInput(item: Pen) {
+  showInput(item: Pen) {
     if (
       this.data.locked ||
       item.locked ||
@@ -1969,7 +1969,7 @@ export class Topology {
     cache && this.cache();
   }
 
-  lock(lock: number) {
+  lock(lock: Lock) {
     this.data.locked = lock;
     for (const item of this.data.pens) {
       (item as any).addToDiv && (item as any).addToDiv();

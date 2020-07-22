@@ -15,10 +15,10 @@ export enum PenType {
 }
 
 export abstract class Pen {
-  private TID: string;
-  id = '';
+  TID: string;
+  id: string;
   type = PenType.Node;
-  name = '';
+  name: string;
   tags: string[];
   rect: Rect = new Rect(0, 0, 0, 0);
   lineWidth = 1;
