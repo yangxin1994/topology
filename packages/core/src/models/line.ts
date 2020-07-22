@@ -331,8 +331,8 @@ export class Line extends Pen {
       case "polyline":
         const i = Math.floor(this.controlPoints.length / 2);
         center = this.getLineCenter(
-          this.controlPoints[i - 1],
-          this.controlPoints[i]
+          this.controlPoints[i - 1] || this.from,
+          this.controlPoints[i] || this.to
         );
         break;
       case "curve":
@@ -410,7 +410,7 @@ export class Line extends Pen {
     this.rectInParent = {
       x:
         ((this.from.x - parent.rect.x - parent.paddingLeftNum) * 100) /
-          parentW +
+        parentW +
         "%",
       y:
         ((this.from.y - parent.rect.y - parent.paddingTopNum) * 100) / parentH +
