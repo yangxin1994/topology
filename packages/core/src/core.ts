@@ -95,6 +95,7 @@ export class Topology {
   needCache = false;
 
   private tip = "";
+  private raf: number;
   tipMarkdown: HTMLElement;
   tipElem: HTMLElement;
 
@@ -586,6 +587,13 @@ export class Topology {
       return;
     }
 
+    // https://caniuse.com/#feat=mdn-api_mouseevent_buttons
+    if (this.mouseDown && e.buttons !== 1) {
+      // 防止异常情况导致mouseup事件没有触发
+      this.onmouseup(e);
+      return;
+    }
+
     if (this.mouseDown && this.moveIn.type === MoveInType.None) {
       let b = false;
       switch (this.options.translateKey) {
@@ -634,7 +642,11 @@ export class Topology {
     this.scheduledAnimationFrame = true;
     const canvasPos = this.divLayer.canvas.getBoundingClientRect() as DOMRect;
     const pos = new Point(e.x - canvasPos.x, e.y - canvasPos.y);
-    requestAnimationFrame(() => {
+
+    if (this.raf) cancelAnimationFrame(this.raf);
+    this.raf = requestAnimationFrame(() => {
+      this.raf = null;
+
       if (!this.mouseDown) {
         this.getMoveIn(pos);
 
@@ -819,6 +831,8 @@ export class Topology {
   };
 
   private onmousedown = (e: MouseEvent) => {
+    if (e.button !== 0) return;
+
     const canvasPos = this.divLayer.canvas.getBoundingClientRect() as DOMRect;
     this.mouseDown = { x: e.x - canvasPos.x, y: e.y - canvasPos.y };
     if (e.altKey) {
@@ -839,7 +853,7 @@ export class Topology {
       // Click a line.
       case MoveInType.Line:
       case MoveInType.LineControlPoint:
-        if (e.ctrlKey) {
+        if (e.ctrlKey || e.shiftKey) {
           this.activeLayer.add(this.moveIn.hoverLine);
           this.dispatch("multi", this.activeLayer.pens);
         } else {
@@ -895,7 +909,7 @@ export class Topology {
           break;
         }
 
-        if (e.ctrlKey) {
+        if (e.ctrlKey || e.shiftKey) {
           if (
             this.moveIn.hoverNode &&
             this.activeLayer.hasInAll(this.moveIn.hoverNode)
@@ -910,7 +924,7 @@ export class Topology {
               this.dispatch("node", this.moveIn.activeNode);
             }
           }
-        } else if (e.shiftKey || e.altKey) {
+        } else if (e.altKey) {
           if (this.moveIn.hoverNode) {
             this.activeLayer.setPens([this.moveIn.hoverNode]);
             this.dispatch("node", this.moveIn.hoverNode);
@@ -936,9 +950,11 @@ export class Topology {
     }
 
     this.render();
-  };
+  }
 
   private onmouseup = (e: MouseEvent) => {
+    if (!this.mouseDown) return;
+
     this.mouseDown = null;
     this.lastTranlated.x = 0;
     this.lastTranlated.y = 0;
@@ -1839,14 +1855,16 @@ export class Topology {
     this.clipboard = new TopologyData({
       pens: [],
     });
-    for (const pen of this.activeLayer.pens) {
+    for (let i = 0; i < this.activeLayer.pens.length; i++) {
+      const pen = this.activeLayer.pens[i];
       this.clipboard.pens.push(pen.clone());
-      const i = this.findIndex(pen);
-      if (i > -1) {
+      const found = this.findIndex(pen);
+      if (found > -1) {
         if (pen.type === PenType.Node) {
-          this.divLayer.removeDiv(this.data.pens[i] as Node);
+          this.divLayer.removeDiv(this.data.pens[found] as Node);
         }
-        this.data.pens.splice(i, 1);
+        this.data.pens.splice(found, 1);
+        --i;
       }
     }
 
@@ -1926,10 +1944,12 @@ export class Topology {
       this.dispatch("multi", {
         pens: this.clipboard.pens,
       });
-    } else if (this.activeLayer.pens[0].type === PenType.Node) {
-      this.dispatch("addNode", this.activeLayer.pens[0]);
-    } else if (this.activeLayer.pens[0].type === PenType.Line) {
-      this.dispatch("addLine", this.activeLayer.pens[0]);
+    } else if (this.activeLayer.pens.length > 0) {
+      if (this.activeLayer.pens[0].type === PenType.Node) {
+        this.dispatch("addNode", this.activeLayer.pens[0]);
+      } else if (this.activeLayer.pens[0].type === PenType.Line) {
+        this.dispatch("addLine", this.activeLayer.pens[0]);
+      }
     }
   }
 
@@ -1995,11 +2015,27 @@ export class Topology {
     });
   }
 
+  up(pen: Pen) {
+    const i = this.findIndex(pen);
+    if (i > -1 && i !== this.data.pens.length - 1) {
+      this.data.pens.splice(i + 2, 0, this.data.pens[i]);
+      this.data.pens.splice(i, 1);
+    }
+  }
+
   top(pen: Pen) {
     const i = this.findIndex(pen);
     if (i > -1) {
       this.data.pens.push(this.data.pens[i]);
       this.data.pens.splice(i, 1);
+    }
+  }
+
+  down(pen: Pen) {
+    const i = this.findIndex(pen);
+    if (i > -1 && i !== 0) {
+      this.data.pens.splice(i - 1, 0, this.data.pens[i]);
+      this.data.pens.splice(i + 1, 1);
     }
   }
 
