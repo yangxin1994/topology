@@ -62,4 +62,8 @@ export class Point {
     this.y = y;
     return this;
   }
+
+  isSameAs(pt: Point) {
+    return this.anchorIndex === pt.anchorIndex && this.direction === pt.direction && this.id === pt.id;
+  }
 }
