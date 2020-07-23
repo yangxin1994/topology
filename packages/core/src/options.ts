@@ -40,6 +40,7 @@ export interface Options {
   onlySizeY?: boolean;
   alwaysAnchor?: boolean;
   disableEmptyLine?: boolean;
+  disableRepeatLine?: boolean;
   disableScale?: boolean;
   disableMoveOutParent?: boolean;
   disableDockLine?: boolean;

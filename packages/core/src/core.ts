@@ -286,7 +286,7 @@ export class Topology {
       this.resize();
       this.overflow();
     }, 100);
-  };
+  }
 
   resize(size?: { width: number; height: number }) {
     this.canvas.resize(size);
@@ -828,7 +828,7 @@ export class Topology {
       this.render();
       this.scheduledAnimationFrame = false;
     });
-  };
+  }
 
   private onmousedown = (e: MouseEvent) => {
     if (e.button !== 0) return;
@@ -975,7 +975,24 @@ export class Topology {
         case MoveInType.HoverAnchors:
           // New active.
           if (this.hoverLayer.line) {
-            if (this.hoverLayer.line.to.id || !this.options.disableEmptyLine) {
+            let willAddLine: boolean;
+            if (this.hoverLayer.line.to.id) {
+              if (!this.options.disableRepeatLine) {
+                willAddLine = true;
+              } else {
+                const lines = this.data.pens.filter(
+                  (pen) =>
+                    pen.type === PenType.Line &&
+                    (pen as Line).from.isSameAs(this.hoverLayer.line.from) &&
+                    (pen as Line).to.isSameAs(this.hoverLayer.line.to)
+                );
+                willAddLine = lines.length <= 1;
+              }
+            } else {
+              willAddLine = !this.options.disableEmptyLine;
+            }
+
+            if (willAddLine) {
               this.activeLayer.pens = [this.hoverLayer.line];
               this.dispatch("addLine", this.hoverLayer.line);
             } else {
@@ -1020,7 +1037,7 @@ export class Topology {
       this.cache();
     }
     this.needCache = false;
-  };
+  }
 
   private ondblclick = (e: MouseEvent) => {
     const canvasPos = this.divLayer.canvas.getBoundingClientRect() as DOMRect;
@@ -1054,7 +1071,7 @@ export class Topology {
 
       this.moveIn.hoverLine.dblclick();
     }
-  };
+  }
 
   private onkeydown = (key: KeyboardEvent) => {
     if (
@@ -1149,7 +1166,7 @@ export class Topology {
 
     this.render();
     this.cache();
-  };
+  }
 
   private getMoveIn(pt: Point) {
     this.lastHoverNode = this.moveIn.hoverNode;
