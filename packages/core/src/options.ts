@@ -52,6 +52,7 @@ export interface Options {
   scaleKey?: KeyType;
   minScale?: number;
   maxScale?: number;
+  autoExpandDistance?: number;
   keydown?: KeydownType;
   on?: (event: string, data: any) => void;
 }
@@ -74,5 +75,6 @@ export const DefalutOptions: Options = {
   hoverCursor: 'pointer',
   minScale: 0.25,
   maxScale: 5,
+  autoExpandDistance: 200,
   keydown: KeydownType.Document
 };

@@ -735,6 +735,46 @@ export class Node extends Pen {
     this.font.fontSize *= scale;
     this.font.lineHeight *= scale;
     this.iconSize *= scale;
+    if (typeof this.paddingLeft === 'number') {
+      this.paddingLeft *= scale;
+    }
+    if (typeof this.paddingTop === 'number') {
+      this.paddingTop *= scale;
+    }
+    if (typeof this.paddingRight === 'number') {
+      this.paddingRight *= scale;
+    }
+    if (typeof this.paddingBottom === 'number') {
+      this.paddingBottom *= scale;
+    }
+
+    if (this.rectInParent) {
+      if (typeof this.rectInParent.x === 'number') {
+        this.rectInParent.x *= scale;
+      }
+      if (typeof this.rectInParent.y === 'number') {
+        this.rectInParent.y *= scale;
+      }
+      if (typeof this.rectInParent.width === 'number') {
+        this.rectInParent.width *= scale;
+      }
+      if (typeof this.rectInParent.height === 'number') {
+        this.rectInParent.height *= scale;
+      }
+      if (typeof this.rectInParent.marginLeft === 'number') {
+        this.rectInParent.marginLeft *= scale;
+      }
+      if (typeof this.rectInParent.marginTop === 'number') {
+        this.rectInParent.marginTop *= scale;
+      }
+      if (typeof this.rectInParent.marginRight === 'number') {
+        this.rectInParent.marginRight *= scale;
+      }
+      if (typeof this.rectInParent.marginBottom === 'number') {
+        this.rectInParent.marginBottom *= scale;
+      }
+    }
+
     this.rect.calcCenter();
 
     if (this.animateFrames && this.animateFrames.length) {

@@ -348,7 +348,7 @@ export abstract class Pen {
   }
 
   private link(url: string, params: string) {
-    window.open(url, '_blank');
+    window.open(url, params === undefined ? '_blank' : params);
   }
 
   private doAnimate(tag: string, params: string) {
