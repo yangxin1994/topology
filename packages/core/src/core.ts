@@ -73,7 +73,7 @@ export class Topology {
   lastHoverLine: Line;
   input = document.createElement('textarea');
   inputObj: Pen;
-  mouseDown: { x: number; y: number };
+  mouseDown: { x: number; y: number; restore?: boolean };
   lastTranlated = { x: 0, y: 0 };
   moveIn: {
     type: MoveInType;
@@ -596,7 +596,7 @@ export class Topology {
     }
 
     // https://caniuse.com/#feat=mdn-api_mouseevent_buttons
-    if (this.mouseDown && e.buttons !== 1) {
+    if (this.mouseDown && !this.mouseDown.restore && e.buttons !== 1) {
       // 防止异常情况导致mouseup事件没有触发
       this.onmouseup(e);
       return;

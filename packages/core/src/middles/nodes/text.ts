@@ -32,7 +32,12 @@ export function getWords(txt: string) {
 // getLines：Get lines of drawing text.
 // words - the word array of text, to avoid spliting a word.
 // maxWidth - the max width of the rect.
-export function getLines(ctx: CanvasRenderingContext2D, words: string[], maxWidth: number, fontSize: number) {
+export function getLines(
+  ctx: CanvasRenderingContext2D,
+  words: string[],
+  maxWidth: number,
+  fontSize: number
+) {
   const lines = [];
   let currentLine = words[0] || '';
   for (let i = 1; i < words.length; ++i) {
@@ -40,7 +45,10 @@ export function getLines(ctx: CanvasRenderingContext2D, words: string[], maxWidt
     const text = currentLine + word;
     const chinese = text.match(/[\u4e00-\u9fa5]/g) || '';
     const chineseLen = chinese.length;
-    if ((text.length - chineseLen) * fontSize * 0.5 + chineseLen * fontSize < maxWidth) {
+    if (
+      (text.length - chineseLen) * fontSize * 0.5 + chineseLen * fontSize <
+      maxWidth
+    ) {
       currentLine += word;
     } else {
       lines.push(currentLine);
@@ -51,9 +59,14 @@ export function getLines(ctx: CanvasRenderingContext2D, words: string[], maxWidt
   return lines;
 }
 
-function textBk(ctx: CanvasRenderingContext2D, str: string, x: number,
+function textBk(
+  ctx: CanvasRenderingContext2D,
+  str: string,
+  x: number,
   y: number,
-  height: number, color?: string) {
+  height: number,
+  color?: string
+) {
   if (!str || !color) {
     return;
   }
@@ -110,7 +123,9 @@ export function fillText(
   if (maxLineLen < lines.length) {
     let str = (lines[maxLineLen - 1] || '') + '...';
     if (lines[maxLineLen - 1] && ctx.measureText(str).width > width) {
-      str = lines[maxLineLen - 1].substr(0, lines[maxLineLen - 1].length - 2) + '...';
+      str =
+        lines[maxLineLen - 1].substr(0, lines[maxLineLen - 1].length - 2) +
+        '...';
     }
     if (bk) {
       textBk(ctx, str, x, y + (maxLineLen - 1) * lineHeight, lineHeight, bk);
@@ -118,7 +133,14 @@ export function fillText(
     ctx.fillText(str, x, y + (maxLineLen - 1) * lineHeight);
   } else {
     if (bk) {
-      textBk(ctx, lines[maxLineLen - 1], x, y + (maxLineLen - 1) * lineHeight, lineHeight, bk);
+      textBk(
+        ctx,
+        lines[maxLineLen - 1],
+        x,
+        y + (maxLineLen - 1) * lineHeight,
+        lineHeight,
+        bk
+      );
     }
     ctx.fillText(lines[maxLineLen - 1], x, y + (maxLineLen - 1) * lineHeight);
   }
@@ -128,14 +150,17 @@ export function text(ctx: CanvasRenderingContext2D, node: Node | Line) {
   if (!node.text) {
     return;
   }
+  if (!node.text.split) {
+    node.text += '';
+  }
 
   ctx.save();
   ctx.beginPath();
   delete ctx.shadowColor;
   delete ctx.shadowBlur;
-  ctx.font = `${node.font.fontStyle || 'normal'} normal ${node.font.fontWeight || 'normal'} ${node.font.fontSize}px/${
-    node.font.lineHeight
-    } ${node.font.fontFamily}`;
+  ctx.font = `${node.font.fontStyle || 'normal'} normal ${
+    node.font.fontWeight || 'normal'
+  } ${node.font.fontSize}px/${node.font.lineHeight} ${node.font.fontFamily}`;
 
   if (node.font.color) {
     ctx.fillStyle = node.font.color;
@@ -153,7 +178,12 @@ export function text(ctx: CanvasRenderingContext2D, node: Node | Line) {
   const lines = [];
   const paragraphs = node.text.split(/[\n,]/g);
   for (let i = 0; i < paragraphs.length; ++i) {
-    const l = getLines(ctx, getWords(paragraphs[i]), textRect.width, node.font.fontSize);
+    const l = getLines(
+      ctx,
+      getWords(paragraphs[i]),
+      textRect.width,
+      node.font.fontSize
+    );
     lines.push.apply(lines, l);
   }
 
@@ -166,7 +196,10 @@ export function text(ctx: CanvasRenderingContext2D, node: Node | Line) {
 
   // By default, the text is center aligned.
   let x = textRect.x + textRect.width / 2;
-  let y = textRect.y + (textRect.height - lineHeight * maxLineLen) / 2 + (lineHeight * 4) / 7;
+  let y =
+    textRect.y +
+    (textRect.height - lineHeight * maxLineLen) / 2 +
+    (lineHeight * 4) / 7;
   switch (ctx.textAlign) {
     case 'left':
       x = textRect.x;
@@ -183,9 +216,17 @@ export function text(ctx: CanvasRenderingContext2D, node: Node | Line) {
       y = textRect.ey - lineHeight * lines.length + lineHeight;
       break;
   }
-  fillText(ctx, lines,
-    x + node.textOffsetX, y + node.textOffsetY, textRect.width, textRect.height, lineHeight, maxLineLen,
-    node.font.background);
+  fillText(
+    ctx,
+    lines,
+    x + node.textOffsetX,
+    y + node.textOffsetY,
+    textRect.width,
+    textRect.height,
+    lineHeight,
+    maxLineLen,
+    node.font.background
+  );
   ctx.restore();
 }
 
