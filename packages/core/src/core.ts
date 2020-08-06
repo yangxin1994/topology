@@ -918,6 +918,14 @@ export class Topology {
           toArrow: this.data.toArrowType,
           strokeStyle: this.options.color,
         });
+        this.dispatch('anchor', {
+          anchor: this.moveIn.hoverNode.rotatedAnchors[
+            this.moveIn.hoverAnchorIndex
+          ],
+          anchorIndex: this.moveIn.hoverAnchorIndex,
+          node: this.moveIn.hoverNode,
+          line: this.hoverLayer.line,
+        });
 
       // tslint:disable-next-line:no-switch-case-fall-through
       case MoveInType.Nodes:
@@ -1058,9 +1066,7 @@ export class Topology {
   private ondblclick = (e: MouseEvent) => {
     const canvasPos = this.divLayer.canvas.getBoundingClientRect() as DOMRect;
     if (this.moveIn.hoverNode) {
-      this.dispatch('dblclick', {
-        node: this.moveIn.hoverNode,
-      });
+      this.dispatch('dblclick', this.moveIn.hoverNode);
 
       if (
         this.moveIn.hoverNode
@@ -1072,9 +1078,7 @@ export class Topology {
 
       this.moveIn.hoverNode.dblclick();
     } else if (this.moveIn.hoverLine) {
-      this.dispatch('dblclick', {
-        line: this.moveIn.hoverLine,
-      });
+      this.dispatch('dblclick', this.moveIn.hoverLine);
 
       if (
         !this.moveIn.hoverLine.text ||
