@@ -2173,22 +2173,22 @@ export class Topology {
       pens = this.data.pens;
     }
 
-    let pen: Pen;
+    const result: Pen[] = [];
     pens.forEach((item) => {
       if (item.id === idOrTag || item.tags.indexOf(idOrTag) > -1) {
-        pen = item;
-        return;
+        result.push(item);
       }
 
       if ((item as any).children) {
-        pen = this.find(idOrTag, (item as any).children);
-        if (pen) {
-          return;
-        }
+        result.push.apply(result, this.find(idOrTag, (item as any).children));
       }
     });
 
-    return pen;
+    if (result.length === 1) {
+      return result[0];
+    }
+
+    return result;
   }
 
   findIndex(pen: Pen) {
