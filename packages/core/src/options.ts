@@ -3,7 +3,7 @@ export enum KeyType {
   CtrlOrAlt,
   Ctrl,
   Shift,
-  Alt
+  Alt,
 }
 
 export enum KeydownType {
@@ -20,6 +20,10 @@ export interface Options {
   color?: string;
   activeColor?: string;
   hoverColor?: string;
+  anchorRadius?: number;
+  anchorFillStyle?: string;
+  dockStrokeStyle?: string;
+  dockFillStyle?: string;
   dragColor?: string;
   animateColor?: string;
   font?: {
@@ -61,14 +65,19 @@ export const DefalutOptions: Options = {
   cacheLen: 30,
   font: {
     color: '#222',
-    fontFamily: '"Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial',
+    fontFamily:
+      '"Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial',
     fontSize: 12,
     lineHeight: 1.5,
     textAlign: 'center',
-    textBaseline: 'middle'
+    textBaseline: 'middle',
   },
   color: '#222',
   hoverColor: '#fa541c',
+  anchorRadius: 4,
+  anchorFillStyle: '#fff',
+  dockStrokeStyle: '#fa541c',
+  dockFillStyle: '#fa541c',
   dragColor: '#1890ff',
   activeColor: '#1890ff',
   rotateCursor: '/assets/img/rotate.cur',
@@ -76,5 +85,5 @@ export const DefalutOptions: Options = {
   minScale: 0.25,
   maxScale: 5,
   autoExpandDistance: 200,
-  keydown: KeydownType.Document
+  keydown: KeydownType.Document,
 };

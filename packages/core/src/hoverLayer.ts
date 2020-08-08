@@ -12,9 +12,6 @@ import { Layer } from './layer';
 export class HoverLayer extends Layer {
   protected data: TopologyData;
 
-  anchorRadius = 4;
-  anchorFillStyle = '#fff';
-
   line: Line;
   // for move line.
   initLine: Line;
@@ -88,9 +85,10 @@ export class HoverLayer extends Layer {
     if (this.data.locked === Lock.NoEvent) {
       return;
     }
+
+    ctx.fillStyle = this.options.hoverColor;
+
     ctx.save();
-    ctx.strokeStyle = this.options.hoverColor;
-    ctx.fillStyle = this.anchorFillStyle;
     // anchors
     if (this.options.alwaysAnchor) {
       this.data.pens.forEach((pen: Pen) => {
@@ -110,15 +108,18 @@ export class HoverLayer extends Layer {
           ctx.arc(
             anchor.x,
             anchor.y,
-            anchor.radius || this.anchorRadius,
+            anchor.radius || this.options.anchorRadius,
             0,
             Math.PI * 2
           );
+          ctx.strokeStyle = anchor.strokeStyle || this.options.hoverColor;
+          ctx.fillStyle = anchor.fillStyle || this.options.anchorFillStyle;
           ctx.fill();
           ctx.stroke();
         }
       });
     }
+    ctx.restore();
 
     if (this.node && !this.data.locked) {
       if (!this.node.getTID()) {
@@ -159,21 +160,36 @@ export class HoverLayer extends Layer {
           ctx.arc(
             this.node.rotatedAnchors[i].x,
             this.node.rotatedAnchors[i].y,
-            this.node.rotatedAnchors[i].radius || this.anchorRadius,
+            this.node.rotatedAnchors[i].radius || this.options.anchorRadius,
             0,
             Math.PI * 2
           );
+          ctx.strokeStyle =
+            this.node.rotatedAnchors[i].strokeStyle || this.options.hoverColor;
+          ctx.fillStyle =
+            this.node.rotatedAnchors[i].fillStyle ||
+            this.options.anchorFillStyle;
           ctx.fill();
           ctx.stroke();
         }
       }
     }
 
-    ctx.fillStyle = this.options.hoverColor;
     if (this.dockAnchor) {
+      ctx.save();
       ctx.beginPath();
-      ctx.arc(this.dockAnchor.x, this.dockAnchor.y, 4, 0, Math.PI * 2);
+      ctx.arc(
+        this.dockAnchor.x,
+        this.dockAnchor.y,
+        this.dockAnchor.radius || this.options.anchorRadius,
+        0,
+        Math.PI * 2
+      );
+      ctx.strokeStyle = this.options.dockStrokeStyle;
+      ctx.fillStyle = this.options.dockFillStyle;
       ctx.fill();
+      ctx.stroke();
+      ctx.restore();
     }
 
     if (this.hoverLineCP) {
@@ -219,8 +235,6 @@ export class HoverLayer extends Layer {
         this.dragRect.height
       );
     }
-
-    ctx.restore();
   }
 
   getRoot(node: Node) {

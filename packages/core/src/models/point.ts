@@ -7,6 +7,7 @@ export class Point {
   direction: Direction;
   // The index of docker anchor on node.
   radius: number;
+  strokeStyle: string;
   fillStyle: string;
   anchorIndex: number;
 
