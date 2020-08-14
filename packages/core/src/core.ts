@@ -916,7 +916,7 @@ export class Topology {
             this.moveIn.hoverNode.rotatedAnchors[this.moveIn.hoverAnchorIndex].y
           ),
           toArrow: this.data.toArrowType,
-          strokeStyle: this.options.color,
+          strokeStyle: this.options.color
         });
         this.dispatch('anchor', {
           anchor: this.moveIn.hoverNode.rotatedAnchors[
@@ -1013,9 +1013,9 @@ export class Topology {
                 willAddLine = lines.length <= 1;
               }
             } else {
-              willAddLine = !this.options.disableEmptyLine;
+              willAddLine = !this.options.disableEmptyLine && !this.hoverLayer.line.disableEmptyLine;
             }
-
+            
             if (willAddLine) {
               this.activeLayer.pens = [this.hoverLayer.line];
               this.dispatch('addLine', this.hoverLayer.line);
@@ -1043,7 +1043,7 @@ export class Topology {
         case MoveInType.LineFrom:
         case MoveInType.LineTo:
           if (
-            this.hoverLayer.line.disableEmptyLine &&
+            (this.hoverLayer.line.disableEmptyLine || this.options.disableEmptyLine) &&
             (!this.hoverLayer.line.from.id || !this.hoverLayer.line.to.id)
           ) {
             this.needCache = true;
