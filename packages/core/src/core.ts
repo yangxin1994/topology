@@ -2340,6 +2340,17 @@ export class Topology {
     this.gridElem.style.display = show ? 'block' : 'none';
   }
 
+  setLineName(name: 'curve' | 'line' | 'polyline' | 'mind', render = true) {
+    this.data.pens.forEach((pen: Pen) => {
+      if (pen.type) {
+        (pen as Line).name = name;
+        (pen as Line).calcControlPoints();
+      }
+    });
+
+    render && this.render();
+  }
+
   destroy() {
     this.subcribe.unsubscribe();
     this.subcribeRender.unsubscribe();
