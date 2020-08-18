@@ -942,7 +942,7 @@ export class Topology {
                 willAddLine = lines.length <= 1;
               }
             } else {
-              willAddLine = !this.options.disableEmptyLine;
+              willAddLine = !this.options.disableEmptyLine && !this.hoverLayer.line.disableEmptyLine;
             }
 
             if (willAddLine) {
@@ -968,7 +968,10 @@ export class Topology {
 
         case MoveInType.LineFrom:
         case MoveInType.LineTo:
-          if (this.hoverLayer.line.disableEmptyLine && (!this.hoverLayer.line.from.id || !this.hoverLayer.line.to.id)) {
+          if (
+            (this.hoverLayer.line.disableEmptyLine || this.options.disableEmptyLine) &&
+            (!this.hoverLayer.line.from.id || !this.hoverLayer.line.to.id)
+          ) {
             this.needCache = true;
             this.activeLayer.clear();
             this.data.pens.splice(this.findIndex(this.hoverLayer.line), 1);
