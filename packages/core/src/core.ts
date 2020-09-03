@@ -1096,6 +1096,7 @@ export class Topology {
     }
 
     key.preventDefault();
+    key.stopPropagation();
 
     if (moveX || moveY) {
       this.activeLayer.saveNodeRects();

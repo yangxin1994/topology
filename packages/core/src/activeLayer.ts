@@ -31,8 +31,8 @@ export class ActiveLayer extends Layer {
   // 备份初始位置，方便移动事件处理
   initialSizeCPs: Point[] = [];
   nodeRects: Rect[] = [];
-  childrenRects: { [key: string]: Rect; } = {};
-  childrenRotate: { [key: string]: number; } = {};
+  childrenRects: { [key: string]: Rect } = {};
+  childrenRotate: { [key: string]: number } = {};
 
   // nodes移动时，停靠点的参考位置
   dockWatchers: Point[] = [];
@@ -51,7 +51,7 @@ export class ActiveLayer extends Layer {
       this.sizeCPs = this.pens[0].rect.toPoints();
       this.rotateCPs = [
         new Point(this.pens[0].rect.x + this.pens[0].rect.width / 2, this.pens[0].rect.y - 35),
-        new Point(this.pens[0].rect.x + this.pens[0].rect.width / 2, this.pens[0].rect.y)
+        new Point(this.pens[0].rect.x + this.pens[0].rect.width / 2, this.pens[0].rect.y),
       ];
 
       if (this.rotate || this.pens[0].rotate) {
@@ -181,7 +181,7 @@ export class ActiveLayer extends Layer {
 
   // pt1 - the point of mouse down.
   // pt2 - the point of mouse move.
-  resize(type: number, pt1: { x: number; y: number; }, pt2: { x: number; y: number; }) {
+  resize(type: number, pt1: { x: number; y: number }, pt2: { x: number; y: number }) {
     const p1 = new Point(pt1.x, pt1.y);
     const p2 = new Point(pt2.x, pt2.y);
     if (this.pens.length === 1 && this.pens[0].rotate % 360) {
@@ -298,7 +298,6 @@ export class ActiveLayer extends Layer {
       }
 
       if (item instanceof Line) {
-
       }
 
       ++i;
@@ -353,12 +352,12 @@ export class ActiveLayer extends Layer {
       }
       for (const item of nodes) {
         let cnt = 0;
-        if (line.from.id === item.id) {
+        if (line.from.id === item.id && item.rotatedAnchors[line.from.anchorIndex]) {
           line.from.x = item.rotatedAnchors[line.from.anchorIndex].x;
           line.from.y = item.rotatedAnchors[line.from.anchorIndex].y;
           ++cnt;
         }
-        if (line.to.id === item.id) {
+        if (line.to.id === item.id && item.rotatedAnchors[line.to.anchorIndex]) {
           line.to.x = item.rotatedAnchors[line.to.anchorIndex].x;
           line.to.y = item.rotatedAnchors[line.to.anchorIndex].y;
           ++cnt;
@@ -489,7 +488,7 @@ export class ActiveLayer extends Layer {
     if (!this.pens.length) {
       return;
     }
-    this.pens.forEach(pen => {
+    this.pens.forEach((pen) => {
       if (!pen.getTID()) {
         pen.setTID(this.TID);
       }
@@ -620,5 +619,4 @@ export class ActiveLayer extends Layer {
     this.dockWatchers = this.rect.toPoints();
     this.dockWatchers.unshift(this.rect.center);
   }
-
 }

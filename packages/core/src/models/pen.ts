@@ -1,4 +1,3 @@
-
 import { Store } from 'le5le-store';
 
 import { s8 } from '../utils/uuid';
@@ -41,7 +40,7 @@ export abstract class Pen {
     fontWeight: 'normal',
     textAlign: 'center',
     textBaseline: 'middle',
-    background: ''
+    background: '',
   };
 
   text: string;
@@ -81,7 +80,7 @@ export abstract class Pen {
   tipId: string;
   title: string;
 
-  events: { type: EventType; action: EventAction; value: string; params: string; name?: string; }[] = [];
+  events: { type: EventType; action: EventAction; value: string; params: string; name?: string }[] = [];
   private eventFns: string[] = ['link', 'doAnimate', 'doFn', 'doWindowFn'];
 
   parentId: string;
@@ -293,7 +292,11 @@ export abstract class Pen {
     }
   }
 
-  doSocketMqtt(item: { type: EventType; action: EventAction; value: string; params: string; name?: string; }, msg: any, client: any) {
+  doSocketMqtt(
+    item: { type: EventType; action: EventAction; value: string; params: string; name?: string },
+    msg: any,
+    client: any
+  ) {
     if (item.action < EventAction.Function) {
       this[this.eventFns[item.action]](msg.value || msg || item.value, msg.params || item.params, client);
     } else if (item.action < EventAction.SetProps) {
@@ -304,7 +307,7 @@ export abstract class Pen {
       if (typeof msg === 'string') {
         try {
           data = JSON.parse(msg);
-        } catch (error) { }
+        } catch (error) {}
       }
       if (Array.isArray(data)) {
         props = data;
@@ -355,7 +358,7 @@ export abstract class Pen {
     this.animateStart = Date.now();
     Store.set(this.generateStoreKey('LT:AnimatePlay'), {
       tag,
-      pen: this
+      pen: this,
     });
   }
 
