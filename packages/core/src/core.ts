@@ -1,5 +1,6 @@
 import { Store, Observer } from 'le5le-store';
-
+// https://github.com/developit/mitt
+import { default as mitt, Emitter, EventType, Handler } from 'mitt';
 import { Options, KeyType, KeydownType, DefalutOptions } from './options';
 import { Pen, PenType } from './models/pen';
 import { Node } from './models/node';
@@ -102,12 +103,14 @@ export class Topology {
 
   socket: Socket;
   mqtt: MQTT;
+  _emitter: Emitter;
 
   private scheduledAnimationFrame = false;
   private scrolling = false;
   private rendering = false;
   constructor(parent: string | HTMLElement, options?: Options) {
     this.id = s8();
+    this._emitter = mitt();
     Store.set(this.generateStoreKey('topology-data'), this.data);
 
     if (!options) {
@@ -128,6 +131,7 @@ export class Topology {
 
     const id = this.id;
     this.activeLayer = new ActiveLayer(this.options, id);
+    this.activeLayer.topology = this;
     this.hoverLayer = new HoverLayer(this.options, id);
     this.animateLayer = new AnimateLayer(this.options, id);
     this.offscreen = new Offscreen(this.parentElem, this.options, id);
@@ -550,7 +554,7 @@ export class Topology {
       height = maxHeight + offset;
     }
     this.resize({ width, height });
-    return this;
+    return rect;
   }
 
   private setNodeText() {
@@ -2293,7 +2297,25 @@ export class Topology {
     if (this.options.on) {
       this.options.on(event, data);
     }
+    this.fire(event, data);
+    return this;
   }
+
+  on(eventType: EventType, handler: Handler) {
+    this._emitter.on(eventType, handler);
+    return this;
+  }
+
+  off(eventType: EventType, handler: Handler) {
+    this._emitter.off(eventType, handler);
+    return this;
+  }
+
+  fire(eventType: EventType, params: any) {
+    this._emitter.emit(eventType, params);
+    return this;
+  }
+
 
   getValue(idOrTag: string, attr = 'text') {
     let pen: Pen;
