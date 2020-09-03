@@ -84,14 +84,14 @@ export class Topology {
     activeNode: Node;
     lineControlPoint: Point;
   } = {
-    type: MoveInType.None,
-    activeAnchorIndex: 0,
-    hoverAnchorIndex: 0,
-    hoverNode: null,
-    hoverLine: null,
-    activeNode: null,
-    lineControlPoint: null,
-  };
+      type: MoveInType.None,
+      activeAnchorIndex: 0,
+      hoverAnchorIndex: 0,
+      hoverNode: null,
+      hoverLine: null,
+      activeNode: null,
+      lineControlPoint: null,
+    };
   needCache = false;
 
   private tip = '';
@@ -144,7 +144,7 @@ export class Topology {
         const obj = JSON.parse(json);
         event.preventDefault();
         this.dropNodes(Array.isArray(obj) ? obj : [obj], event.offsetX, event.offsetY);
-      } catch {}
+      } catch { }
     };
     this.subcribe = Store.subscribe(this.generateStoreKey('LT:render'), () => {
       this.render();
@@ -540,15 +540,17 @@ export class Topology {
   overflow() {
     const rect = this.getRect();
     let { width, height } = this.canvas;
-    if (width < rect.width) {
-      width = rect.width;
+    const maxWidth = Math.max(rect.width, rect.ex);
+    const maxHeight = Math.max(rect.height, rect.ey);
+    const offset = 50;
+    if (width < maxWidth) {
+      width = maxWidth + offset;
     }
-    if (height < rect.height) {
-      height = rect.height;
+    if (height < maxHeight) {
+      height = maxHeight + offset;
     }
     this.resize({ width, height });
-
-    return rect;
+    return this;
   }
 
   private setNodeText() {
