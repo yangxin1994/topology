@@ -1,5 +1,6 @@
 import { Store, Observer } from 'le5le-store';
-
+// https://github.com/developit/mitt
+import { default as mitt, Emitter, EventType, Handler } from 'mitt';
 import { Options, KeyType, KeydownType, DefalutOptions } from './options';
 import { Pen, PenType } from './models/pen';
 import { Node } from './models/node';
@@ -84,14 +85,14 @@ export class Topology {
     activeNode: Node;
     lineControlPoint: Point;
   } = {
-    type: MoveInType.None,
-    activeAnchorIndex: 0,
-    hoverAnchorIndex: 0,
-    hoverNode: null,
-    hoverLine: null,
-    activeNode: null,
-    lineControlPoint: null,
-  };
+      type: MoveInType.None,
+      activeAnchorIndex: 0,
+      hoverAnchorIndex: 0,
+      hoverNode: null,
+      hoverLine: null,
+      activeNode: null,
+      lineControlPoint: null,
+    };
   needCache = false;
 
   private tip = '';
@@ -102,12 +103,14 @@ export class Topology {
 
   socket: Socket;
   mqtt: MQTT;
+  _emitter: Emitter;
 
   private scheduledAnimationFrame = false;
   private scrolling = false;
   private rendering = false;
   constructor(parent: string | HTMLElement, options?: Options) {
     this.id = s8();
+    this._emitter = mitt();
     Store.set(this.generateStoreKey('topology-data'), this.data);
 
     if (!options) {
@@ -128,6 +131,7 @@ export class Topology {
 
     const id = this.id;
     this.activeLayer = new ActiveLayer(this.options, id);
+    this.activeLayer.topology = this;
     this.hoverLayer = new HoverLayer(this.options, id);
     this.animateLayer = new AnimateLayer(this.options, id);
     this.offscreen = new Offscreen(this.parentElem, this.options, id);
@@ -144,7 +148,7 @@ export class Topology {
         const obj = JSON.parse(json);
         event.preventDefault();
         this.dropNodes(Array.isArray(obj) ? obj : [obj], event.offsetX, event.offsetY);
-      } catch {}
+      } catch { }
     };
     this.subcribe = Store.subscribe(this.generateStoreKey('LT:render'), () => {
       this.render();
@@ -540,14 +544,16 @@ export class Topology {
   overflow() {
     const rect = this.getRect();
     let { width, height } = this.canvas;
-    if (width < rect.width) {
-      width = rect.width;
+    const maxWidth = Math.max(rect.width, rect.ex);
+    const maxHeight = Math.max(rect.height, rect.ey);
+    const offset = 50;
+    if (width < maxWidth) {
+      width = maxWidth + offset;
     }
-    if (height < rect.height) {
-      height = rect.height;
+    if (height < maxHeight) {
+      height = maxHeight + offset;
     }
     this.resize({ width, height });
-
     return rect;
   }
 
@@ -2292,7 +2298,25 @@ export class Topology {
     if (this.options.on) {
       this.options.on(event, data);
     }
+    this.fire(event, data);
+    return this;
   }
+
+  on(eventType: EventType, handler: Handler) {
+    this._emitter.on(eventType, handler);
+    return this;
+  }
+
+  off(eventType: EventType, handler: Handler) {
+    this._emitter.off(eventType, handler);
+    return this;
+  }
+
+  fire(eventType: EventType, params: any) {
+    this._emitter.emit(eventType, params);
+    return this;
+  }
+
 
   getValue(idOrTag: string, attr = 'text') {
     let pen: Pen;

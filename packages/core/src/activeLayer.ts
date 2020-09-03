@@ -13,6 +13,7 @@ import { drawLineFns } from './middles';
 import { getBezierPoint } from './middles/lines/curve';
 import { Layer } from './layer';
 import { flatNodes, getParent } from './utils';
+import { Topology } from './core';
 
 export class ActiveLayer extends Layer {
   protected data: TopologyData;
@@ -36,6 +37,7 @@ export class ActiveLayer extends Layer {
 
   // nodes移动时，停靠点的参考位置
   dockWatchers: Point[] = [];
+  topology: Topology;
 
   rotating = false;
 
@@ -305,9 +307,7 @@ export class ActiveLayer extends Layer {
 
     this.updateLines();
 
-    if (this.options.on) {
-      this.options.on('move', this.pens);
-    }
+    this.topology.dispatch('move', this.pens);
   }
 
   getLinesOfNode(node: Node) {
@@ -398,9 +398,7 @@ export class ActiveLayer extends Layer {
     }
     this.rotate = angle;
 
-    if (this.options.on) {
-      this.options.on('rotated', this.pens);
-    }
+    this.topology.dispatch('rotated', this.pens);
   }
 
   rotateChildren(node: Pen) {
