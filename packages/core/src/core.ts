@@ -1,7 +1,7 @@
 import { Store, Observer } from 'le5le-store';
 // https://github.com/developit/mitt
 import { default as mitt, Emitter, EventType, Handler } from 'mitt';
-import { Options, KeyType, KeydownType, DefalutOptions } from './options';
+import { Options, KeyType, KeydownType, DefalutOptions, Padding } from './options';
 import { Pen, PenType } from './models/pen';
 import { Node } from './models/node';
 import { Point } from './models/point';
@@ -19,6 +19,7 @@ import { Rect } from './models/rect';
 import { s8 } from './utils/uuid';
 import { pointInRect } from './utils/canvas';
 import { getRect } from './utils/rect';
+import { formatPadding } from './utils/padding';
 import { Socket } from './socket';
 import { MQTT } from './mqtt';
 
@@ -2137,6 +2138,68 @@ export class Topology {
         item.round();
       }
     }
+  }
+  
+   // 图形居中
+  centerView() {
+    if (!this.hasView()) return;
+    const rect = this.getRect();
+    const viewCenter = this.getViewCenter();
+    const { center } = rect;
+    this.translate(viewCenter.x - center.x, viewCenter.y - center.y);
+    const { parentElem } = this.canvas;
+    const x = (parentElem.scrollWidth - parentElem.offsetWidth) / 2;
+    const y = (parentElem.scrollHeight - parentElem.offsetHeight) / 2;
+    parentElem.scrollTo(x, y);
+    return true;
+  }
+
+  // 自适应画布
+  fitView() {
+    if (!this.hasView()) return;
+    // 1. 重置画布尺寸为容器尺寸
+    const { parentElem } = this.canvas;
+    const { offsetWidth: width, offsetHeight: height } = parentElem;
+    this.resize({
+      width,
+      height,
+    });
+    // 2. 图形居中
+    this.centerView();
+    // 3. 获取设置的留白值
+    const padding = this.getFormatPadding();
+    // 4. 获取图形尺寸
+    const rect = this.getRect();
+    // 6. 计算缩放比
+    const w = (width - padding[1] - padding[3]) / rect.width;
+    const h = (height - padding[0] - padding[2]) / rect.height;
+    let ratio = w;
+    if (w > h) {
+      ratio = h;
+    }
+    this.scale(w);
+  }
+
+  // 判断画布中是否有图形
+  private hasView() {
+    const rect = this.getRect();
+    return !(rect.width === 99999 || rect.height === 99999);
+  }
+
+  // 获取留白值
+  private getFormatPadding(): number[] {
+    const padding: Padding = this.options.fitViewPadding;
+    return formatPadding(padding);
+  }
+
+  // 获取画布的中心坐标
+  private getViewCenter() {
+    const padding = this.getFormatPadding();
+    const { width, height } = this.canvas;
+    return {
+      x: (width - padding[1] - padding[3]) / 2 + padding[3],
+      y: (height - padding[0] - padding[2]) / 2 + padding[0],
+    };
   }
 
   private generateStoreKey(key) {

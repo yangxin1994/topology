@@ -180,6 +180,12 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
           this.router.navigateByUrl(`/view?id=${this.data.id}${this.data.version ? '&version=' + this.data.version : ''}&r=1`);
         }
         break;
+      case "fitView":
+        this.canvas.fitView();
+        break;
+      case "centerView":
+        this.canvas.centerView();
+        break;
     }
   }
 
