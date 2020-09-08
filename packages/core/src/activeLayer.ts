@@ -347,30 +347,36 @@ export class ActiveLayer extends Layer {
 
     const nodes = flatNodes(pens);
     const lines: Line[] = [];
-    for (const line of this.data.pens) {
-      if (!(line instanceof Line)) {
-        continue;
-      }
-      for (const item of nodes) {
-        let cnt = 0;
-        if (line.from.id === item.id) {
-          line.from.x = item.rotatedAnchors[line.from.anchorIndex].x;
-          line.from.y = item.rotatedAnchors[line.from.anchorIndex].y;
-          ++cnt;
+    const collectionLine = function(pens: Array<any>, activeLayer: ActiveLayer) {
+      for (const line of pens) {
+        if (line.children){
+          collectionLine(line.children, activeLayer);
         }
-        if (line.to.id === item.id) {
-          line.to.x = item.rotatedAnchors[line.to.anchorIndex].x;
-          line.to.y = item.rotatedAnchors[line.to.anchorIndex].y;
-          ++cnt;
+        if (!(line instanceof Line)) {
+          continue;
         }
-        if (cnt && !this.data.manualCps) {
-          line.calcControlPoints();
+        for (const item of nodes) {
+          let cnt = 0;
+          if (line.from.id === item.id) {
+            line.from.x = item.rotatedAnchors[line.from.anchorIndex].x;
+            line.from.y = item.rotatedAnchors[line.from.anchorIndex].y;
+            ++cnt;
+          }
+          if (line.to.id === item.id) {
+            line.to.x = item.rotatedAnchors[line.to.anchorIndex].x;
+            line.to.y = item.rotatedAnchors[line.to.anchorIndex].y;
+            ++cnt;
+          }
+          if (cnt && !activeLayer.data.manualCps) {
+            line.calcControlPoints();
+          }
+          line.textRect = null;
+          Store.set(activeLayer.generateStoreKey('pts-') + line.id, null);
+          lines.push(line);
         }
-        line.textRect = null;
-        Store.set(this.generateStoreKey('pts-') + line.id, null);
-        lines.push(line);
       }
     }
+    collectionLine(this.data.pens, this);
 
     Store.set(this.generateStoreKey('LT:updateLines'), lines);
   }
