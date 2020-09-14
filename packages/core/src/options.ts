@@ -42,6 +42,7 @@ export interface Options {
   hideAnchor?: boolean;
   onlySizeX?: boolean;
   onlySizeY?: boolean;
+  anchorSize?: number;
   alwaysAnchor?: boolean;
   disableEmptyLine?: boolean;
   disableRepeatLine?: boolean;
@@ -65,8 +66,7 @@ export const DefalutOptions: Options = {
   cacheLen: 30,
   font: {
     color: '#222',
-    fontFamily:
-      '"Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial',
+    fontFamily: '"Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial',
     fontSize: 12,
     lineHeight: 1.5,
     textAlign: 'center',
@@ -84,6 +84,7 @@ export const DefalutOptions: Options = {
   hoverCursor: 'pointer',
   minScale: 0.25,
   maxScale: 5,
+  anchorSize: 25,
   autoExpandDistance: 200,
   keydown: KeydownType.Document,
 };

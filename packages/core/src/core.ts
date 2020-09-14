@@ -85,14 +85,14 @@ export class Topology {
     activeNode: Node;
     lineControlPoint: Point;
   } = {
-      type: MoveInType.None,
-      activeAnchorIndex: 0,
-      hoverAnchorIndex: 0,
-      hoverNode: null,
-      hoverLine: null,
-      activeNode: null,
-      lineControlPoint: null,
-    };
+    type: MoveInType.None,
+    activeAnchorIndex: 0,
+    hoverAnchorIndex: 0,
+    hoverNode: null,
+    hoverLine: null,
+    activeNode: null,
+    lineControlPoint: null,
+  };
   needCache = false;
 
   private tip = '';
@@ -148,7 +148,7 @@ export class Topology {
         const obj = JSON.parse(json);
         event.preventDefault();
         this.dropNodes(Array.isArray(obj) ? obj : [obj], event.offsetX, event.offsetY);
-      } catch { }
+      } catch {}
     };
     this.subcribe = Store.subscribe(this.generateStoreKey('LT:render'), () => {
       this.render();
@@ -641,7 +641,6 @@ export class Topology {
             // Clear hover anchors.
             this.hoverLayer.node = null;
           }
-
           if (this.moveIn.hoverNode) {
             this.hoverLayer.node = this.moveIn.hoverNode;
 
@@ -652,13 +651,11 @@ export class Topology {
           }
         }
 
-        if (this.moveIn.hoverLine !== this.lastHoverLine) {
+        if (this.moveIn.hoverLine !== this.lastHoverLine && !this.moveIn.hoverNode) {
           if (this.lastHoverLine) {
             this.dispatch('moveOutLine', this.lastHoverLine);
-
             this.hideTip();
           }
-
           if (this.moveIn.hoverLine) {
             this.dispatch('moveInLine', this.moveIn.hoverLine);
 
@@ -1255,7 +1252,7 @@ export class Topology {
         !(this.options.hideAnchor || node.hideAnchor || node.rect.width < 20 || node.rect.height < 20)
       ) {
         for (let j = 0; j < node.rotatedAnchors.length; ++j) {
-          if (node.rotatedAnchors[j].hit(pt, 5)) {
+          if (node.rotatedAnchors[j].hit(pt, this.options.anchorSize)) {
             if (!this.mouseDown && node.rotatedAnchors[j].mode === AnchorMode.In) {
               continue;
             }
@@ -1279,9 +1276,9 @@ export class Topology {
       return null;
     }
 
-    if (node.hit(pt, 5)) {
+    if (node.hit(pt, this.options.anchorSize)) {
       for (let j = 0; j < node.rotatedAnchors.length; ++j) {
-        if (node.rotatedAnchors[j].hit(pt, 5)) {
+        if (node.rotatedAnchors[j].hit(pt, this.options.anchorSize)) {
           if (!this.mouseDown && node.rotatedAnchors[j].mode === AnchorMode.In) {
             continue;
           }
@@ -1308,7 +1305,7 @@ export class Topology {
       return null;
     }
 
-    if (line.from.hit(point, 5)) {
+    if (line.from.hit(point, this.options.anchorSize)) {
       this.moveIn.type = MoveInType.LineFrom;
       this.moveIn.hoverLine = line;
       if (this.data.locked || line.locked) {
@@ -1319,7 +1316,7 @@ export class Topology {
       return line;
     }
 
-    if (line.to.hit(point, 5)) {
+    if (line.to.hit(point, this.options.anchorSize)) {
       this.moveIn.type = MoveInType.LineTo;
       this.moveIn.hoverLine = line;
       if (this.data.locked || line.locked) {
@@ -2213,6 +2210,7 @@ export class Topology {
       y = document.body.clientHeight - elemRect.height;
     }
 
+    elem.style.display = 'block';
     elem.style.position = 'fixed';
     elem.style.left = x + 'px';
     elem.style.top = y + 'px';
@@ -2226,7 +2224,6 @@ export class Topology {
     if (!this.tip) {
       return;
     }
-
     this.tipMarkdown.style.left = '-9999px';
     this.tipMarkdown.style.zIndex = '-1';
     if (this.tipElem) {
@@ -2316,7 +2313,6 @@ export class Topology {
     this._emitter.emit(eventType, params);
     return this;
   }
-
 
   getValue(idOrTag: string, attr = 'text') {
     let pen: Pen;

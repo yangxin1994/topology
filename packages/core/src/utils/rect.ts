@@ -22,15 +22,14 @@ export function getRect(pens: Pen[]) {
       }
       points.push.apply(points, pts);
     } else if (item instanceof Line) {
-      points.push(item.from);
-      points.push(item.to);
+      // points.push(item.from);
+      // points.push(item.to);
       if (item.name === 'curve') {
         for (let i = 0.01; i < 1; i += 0.02) {
           points.push(getBezierPoint(i, item.from, item.controlPoints[0], item.controlPoints[1], item.to));
         }
       }
     }
-
   }
 
   for (const item of points) {
