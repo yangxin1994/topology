@@ -313,7 +313,7 @@ export class ActiveLayer extends Layer {
   getLinesOfNode(node: Node) {
     const result: Line[] = [];
 
-    const nodes: Node[] = flatNodes([node]);
+    const nodesLines = flatNodes([node]);
 
     for (const pen of this.data.pens) {
       if (!(pen instanceof Line)) {
@@ -322,7 +322,7 @@ export class ActiveLayer extends Layer {
       const line = pen as Line;
       let fromIn = false;
       let toIn = false;
-      for (const item of nodes) {
+      for (const item of nodesLines.nodes) {
         if (line.from.id === item.id) {
           fromIn = true;
         }
@@ -344,20 +344,21 @@ export class ActiveLayer extends Layer {
       pens = this.pens;
     }
 
-    const nodes = flatNodes(pens);
+    const nodesLines = flatNodes(pens);
     const lines: Line[] = [];
-    for (const line of this.data.pens) {
-      if (!(line instanceof Line)) {
-        continue;
-      }
-      for (const item of nodes) {
+    nodesLines.lines.push.apply(
+      nodesLines.lines,
+      this.data.pens.filter((pen: Pen) => pen.type)
+    );
+    for (const line of nodesLines.lines) {
+      for (const item of nodesLines.nodes) {
         let cnt = 0;
-        if (line.from.id === item.id && item.rotatedAnchors[line.from.anchorIndex]) {
+        if (line.from.id === item.id) {
           line.from.x = item.rotatedAnchors[line.from.anchorIndex].x;
           line.from.y = item.rotatedAnchors[line.from.anchorIndex].y;
           ++cnt;
         }
-        if (line.to.id === item.id && item.rotatedAnchors[line.to.anchorIndex]) {
+        if (line.to.id === item.id) {
           line.to.x = item.rotatedAnchors[line.to.anchorIndex].x;
           line.to.y = item.rotatedAnchors[line.to.anchorIndex].y;
           ++cnt;

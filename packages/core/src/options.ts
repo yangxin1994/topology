@@ -84,7 +84,7 @@ export const DefalutOptions: Options = {
   hoverCursor: 'pointer',
   minScale: 0.25,
   maxScale: 5,
-  anchorSize: 25,
+  anchorSize: 5,
   autoExpandDistance: 200,
   keydown: KeydownType.Document,
 };
