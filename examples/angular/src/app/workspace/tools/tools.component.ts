@@ -7,12 +7,13 @@ import { Store } from 'le5le-store';
 
 import { ToolsService } from './tools.service';
 import { Tools } from './tools';
+import { drawNodeFns, Point } from '@topology/core';
 
 @Component({
   selector: 'app-tools',
   templateUrl: './tools.component.html',
   styleUrls: ['./tools.component.scss'],
-  providers: [ToolsService]
+  providers: [ToolsService],
 })
 export class ToolsComponent implements OnInit, OnDestroy {
   @Output() edit = new EventEmitter<any>();
@@ -29,10 +30,12 @@ export class ToolsComponent implements OnInit, OnDestroy {
   search$ = new Subject<string>();
   classes$: any;
 
+  topologyTools: any[];
+  topologyToolsExpand = true;
+
   user: any;
   user$: any;
-  constructor(private service: ToolsService) {
-  }
+  constructor(private service: ToolsService) {}
 
   async ngOnInit() {
     this.user$ = Store.subscribe('user', async (user: any) => {
@@ -45,11 +48,9 @@ export class ToolsComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.search$
-      .pipe(debounceTime(300), distinctUntilChanged())
-      .subscribe(text => {
-        this.onSearch(text);
-      });
+    this.search$.pipe(debounceTime(300), distinctUntilChanged()).subscribe((text) => {
+      this.onSearch(text);
+    });
 
     this.classes$ = Store.subscribe('app-classes', (classes: any) => {
       if (!classes) {
@@ -59,6 +60,11 @@ export class ToolsComponent implements OnInit, OnDestroy {
       this.userTools = [];
       this.classifyTools(this.topoTools, this.userTools);
     });
+
+    this.topologyTools = (window as any).topologyTools;
+
+    (window as any).Le5leTopologyPoint = Point;
+    (window as any).registerTools();
   }
 
   classifyTools(tools: any[], list: any[]) {
@@ -70,7 +76,7 @@ export class ToolsComponent implements OnInit, OnDestroy {
       const menu = {
         name: c.name,
         list: [],
-        expand: true
+        expand: true,
       };
       for (const item of tools) {
         if (item.class === c.name) {
@@ -110,9 +116,26 @@ export class ToolsComponent implements OnInit, OnDestroy {
     }
   }
 
-  onDrag(event: DragEvent, node: any) {
-    if (node) {
-      event.dataTransfer.setData('Text', JSON.stringify(node.componentData || node.data));
+  onDrag(event: DragEvent, node: any, fn?: boolean) {
+    if (!node) {
+      return;
+    }
+
+    if (fn) {
+      event.dataTransfer.setData(
+        'Topology',
+        JSON.stringify({
+          name: node.fullname,
+          rect: {
+            width: 100,
+            height: (100 * node.data.rect.height) / node.data.rect.width,
+          },
+        })
+      );
+      console.log('onDrag', node, drawNodeFns[node.fullname]);
+    } else {
+      event.dataTransfer.setData('Topology', JSON.stringify(node.componentData || node.data));
+      console.log('onDrag', node, drawNodeFns[node.data.name]);
     }
   }
 
@@ -123,7 +146,7 @@ export class ToolsComponent implements OnInit, OnDestroy {
   onEditComponent(name: string, id: string = '') {
     this.edit.emit({
       id,
-      name
+      name,
     });
   }
 
