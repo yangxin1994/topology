@@ -2137,12 +2137,11 @@ export class Topology {
       }
     }
   }
-  
-   // 图形居中
-  centerView() {
+
+  centerView(padding?: Padding) {
     if (!this.hasView()) return;
     const rect = this.getRect();
-    const viewCenter = this.getViewCenter();
+    const viewCenter = this.getViewCenter(padding);
     const { center } = rect;
     this.translate(viewCenter.x - center.x, viewCenter.y - center.y);
     const { parentElem } = this.canvas;
@@ -2152,8 +2151,7 @@ export class Topology {
     return true;
   }
 
-  // 自适应画布
-  fitView() {
+  fitView(viewPadding?: Padding) {
     if (!this.hasView()) return;
     // 1. 重置画布尺寸为容器尺寸
     const { parentElem } = this.canvas;
@@ -2163,9 +2161,9 @@ export class Topology {
       height,
     });
     // 2. 图形居中
-    this.centerView();
+    this.centerView(viewPadding);
     // 3. 获取设置的留白值
-    const padding = this.getFormatPadding();
+    const padding = formatPadding(viewPadding || this.options.viewPadding);
     // 4. 获取图形尺寸
     const rect = this.getRect();
     // 6. 计算缩放比
@@ -2178,21 +2176,13 @@ export class Topology {
     this.scale(w);
   }
 
-  // 判断画布中是否有图形
-  private hasView() {
+  hasView() {
     const rect = this.getRect();
     return !(rect.width === 99999 || rect.height === 99999);
   }
 
-  // 获取留白值
-  private getFormatPadding(): number[] {
-    const padding: Padding = this.options.fitViewPadding;
-    return formatPadding(padding);
-  }
-
-  // 获取画布的中心坐标
-  private getViewCenter() {
-    const padding = this.getFormatPadding();
+  getViewCenter(viewPadding?: Padding) {
+    const padding = formatPadding(viewPadding || this.options.viewPadding);
     const { width, height } = this.canvas;
     return {
       x: (width - padding[1] - padding[3]) / 2 + padding[3],
@@ -2200,7 +2190,7 @@ export class Topology {
     };
   }
 
-  private generateStoreKey(key) {
+  generateStoreKey(key: string) {
     return `${this.id}-${key}`;
   }
 

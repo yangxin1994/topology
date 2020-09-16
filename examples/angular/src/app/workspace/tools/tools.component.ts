@@ -5,9 +5,10 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 import { Store } from 'le5le-store';
 
+import { Point } from '@topology/core';
+
 import { ToolsService } from './tools.service';
 import { Tools } from './tools';
-import { drawNodeFns, Point } from '@topology/core';
 
 @Component({
   selector: 'app-tools',
@@ -132,10 +133,8 @@ export class ToolsComponent implements OnInit, OnDestroy {
           },
         })
       );
-      console.log('onDrag', node, drawNodeFns[node.fullname]);
     } else {
       event.dataTransfer.setData('Topology', JSON.stringify(node.componentData || node.data));
-      console.log('onDrag', node, drawNodeFns[node.data.name]);
     }
   }
 

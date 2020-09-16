@@ -61,8 +61,7 @@ export interface Options {
   maxScale?: number;
   autoExpandDistance?: number;
   keydown?: KeydownType;
-  fitView?: boolean;
-  fitViewPadding?: Padding;
+  viewPadding?: Padding;
   on?: (event: string, data: any) => void;
 }
 
@@ -91,6 +90,5 @@ export const DefalutOptions: Options = {
   anchorSize: 5,
   autoExpandDistance: 200,
   keydown: KeydownType.Document,
-  fitView: false,
-  fitViewPadding: 0,
+  viewPadding: 0,
 };
