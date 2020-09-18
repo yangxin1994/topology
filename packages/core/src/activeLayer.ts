@@ -24,9 +24,6 @@ export class ActiveLayer extends Layer {
 
   pens: Pen[] = [];
 
-  // nodes: Node[] = [];
-  // lines: Line[] = [];
-
   rotate = 0;
 
   // 备份初始位置，方便移动事件处理
