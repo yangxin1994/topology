@@ -12,7 +12,7 @@ import { Lock } from './models/status';
 import { drawLineFns } from './middles';
 import { getBezierPoint } from './middles/lines/curve';
 import { Layer } from './layer';
-import { flatNodes, getParent } from './utils';
+import { flatNodes, getParent, getRectOfPoints } from './utils';
 import { Topology } from './core';
 
 export class ActiveLayer extends Layer {
@@ -79,25 +79,7 @@ export class ActiveLayer extends Layer {
       return;
     }
 
-    let x1 = 99999;
-    let y1 = 99999;
-    let x2 = -99999;
-    let y2 = -99999;
-    const pts = this.getPoints();
-    for (const item of pts) {
-      if (x1 > item.x) {
-        x1 = item.x;
-      }
-      if (y1 > item.y) {
-        y1 = item.y;
-      }
-      if (x2 < item.x) {
-        x2 = item.x;
-      }
-      if (y2 < item.y) {
-        y2 = item.y;
-      }
-    }
+    const { x1, y1, x2, y2 } = getRectOfPoints(this.getPoints());
     this.rect = new Rect(x1, y1, x2 - x1, y2 - y1);
     this.sizeCPs = [new Point(x1, y1), new Point(x2, y1), new Point(x2, y2), new Point(x1, y2)];
     this.rotateCPs = [new Point(x1 + (x2 - x1) / 2, y1 - 35), new Point(x1 + (x2 - x1) / 2, y1)];
