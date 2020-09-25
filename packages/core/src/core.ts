@@ -86,14 +86,14 @@ export class Topology {
     activeNode: Node;
     lineControlPoint: Point;
   } = {
-    type: MoveInType.None,
-    activeAnchorIndex: 0,
-    hoverAnchorIndex: 0,
-    hoverNode: null,
-    hoverLine: null,
-    activeNode: null,
-    lineControlPoint: null,
-  };
+      type: MoveInType.None,
+      activeAnchorIndex: 0,
+      hoverAnchorIndex: 0,
+      hoverNode: null,
+      hoverLine: null,
+      activeNode: null,
+      lineControlPoint: null,
+    };
   needCache = false;
 
   private tip = '';
@@ -149,7 +149,7 @@ export class Topology {
         const obj = JSON.parse(json);
         event.preventDefault();
         this.dropNodes(Array.isArray(obj) ? obj : [obj], event.offsetX, event.offsetY);
-      } catch {}
+      } catch { }
     };
     this.subcribe = Store.subscribe(this.generateStoreKey('LT:render'), () => {
       this.render();
@@ -2212,7 +2212,7 @@ export class Topology {
   }
 
   private showTip(data: Pen, pos: { x: number; y: number }) {
-    if (!this.data.locked || !data || (!data.markdown && !data.tipId && !data.title) || data.id === this.tip) {
+    if (!this.data.locked || !data || (!data.markdown && !data.tipId && !data.title) || data.id === this.tip || (!this.options.tooltip)) {
       return;
     }
 

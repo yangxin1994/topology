@@ -6,10 +6,6 @@ import { getBezierPoint } from '../middles/lines/curve';
 import { Rect } from '../models/rect';
 
 export function getRect(pens: Pen[]) {
-  let x1 = 99999;
-  let y1 = 99999;
-  let x2 = -99999;
-  let y2 = -99999;
 
   const points: Point[] = [];
   for (const item of pens) {
@@ -31,21 +27,24 @@ export function getRect(pens: Pen[]) {
       }
     }
   }
-
-  for (const item of points) {
-    if (x1 > item.x) {
-      x1 = item.x;
-    }
-    if (y1 > item.y) {
-      y1 = item.y;
-    }
-    if (x2 < item.x) {
-      x2 = item.x;
-    }
-    if (y2 < item.y) {
-      y2 = item.y;
-    }
-  }
+  const { x1, y1, x2, y2 } = getBboxOfPoints(points);
 
   return new Rect(x1, y1, x2 - x1, y2 - y1);
+}
+
+
+export function getBboxOfPoints(points: Point[]) {
+  let x1 = Infinity;
+  let y1 = Infinity;
+  let x2 = -Infinity;
+  let y2 = -Infinity;
+
+  for (const item of points) {
+    const { x, y } = item;
+    x1 = Math.min(x1, x);
+    y1 = Math.min(y1, y);
+    x2 = Math.max(x2, x);
+    y2 = Math.max(y2, y);
+  }
+  return { x1, y1, x2, y2 };
 }
