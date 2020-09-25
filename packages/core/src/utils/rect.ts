@@ -27,13 +27,13 @@ export function getRect(pens: Pen[]) {
       }
     }
   }
-  const { x1, y1, x2, y2 } = getRectOfPoints(points);
+  const { x1, y1, x2, y2 } = getBboxOfPoints(points);
 
   return new Rect(x1, y1, x2 - x1, y2 - y1);
 }
 
 
-export function getRectOfPoints(points: Point[]) {
+export function getBboxOfPoints(points: Point[]) {
   let x1 = Infinity;
   let y1 = Infinity;
   let x2 = -Infinity;
