@@ -63,7 +63,6 @@ export interface Options {
   keydown?: KeydownType;
   viewPadding?: Padding;
   on?: (event: string, data: any) => void;
-  tooltip?: boolean;
 }
 
 export const DefalutOptions: Options = {
@@ -92,5 +91,4 @@ export const DefalutOptions: Options = {
   autoExpandDistance: 200,
   keydown: KeydownType.Document,
   viewPadding: 0,
-  tooltip: true
 };

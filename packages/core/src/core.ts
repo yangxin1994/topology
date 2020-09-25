@@ -86,14 +86,14 @@ export class Topology {
     activeNode: Node;
     lineControlPoint: Point;
   } = {
-      type: MoveInType.None,
-      activeAnchorIndex: 0,
-      hoverAnchorIndex: 0,
-      hoverNode: null,
-      hoverLine: null,
-      activeNode: null,
-      lineControlPoint: null,
-    };
+    type: MoveInType.None,
+    activeAnchorIndex: 0,
+    hoverAnchorIndex: 0,
+    hoverNode: null,
+    hoverLine: null,
+    activeNode: null,
+    lineControlPoint: null,
+  };
   needCache = false;
 
   private tip = '';
@@ -149,7 +149,7 @@ export class Topology {
         const obj = JSON.parse(json);
         event.preventDefault();
         this.dropNodes(Array.isArray(obj) ? obj : [obj], event.offsetX, event.offsetY);
-      } catch { }
+      } catch {}
     };
     this.subcribe = Store.subscribe(this.generateStoreKey('LT:render'), () => {
       this.render();
@@ -717,6 +717,8 @@ export class Topology {
       if (moveLeft || moveTop) {
         this.scroll(moveLeft ? -100 : 0, moveTop ? -100 : 0);
       }
+
+      this.hideTip();
 
       switch (this.moveIn.type) {
         case MoveInType.None:
@@ -1605,29 +1607,28 @@ export class Topology {
     this.dispatch('redo', this.data);
   }
 
-  toImage(
-    type?: string,
-    quality?: any,
-    callback?: any,
-    padding?: { left: number; top: number; right: number; bottom: number },
-    thumbnail = true
-  ): string {
+  toImage(type?: string, quality?: any, callback?: any, padding?: Padding, thumbnail = true): string {
     let rect = new Rect(0, 0, this.canvas.width, this.canvas.height);
     if (thumbnail) {
       rect = this.getRect();
     }
-    if (!padding) {
-      padding = {
-        left: 10,
-        top: 10,
-        right: 10,
-        bottom: 10,
-      };
+
+    let offX = 0;
+    let offY = 0;
+    if (rect.x < 0 || rect.y < 0) {
+      if (rect.x < 0) {
+        offX = -rect.x;
+      }
+      if (rect.y < 0) {
+        offY = -rect.y;
+      }
     }
-    rect.x -= padding.left;
-    rect.y -= padding.top;
-    rect.width += padding.left + padding.right;
-    rect.height += padding.top + padding.bottom;
+
+    const p = formatPadding(padding || 0);
+    rect.x -= p[3];
+    rect.y -= p[0];
+    rect.width += p[3] + p[1];
+    rect.height += p[0] + p[2];
     rect.round();
     const srcRect = rect.clone();
     srcRect.scale(this.offscreen.getDpiRatio(), new Point(0, 0));
@@ -1643,17 +1644,20 @@ export class Topology {
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
-    ctx.drawImage(
-      this.canvas.canvas,
-      srcRect.x,
-      srcRect.y,
-      srcRect.width,
-      srcRect.height,
-      0,
-      0,
-      srcRect.width,
-      srcRect.height
-    );
+
+    for (const item of this.data.pens) {
+      let pen: Pen;
+      if (item.type) {
+        pen = new Line(item);
+      } else {
+        pen = new Node(item);
+      }
+
+      if (offX || offY) {
+        pen.translate(offX, offY);
+      }
+      pen.render(ctx);
+    }
 
     if (callback) {
       canvas.toBlob(callback);
@@ -1663,13 +1667,7 @@ export class Topology {
     return canvas.toDataURL(type, quality);
   }
 
-  saveAsImage(
-    name?: string,
-    type?: string,
-    quality?: any,
-    padding?: { left: number; top: number; right: number; bottom: number },
-    thumbnail = true
-  ) {
+  saveAsImage(name?: string, type?: string, quality?: any, padding?: Padding, thumbnail = true) {
     const a = document.createElement('a');
     a.setAttribute('download', name || 'le5le.topology.png');
     a.setAttribute('href', this.toImage(type, quality, null, padding, thumbnail));
@@ -2173,7 +2171,7 @@ export class Topology {
     if (w > h) {
       ratio = h;
     }
-    this.scale(w);
+    this.scale(ratio);
   }
 
   hasView() {
@@ -2212,7 +2210,13 @@ export class Topology {
   }
 
   private showTip(data: Pen, pos: { x: number; y: number }) {
-    if (!this.data.locked || !data || (!data.markdown && !data.tipId && !data.title) || data.id === this.tip || (!this.options.tooltip)) {
+    if (
+      !data ||
+      (!data.markdown && !data.tipId && !data.title) ||
+      data.id === this.tip ||
+      this.data.tooltip === false ||
+      this.data.tooltip === 0
+    ) {
       return;
     }
 
@@ -2268,6 +2272,7 @@ export class Topology {
     elem.style.left = x + 'px';
     elem.style.top = y + 'px';
     elem.style.zIndex = '100';
+
     this.tip = data.id;
 
     this.dispatch('tip', elem);

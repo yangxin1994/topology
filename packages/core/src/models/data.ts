@@ -17,14 +17,15 @@ export class TopologyData {
   websocket?: string;
   mqttUrl?: string;
   mqttOptions?: {
-    clientId?: string,
-    username?: string,
-    password?: string,
+    clientId?: string;
+    username?: string;
+    password?: string;
   } = {
-      clientId: s8()
-    };
+    clientId: s8(),
+  };
   mqttTopics?: string;
   manualCps?: boolean;
+  tooltip?: boolean | number;
   data?: any;
   constructor(json?: any) {
     if (json) {
