@@ -65,14 +65,8 @@ export class HoverLayer extends Layer {
     }
     const x = pt.x - initPos.x;
     const y = pt.y - initPos.y;
-    this.line.setTo(
-      new Point(this.initLine.to.x + x, this.initLine.to.y + y),
-      this.line.toArrow
-    );
-    this.line.setFrom(
-      new Point(this.initLine.from.x + x, this.initLine.from.y + y),
-      this.line.fromArrow
-    );
+    this.line.setTo(new Point(this.initLine.to.x + x, this.initLine.to.y + y), this.line.toArrow);
+    this.line.setFrom(new Point(this.initLine.from.x + x, this.initLine.from.y + y), this.line.fromArrow);
     for (let i = 0; i < this.initLine.controlPoints.length; ++i) {
       this.line.controlPoints[i].x = this.initLine.controlPoints[i].x + x;
       this.line.controlPoints[i].y = this.initLine.controlPoints[i].y + y;
@@ -82,7 +76,7 @@ export class HoverLayer extends Layer {
   }
 
   render(ctx: CanvasRenderingContext2D) {
-    if (this.data.locked === Lock.NoEvent) {
+    if (this.data.locked === Lock.NoEvent || this.options.hoverColor === 'transparent') {
       return;
     }
 
@@ -105,13 +99,7 @@ export class HoverLayer extends Layer {
             continue;
           }
           ctx.beginPath();
-          ctx.arc(
-            anchor.x,
-            anchor.y,
-            anchor.radius || this.options.anchorRadius,
-            0,
-            Math.PI * 2
-          );
+          ctx.arc(anchor.x, anchor.y, anchor.radius || this.options.anchorRadius, 0, Math.PI * 2);
           ctx.strokeStyle = anchor.strokeStyle || this.options.hoverColor;
           ctx.fillStyle = anchor.fillStyle || this.options.anchorFillStyle;
           ctx.fill();
@@ -132,18 +120,11 @@ export class HoverLayer extends Layer {
         ctx.globalAlpha = 0.2;
         if (this.root.rotate) {
           ctx.translate(this.root.rect.center.x, this.root.rect.center.y);
-          ctx.rotate(
-            ((this.root.rotate + this.root.offsetRotate) * Math.PI) / 180
-          );
+          ctx.rotate(((this.root.rotate + this.root.offsetRotate) * Math.PI) / 180);
           ctx.translate(-this.root.rect.center.x, -this.root.rect.center.y);
         }
         ctx.beginPath();
-        ctx.strokeRect(
-          this.root.rect.x,
-          this.root.rect.y,
-          this.root.rect.width,
-          this.root.rect.height
-        );
+        ctx.strokeRect(this.root.rect.x, this.root.rect.y, this.root.rect.width, this.root.rect.height);
         ctx.restore();
       }
 
@@ -164,11 +145,8 @@ export class HoverLayer extends Layer {
             0,
             Math.PI * 2
           );
-          ctx.strokeStyle =
-            this.node.rotatedAnchors[i].strokeStyle || this.options.hoverColor;
-          ctx.fillStyle =
-            this.node.rotatedAnchors[i].fillStyle ||
-            this.options.anchorFillStyle;
+          ctx.strokeStyle = this.node.rotatedAnchors[i].strokeStyle || this.options.hoverColor;
+          ctx.fillStyle = this.node.rotatedAnchors[i].fillStyle || this.options.anchorFillStyle;
           ctx.fill();
           ctx.stroke();
         }
@@ -222,18 +200,8 @@ export class HoverLayer extends Layer {
       ctx.fillStyle = this.options.dragColor + '30';
       ctx.strokeStyle = this.options.dragColor;
       ctx.beginPath();
-      ctx.strokeRect(
-        this.dragRect.x,
-        this.dragRect.y,
-        this.dragRect.width,
-        this.dragRect.height
-      );
-      ctx.fillRect(
-        this.dragRect.x,
-        this.dragRect.y,
-        this.dragRect.width,
-        this.dragRect.height
-      );
+      ctx.strokeRect(this.dragRect.x, this.dragRect.y, this.dragRect.width, this.dragRect.height);
+      ctx.fillRect(this.dragRect.x, this.dragRect.y, this.dragRect.width, this.dragRect.height);
     }
   }
 

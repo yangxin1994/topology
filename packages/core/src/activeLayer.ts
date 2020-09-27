@@ -12,7 +12,7 @@ import { Lock } from './models/status';
 import { drawLineFns } from './middles';
 import { getBezierPoint } from './middles/lines/curve';
 import { Layer } from './layer';
-import { flatNodes, getParent, getBboxOfPoints } from './utils';
+import { flatNodes, getBboxOfPoints } from './utils';
 import { Topology } from './core';
 
 export class ActiveLayer extends Layer {
@@ -459,7 +459,7 @@ export class ActiveLayer extends Layer {
   }
 
   render(ctx: CanvasRenderingContext2D) {
-    if (this.data.locked > Lock.Readonly) {
+    if (this.data.locked > Lock.Readonly || this.options.activeColor === 'transparent') {
       return;
     }
 
