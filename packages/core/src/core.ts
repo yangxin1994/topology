@@ -824,7 +824,9 @@ export class Topology {
           this.activeLayer.pens = [this.moveIn.hoverLine];
           this.dispatch('line', this.moveIn.hoverLine);
         }
-
+        if (this.data.locked || this.moveIn.hoverLine.locked) {
+          this.moveIn.hoverLine.click();
+        }
         break;
       case MoveInType.LineMove:
         this.hoverLayer.initLine = new Line(this.moveIn.hoverLine);

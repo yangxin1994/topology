@@ -323,7 +323,9 @@ export abstract class Pen {
         }
       }
 
-      Store.set(this.generateStoreKey('LT:render'), true);
+      if (item.params !== 'false') {
+        Store.set(this.generateStoreKey('LT:render'), true);
+      }
     }
   }
 
