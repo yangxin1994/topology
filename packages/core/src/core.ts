@@ -464,6 +464,7 @@ export class Topology {
 
     this.data.bkColor = data.bkColor;
     this.data.bkImage = data.bkImage;
+    this.data.tooltip = data.tooltip;
     this.data.pens = [];
 
     // for old data.
