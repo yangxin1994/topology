@@ -143,6 +143,9 @@ export class Topology {
 
     this.divLayer.canvas.ondragover = (event) => event.preventDefault();
     this.divLayer.canvas.ondrop = (event) => {
+      if (this.data.locked) {
+        return;
+      }
       try {
         const json = event.dataTransfer.getData('Topology') || event.dataTransfer.getData('Text');
         if (!json) return;
@@ -366,7 +369,7 @@ export class Topology {
   }
 
   addNode(node: Node | any, focus = false) {
-    if (this.data.locked || !drawNodeFns[node.name]) {
+    if (!drawNodeFns[node.name]) {
       return null;
     }
 
@@ -2040,7 +2043,9 @@ export class Topology {
       }
     });
 
-    if (result.length === 1) {
+    if (result.length === 0) {
+      return;
+    } else if (result.length === 1) {
       return result[0];
     }
 
@@ -2213,13 +2218,7 @@ export class Topology {
   }
 
   private showTip(data: Pen, pos: { x: number; y: number }) {
-    if (
-      !data ||
-      (!data.markdown && !data.tipId && !data.title) ||
-      data.id === this.tip ||
-      this.data.tooltip === false ||
-      this.data.tooltip === 0
-    ) {
+    if (!data || data.id === this.tip || this.data.tooltip === false || this.data.tooltip === 0) {
       return;
     }
 
@@ -2246,6 +2245,10 @@ export class Topology {
       for (let i = 0; i < a.length; ++i) {
         a[i].setAttribute('target', '_blank');
       }
+    }
+
+    if (!elem) {
+      return;
     }
 
     const parentRect = this.parentElem.getBoundingClientRect();
