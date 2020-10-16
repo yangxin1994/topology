@@ -1619,32 +1619,16 @@ export class Topology {
       rect = this.getRect();
     }
 
-    let offX = 0;
-    let offY = 0;
-    if (rect.x < 0 || rect.y < 0) {
-      if (rect.x < 0) {
-        offX = -rect.x;
-      }
-      if (rect.y < 0) {
-        offY = -rect.y;
-      }
-    }
-
     const p = formatPadding(padding || 0);
     rect.x -= p[3];
     rect.y -= p[0];
     rect.width += p[3] + p[1];
     rect.height += p[0] + p[2];
     rect.round();
-    const srcRect = rect.clone();
-    srcRect.scale(this.offscreen.getDpiRatio(), new Point(0, 0));
-    srcRect.round();
 
     const canvas = document.createElement('canvas');
-    canvas.width = srcRect.width;
-    canvas.height = srcRect.height;
-    canvas.style.width = rect.width + 'px';
-    canvas.style.height = rect.height + 'px';
+    canvas.width = rect.width;
+    canvas.height = rect.height;
     const ctx = canvas.getContext('2d');
     if (type && type !== 'image/png') {
       ctx.fillStyle = 'white';
@@ -1659,12 +1643,9 @@ export class Topology {
         pen = new Node(item);
       }
 
-      if (offX || offY) {
-        pen.translate(offX, offY);
-      }
+      pen.translate(-rect.x - p[3], -rect.y - p[0]);
       pen.render(ctx);
     }
-
     if (callback) {
       canvas.toBlob(callback);
       return '';
