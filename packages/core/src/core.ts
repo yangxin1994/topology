@@ -1613,18 +1613,8 @@ export class Topology {
     this.dispatch('redo', this.data);
   }
 
-  toImage(
-    type: string = 'image/png',
-    quality = 1,
-    padding: Padding = 0,
-    thumbnail = true,
-    callback: any = null
-  ): string {
-    let rect = new Rect(0, 0, this.canvas.width, this.canvas.height);
-    if (thumbnail) {
-      rect = this.getRect();
-    }
-
+  toImage(type = 'image/png', quality = 1, padding: Padding = 0, callback: any = null): string {
+    const rect = this.getRect();
     const p = formatPadding(padding || 0);
     rect.x -= p[3];
     rect.y -= p[0];
@@ -1664,10 +1654,10 @@ export class Topology {
     return canvas.toDataURL(type, quality);
   }
 
-  saveAsImage(name?: string, type: string = 'image/png', quality = 1, padding: Padding = 0, thumbnail = true) {
+  saveAsImage(name?: string, type: string = 'image/png', quality = 1, padding: Padding = 0) {
     const a = document.createElement('a');
     a.setAttribute('download', name || 'le5le.topology.png');
-    a.setAttribute('href', this.toImage(type, quality, padding, thumbnail));
+    a.setAttribute('href', this.toImage(type, quality, padding));
     const evt = document.createEvent('MouseEvents');
     evt.initEvent('click', true, true);
     a.dispatchEvent(evt);
