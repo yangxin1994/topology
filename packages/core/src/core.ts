@@ -1613,7 +1613,13 @@ export class Topology {
     this.dispatch('redo', this.data);
   }
 
-  toImage(type?: string, quality?: any, callback?: any, padding?: Padding, thumbnail = true): string {
+  toImage(
+    type: string = 'image/png',
+    quality = 1,
+    padding: Padding = 0,
+    thumbnail = true,
+    callback: any = null
+  ): string {
     let rect = new Rect(0, 0, this.canvas.width, this.canvas.height);
     if (thumbnail) {
       rect = this.getRect();
@@ -1624,12 +1630,17 @@ export class Topology {
     rect.y -= p[0];
     rect.width += p[3] + p[1];
     rect.height += p[0] + p[2];
-    rect.round();
+
+    const dpi = this.offscreen.getDpiRatio();
+    const dpiRect = rect.clone();
+    dpiRect.scale(dpi);
 
     const canvas = document.createElement('canvas');
-    canvas.width = rect.width;
-    canvas.height = rect.height;
+    canvas.width = dpiRect.width;
+    canvas.height = dpiRect.height;
     const ctx = canvas.getContext('2d');
+    ctx.scale(dpi, dpi);
+
     if (type && type !== 'image/png') {
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -1646,18 +1657,17 @@ export class Topology {
       pen.translate(-rect.x - p[3], -rect.y - p[0]);
       pen.render(ctx);
     }
+
     if (callback) {
       canvas.toBlob(callback);
-      return '';
     }
-
     return canvas.toDataURL(type, quality);
   }
 
-  saveAsImage(name?: string, type?: string, quality?: any, padding?: Padding, thumbnail = true) {
+  saveAsImage(name?: string, type: string = 'image/png', quality = 1, padding: Padding = 0, thumbnail = true) {
     const a = document.createElement('a');
     a.setAttribute('download', name || 'le5le.topology.png');
-    a.setAttribute('href', this.toImage(type, quality, null, padding, thumbnail));
+    a.setAttribute('href', this.toImage(type, quality, padding, thumbnail));
     const evt = document.createEvent('MouseEvents');
     evt.initEvent('click', true, true);
     a.dispatchEvent(evt);
@@ -2403,6 +2413,8 @@ export class Topology {
   showGrid(show?: boolean) {
     if (show === undefined) {
       show = this.data.grid;
+    } else {
+      this.data.grid = show;
     }
     this.gridElem.style.width = this.canvas.width + 'px';
     this.gridElem.style.height = this.canvas.height + 'px';
