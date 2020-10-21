@@ -931,8 +931,12 @@ export class Topology {
     if (this.hoverLayer.dragRect) {
       this.getPensInRect(this.hoverLayer.dragRect);
 
-      if (this.activeLayer.pens && this.activeLayer.pens.length) {
+      if (this.activeLayer.pens && this.activeLayer.pens.length > 1) {
         this.dispatch('multi', this.activeLayer.pens);
+      } else if (this.activeLayer.pens && this.activeLayer.pens[0].type === PenType.Line) {
+        this.dispatch('line', this.activeLayer.pens[0]);
+      } else if (this.activeLayer.pens && this.activeLayer.pens[0].type === PenType.Node) {
+        this.dispatch('node', this.activeLayer.pens[0]);
       }
     } else {
       switch (this.moveIn.type) {
@@ -1621,15 +1625,15 @@ export class Topology {
     rect.width += p[3] + p[1];
     rect.height += p[0] + p[2];
 
-    const dpi = this.offscreen.getDpiRatio();
-    const dpiRect = rect.clone();
-    dpiRect.scale(dpi);
+    // const dpi = this.offscreen.getDpiRatio();
+    // const dpiRect = rect.clone();
+    // dpiRect.scale(dpi);
 
     const canvas = document.createElement('canvas');
-    canvas.width = dpiRect.width;
-    canvas.height = dpiRect.height;
+    canvas.width = rect.width;
+    canvas.height = rect.height;
     const ctx = canvas.getContext('2d');
-    ctx.scale(dpi, dpi);
+    // ctx.scale(dpi, dpi);
 
     if (type && type !== 'image/png') {
       ctx.fillStyle = 'white';
@@ -2020,7 +2024,12 @@ export class Topology {
       }
 
       if ((item as any).children) {
-        result.push.apply(result, this.find(idOrTag, (item as any).children));
+        const children: any = this.find(idOrTag, (item as any).children);
+        if (children && children.length > 1) {
+          result.push.apply(result, children);
+        } else if (children) {
+          result.push(children);
+        }
       }
     });
 
