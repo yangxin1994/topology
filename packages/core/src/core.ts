@@ -933,9 +933,9 @@ export class Topology {
 
       if (this.activeLayer.pens && this.activeLayer.pens.length > 1) {
         this.dispatch('multi', this.activeLayer.pens);
-      } else if (this.activeLayer.pens && this.activeLayer.pens[0].type === PenType.Line) {
+      } else if (this.activeLayer.pens && this.activeLayer.pens[0] && this.activeLayer.pens[0].type === PenType.Line) {
         this.dispatch('line', this.activeLayer.pens[0]);
-      } else if (this.activeLayer.pens && this.activeLayer.pens[0].type === PenType.Node) {
+      } else if (this.activeLayer.pens && this.activeLayer.pens[0] && this.activeLayer.pens[0].type === PenType.Node) {
         this.dispatch('node', this.activeLayer.pens[0]);
       }
     } else {
