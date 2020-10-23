@@ -86,14 +86,14 @@ export class Topology {
     activeNode: Node;
     lineControlPoint: Point;
   } = {
-    type: MoveInType.None,
-    activeAnchorIndex: 0,
-    hoverAnchorIndex: 0,
-    hoverNode: null,
-    hoverLine: null,
-    activeNode: null,
-    lineControlPoint: null,
-  };
+      type: MoveInType.None,
+      activeAnchorIndex: 0,
+      hoverAnchorIndex: 0,
+      hoverNode: null,
+      hoverLine: null,
+      activeNode: null,
+      lineControlPoint: null,
+    };
   needCache = false;
 
   private tip = '';
@@ -152,7 +152,7 @@ export class Topology {
         const obj = JSON.parse(json);
         event.preventDefault();
         this.dropNodes(Array.isArray(obj) ? obj : [obj], event.offsetX, event.offsetY);
-      } catch {}
+      } catch { }
     };
     this.subcribe = Store.subscribe(this.generateStoreKey('LT:render'), () => {
       this.render();
@@ -1639,6 +1639,13 @@ export class Topology {
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
+    if (this.data.bkColor) {
+      ctx.fillStyle = this.data.bkColor;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    if (this.data.bkImage) {
+      ctx.drawImage(this.canvas.bkImg, 0, 0, canvas.width, canvas.height);
+    }
 
     for (const item of this.data.pens) {
       let pen: Pen;
@@ -1648,7 +1655,7 @@ export class Topology {
         pen = new Node(item);
       }
 
-      pen.translate(-rect.x - p[3], -rect.y - p[0]);
+      pen.translate(-rect.x, -rect.y);
       pen.render(ctx);
     }
 
