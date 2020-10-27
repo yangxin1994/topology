@@ -7,8 +7,8 @@ import { s8 } from '../utils';
 export class TopologyData {
   pens: Pen[] = [];
   lineName = 'curve';
-  fromArrowType = '';
-  toArrowType = 'triangleSolid';
+  fromArrow = '';
+  toArrow = 'triangleSolid';
   scale = 1;
   locked = Lock.None;
   bkImage: string;
@@ -38,8 +38,8 @@ export class TopologyData {
         }
       }
       this.lineName = json.lineName || 'curve';
-      this.fromArrowType = json.fromArrowType || '';
-      this.toArrowType = json.toArrowType || 'triangleSolid';
+      this.fromArrow = json.fromArrow || '';
+      this.toArrow = json.toArrow || 'triangleSolid';
       this.scale = json.scale || 1;
       this.locked = json.locked || Lock.None;
       this.bkImage = json.bkImage;

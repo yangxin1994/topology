@@ -86,14 +86,14 @@ export class Topology {
     activeNode: Node;
     lineControlPoint: Point;
   } = {
-      type: MoveInType.None,
-      activeAnchorIndex: 0,
-      hoverAnchorIndex: 0,
-      hoverNode: null,
-      hoverLine: null,
-      activeNode: null,
-      lineControlPoint: null,
-    };
+    type: MoveInType.None,
+    activeAnchorIndex: 0,
+    hoverAnchorIndex: 0,
+    hoverNode: null,
+    hoverLine: null,
+    activeNode: null,
+    lineControlPoint: null,
+  };
   needCache = false;
 
   private tip = '';
@@ -152,7 +152,7 @@ export class Topology {
         const obj = JSON.parse(json);
         event.preventDefault();
         this.dropNodes(Array.isArray(obj) ? obj : [obj], event.offsetX, event.offsetY);
-      } catch { }
+      } catch {}
     };
     this.subcribe = Store.subscribe(this.generateStoreKey('LT:render'), () => {
       this.render();
@@ -314,16 +314,19 @@ export class Topology {
         json.rect.y = firstNode.rect.y + dy;
       }
 
-      if (json.name === 'lineAlone') {
+      if (json.name === 'curve' || json.name === 'line' || json.name === 'polyline' || json.name === 'mind') {
         this.addLine(
-          {
-            name: this.data.lineName,
-            from: new Point(json.rect.x, json.rect.y),
-            fromArrow: this.data.fromArrowType,
-            to: new Point(json.rect.x + json.rect.width, json.rect.y + json.rect.height),
-            toArrow: this.data.toArrowType,
-            strokeStyle: this.options.color,
-          },
+          Object.assign(
+            {
+              name: 'line',
+              from: new Point(json.rect.x, json.rect.y),
+              fromArrow: this.data.fromArrow,
+              to: new Point(json.rect.x + json.rect.width, json.rect.y + json.rect.height),
+              toArrow: this.data.toArrow,
+              strokeStyle: this.options.color,
+            },
+            json
+          ),
           true
         );
       } else {
@@ -458,8 +461,8 @@ export class Topology {
     if (data.lineName) {
       this.data.lineName = data.lineName;
     }
-    this.data.fromArrowType = data.fromArrowType;
-    this.data.toArrowType = data.toArrowType;
+    this.data.fromArrow = data.fromArrow;
+    this.data.toArrow = data.toArrow;
 
     this.data.scale = data.scale || 1;
     Store.set(this.generateStoreKey('LT:scale'), this.data.scale);
@@ -753,7 +756,7 @@ export class Topology {
           break;
         case MoveInType.LineTo:
         case MoveInType.HoverAnchors:
-          let arrow = this.data.toArrowType;
+          let arrow = this.data.toArrow;
           if (this.moveIn.hoverLine) {
             arrow = this.moveIn.hoverLine.toArrow;
           }
@@ -856,12 +859,12 @@ export class Topology {
             this.moveIn.hoverAnchorIndex,
             this.moveIn.hoverNode.id
           ),
-          fromArrow: this.data.fromArrowType,
+          fromArrow: this.data.fromArrow,
           to: new Point(
             this.moveIn.hoverNode.rotatedAnchors[this.moveIn.hoverAnchorIndex].x,
             this.moveIn.hoverNode.rotatedAnchors[this.moveIn.hoverAnchorIndex].y
           ),
-          toArrow: this.data.toArrowType,
+          toArrow: this.data.toArrow,
           strokeStyle: this.options.color,
         });
         this.dispatch('anchor', {
