@@ -285,7 +285,7 @@ export class Line extends Pen {
         center = this.getLineCenter(this.from, this.to);
         break;
       case 'polyline':
-        const i = Math.floor(this.controlPoints.length / 2);
+        const i = Math.round(this.controlPoints.length / 2);
         center = this.getLineCenter(this.controlPoints[i - 1] || this.from, this.controlPoints[i] || this.to);
         break;
       case 'curve':

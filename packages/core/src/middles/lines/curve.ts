@@ -106,10 +106,10 @@ export function getControlPt(pt: Point, to: Point) {
   let dis = (window as any).topologyControlPtDistance || distance;
   if ((pt.direction === Direction.Up || pt.direction === Direction.Bottom) && Math.abs(pt.x - to.x) < 3) {
     if (to.y > pt.y) {
-      dis = Math.floor((to.y - pt.y) / 3);
+      dis = Math.round((to.y - pt.y) / 3);
       point.y += dis;
     } else {
-      dis = Math.floor((pt.y - to.y) / 3);
+      dis = Math.round((pt.y - to.y) / 3);
       point.y -= dis;
     }
     return point;
@@ -117,10 +117,10 @@ export function getControlPt(pt: Point, to: Point) {
 
   if ((pt.direction === Direction.Left || pt.direction === Direction.Right) && Math.abs(pt.y - to.y) < 3) {
     if (to.x > pt.x) {
-      dis = Math.floor((to.x - pt.x) / 3);
+      dis = Math.round((to.x - pt.x) / 3);
       point.x += dis;
     } else {
-      dis = Math.floor((pt.x - to.x) / 3);
+      dis = Math.round((pt.x - to.x) / 3);
       point.x -= dis;
     }
     return point;
