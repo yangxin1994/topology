@@ -314,7 +314,7 @@ export class Topology {
         json.rect.y = firstNode.rect.y + dy;
       }
 
-      if (json.name === 'curve' || json.name === 'line' || json.name === 'polyline' || json.name === 'mind') {
+      if (json.type === PenType.Line) {
         this.addLine(
           Object.assign(
             {

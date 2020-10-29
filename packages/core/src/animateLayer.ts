@@ -134,6 +134,11 @@ export class AnimateLayer extends Layer {
         if (!pen.animateStart || pen.animateStart < 1) {
           if (pen.type) {
             this.pens.delete(pen.data);
+            const line = this.findLine(pen);
+            if (line) {
+              line.animateStart = 0;
+              (line as any).animatePos = (pen as any).animatePos;
+            }
           } else {
             this.pens.delete(pen.id);
           }
@@ -163,7 +168,10 @@ export class AnimateLayer extends Layer {
           }
           if (pen.type === PenType.Line) {
             const line = this.findLine(pen);
-            line && (line.animateStart = 0);
+            if (line) {
+              line.animateStart = 0;
+              (line as any).animatePos = (pen as any).animatePos;
+            }
           }
           if (pen.nextAnimate) {
             this.readyPlay(pen.nextAnimate, false);

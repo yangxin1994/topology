@@ -62,6 +62,9 @@ export class Line extends Pen {
       if (json.animateColor) {
         this.animateColor = json.animateColor;
       }
+      if (json.animatePos) {
+        this.animatePos = json.animatePos;
+      }
       if (json.animateSpan) {
         this.animateSpan = json.animateSpan;
       }
