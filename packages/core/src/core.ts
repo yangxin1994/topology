@@ -226,12 +226,14 @@ export class Topology {
             return;
           }
       }
+
       event.preventDefault();
+      event.stopPropagation();
 
       if (event.deltaY < 0) {
-        this.scale(1.1);
+        this.scale(1.1, new Point(event.x, event.y));
       } else {
-        this.scale(0.9);
+        this.scale(0.9, new Point(event.x, event.y));
       }
 
       this.divLayer.canvas.focus();
@@ -2109,30 +2111,14 @@ export class Topology {
     Store.set(this.generateStoreKey('LT:scale'), this.data.scale);
 
     this.render();
-    const rect = this.overflow();
-    let x = 0;
-    let y = 0;
-    if (rect.x < 0) {
-      x = -rect.x + this.options.autoExpandDistance / 2;
-    }
-    if (rect.ex > this.canvas.width) {
-      x = this.canvas.width - rect.ex - this.options.autoExpandDistance / 2;
-    }
-    if (rect.y < 0) {
-      y = -rect.y + this.options.autoExpandDistance / 2;
-    }
-    if (rect.ey > this.canvas.height) {
-      y = this.canvas.height - rect.ey - this.options.autoExpandDistance / 2;
-    }
-    this.translate(x, y);
     this.cache();
 
     this.dispatch('scale', this.data.scale);
   }
 
   // scale for origin canvas:
-  scaleTo(scale: number) {
-    this.scale(scale / this.data.scale);
+  scaleTo(scale: number, center?: Point) {
+    this.scale(scale / this.data.scale, center);
     this.data.scale = scale;
   }
 

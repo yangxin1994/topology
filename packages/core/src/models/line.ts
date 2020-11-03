@@ -469,6 +469,8 @@ export class Line extends Pen {
     this.from.y = center.y - (center.y - this.from.y) * scale;
     this.to.x = center.x - (center.x - this.to.x) * scale;
     this.to.y = center.y - (center.y - this.to.y) * scale;
+    this.lineWidth *= scale;
+    this.borderWidth *= scale;
     if (this.text && this.font && this.font.fontSize) {
       this.font.fontSize *= scale;
       this.textRect = null;
