@@ -330,17 +330,39 @@ export class ActiveLayer extends Layer {
       this.data.pens.filter((pen: Pen) => pen.type)
     );
     for (const line of nodesLines.lines) {
-      for (const item of nodesLines.nodes) {
+      let nodes: Pen[] = nodesLines.nodes;
+      if (this.options.autoAnchor) {
+        nodes = this.data.pens;
+      }
+      for (const item of nodes) {
         let cnt = 0;
         if (line.from.id === item.id) {
-          line.from.x = item.rotatedAnchors[line.from.anchorIndex].x;
-          line.from.y = item.rotatedAnchors[line.from.anchorIndex].y;
-          ++cnt;
+          if (line.from.autoAnchor) {
+            const autoAnchor = (item as Node).nearestAnchor(line.to);
+            if (autoAnchor.index > -1) {
+              line.from.anchorIndex = autoAnchor.index;
+              line.from.direction = autoAnchor.direction;
+            }
+          }
+          if (line.from.anchorIndex >= 0) {
+            line.from.x = (item as Node).rotatedAnchors[line.from.anchorIndex].x;
+            line.from.y = (item as Node).rotatedAnchors[line.from.anchorIndex].y;
+            ++cnt;
+          }
         }
         if (line.to.id === item.id) {
-          line.to.x = item.rotatedAnchors[line.to.anchorIndex].x;
-          line.to.y = item.rotatedAnchors[line.to.anchorIndex].y;
-          ++cnt;
+          if (line.to.autoAnchor) {
+            const autoAnchor = (item as Node).nearestAnchor(line.from);
+            if (autoAnchor.index > -1) {
+              line.to.anchorIndex = autoAnchor.index;
+              line.to.direction = autoAnchor.direction;
+            }
+          }
+          if (line.to.anchorIndex >= 0) {
+            line.to.x = (item as Node).rotatedAnchors[line.to.anchorIndex].x;
+            line.to.y = (item as Node).rotatedAnchors[line.to.anchorIndex].y;
+            ++cnt;
+          }
         }
         if (cnt && !this.data.manualCps) {
           line.calcControlPoints();

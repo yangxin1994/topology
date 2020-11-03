@@ -10,6 +10,7 @@ export class Point {
   strokeStyle: string;
   fillStyle: string;
   anchorIndex: number;
+  autoAnchor: boolean;
 
   hidden: boolean;
   mode: AnchorMode;
@@ -39,14 +40,8 @@ export class Point {
   }
 
   clone(): Point {
-    const pt = new Point(
-      this.x,
-      this.y,
-      this.direction,
-      this.anchorIndex,
-      this.id,
-      this.hidden
-    );
+    const pt = new Point(this.x, this.y, this.direction, this.anchorIndex, this.id, this.hidden);
+    pt.autoAnchor = this.autoAnchor;
     if (this.data) {
       pt.data = this.data;
     }
@@ -57,12 +52,7 @@ export class Point {
   }
 
   hit(pt: Point, radius = 5) {
-    return (
-      pt.x > this.x - radius &&
-      pt.x < this.x + radius &&
-      pt.y > this.y - radius &&
-      pt.y < this.y + radius
-    );
+    return pt.x > this.x - radius && pt.x < this.x + radius && pt.y > this.y - radius && pt.y < this.y + radius;
   }
 
   rotate(angle: number, center: { x: number; y: number }): Point {
@@ -71,24 +61,14 @@ export class Point {
     }
 
     angle *= Math.PI / 180;
-    const x =
-      (this.x - center.x) * Math.cos(angle) -
-      (this.y - center.y) * Math.sin(angle) +
-      center.x;
-    const y =
-      (this.x - center.x) * Math.sin(angle) +
-      (this.y - center.y) * Math.cos(angle) +
-      center.y;
+    const x = (this.x - center.x) * Math.cos(angle) - (this.y - center.y) * Math.sin(angle) + center.x;
+    const y = (this.x - center.x) * Math.sin(angle) + (this.y - center.y) * Math.cos(angle) + center.y;
     this.x = x;
     this.y = y;
     return this;
   }
 
   isSameAs(pt: Point) {
-    return (
-      this.anchorIndex === pt.anchorIndex &&
-      this.direction === pt.direction &&
-      this.id === pt.id
-    );
+    return this.anchorIndex === pt.anchorIndex && this.direction === pt.direction && this.id === pt.id;
   }
 }

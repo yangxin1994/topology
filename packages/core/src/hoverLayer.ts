@@ -105,6 +105,21 @@ export class HoverLayer extends Layer {
           ctx.fill();
           ctx.stroke();
         }
+
+        if (this.options.autoAnchor) {
+          ctx.beginPath();
+          ctx.arc(
+            (pen as Node).rect.center.x,
+            (pen as Node).rect.center.y,
+            (pen as Node).rect.center.radius || this.options.anchorRadius,
+            0,
+            Math.PI * 2
+          );
+          ctx.strokeStyle = this.options.hoverColor;
+          ctx.fillStyle = this.options.anchorFillStyle;
+          ctx.fill();
+          ctx.stroke();
+        }
       });
     }
     ctx.restore();
@@ -150,6 +165,21 @@ export class HoverLayer extends Layer {
           ctx.fill();
           ctx.stroke();
         }
+      }
+
+      if (this.options.autoAnchor) {
+        ctx.beginPath();
+        ctx.arc(
+          this.node.rect.center.x,
+          this.node.rect.center.y,
+          this.node.rect.center.radius || this.options.anchorRadius,
+          0,
+          Math.PI * 2
+        );
+        ctx.strokeStyle = this.options.hoverColor;
+        ctx.fillStyle = this.options.anchorFillStyle;
+        ctx.fill();
+        ctx.stroke();
       }
     }
 

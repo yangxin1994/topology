@@ -46,6 +46,7 @@ export interface Options {
   onlySizeY?: boolean;
   anchorSize?: number;
   alwaysAnchor?: boolean;
+  autoAnchor?: boolean;
   disableEmptyLine?: boolean;
   disableRepeatLine?: boolean;
   disableScale?: boolean;
@@ -91,4 +92,5 @@ export const DefalutOptions: Options = {
   autoExpandDistance: 200,
   keydown: KeydownType.Document,
   viewPadding: 0,
+  autoAnchor: true,
 };

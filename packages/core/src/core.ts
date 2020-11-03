@@ -22,6 +22,7 @@ import { getRect } from './utils/rect';
 import { formatPadding } from './utils/padding';
 import { Socket } from './socket';
 import { MQTT } from './mqtt';
+import { Direction } from './models';
 
 const resizeCursors = ['nw-resize', 'ne-resize', 'se-resize', 'sw-resize'];
 enum MoveInType {
@@ -34,6 +35,7 @@ enum MoveInType {
   Nodes,
   ResizeCP,
   HoverAnchors,
+  AutoAnchor,
   Rotate,
 }
 
@@ -728,7 +730,6 @@ export class Topology {
       }
 
       this.hideTip();
-
       switch (this.moveIn.type) {
         case MoveInType.None:
           this.hoverLayer.dragRect = new Rect(
@@ -758,6 +759,7 @@ export class Topology {
           break;
         case MoveInType.LineTo:
         case MoveInType.HoverAnchors:
+        case MoveInType.AutoAnchor:
           let arrow = this.data.toArrow;
           if (this.moveIn.hoverLine) {
             arrow = this.moveIn.hoverLine.toArrow;
@@ -765,11 +767,12 @@ export class Topology {
           if (this.hoverLayer.line) {
             this.activeLayer.pens = [this.hoverLayer.line];
           }
-          this.hoverLayer.lineTo(this.getLineDock(pos), arrow);
+          this.hoverLayer.lineTo(this.getLineDock(pos, AnchorMode.In), arrow);
           this.needCache = true;
           break;
+
         case MoveInType.LineFrom:
-          this.hoverLayer.lineFrom(this.getLineDock(pos));
+          this.hoverLayer.lineFrom(this.getLineDock(pos, AnchorMode.Out));
           this.needCache = true;
           break;
         case MoveInType.LineMove:
@@ -875,7 +878,26 @@ export class Topology {
           node: this.moveIn.hoverNode,
           line: this.hoverLayer.line,
         });
+        break;
 
+      case MoveInType.AutoAnchor:
+        this.hoverLayer.line = this.addLine({
+          name: this.data.lineName,
+          from: new Point(
+            this.moveIn.hoverNode.rect.center.x,
+            this.moveIn.hoverNode.rect.center.y,
+            Direction.None,
+            0,
+            this.moveIn.hoverNode.id
+          ),
+          fromArrow: this.data.fromArrow,
+          to: new Point(this.moveIn.hoverNode.rect.center.x, this.moveIn.hoverNode.rect.center.y),
+          toArrow: this.data.toArrow,
+          strokeStyle: this.options.color,
+        });
+        this.hoverLayer.line.from.autoAnchor = true;
+        this.dispatch('nodeCenter', this.moveIn.hoverNode);
+        break;
       // tslint:disable-next-line:no-switch-case-fall-through
       case MoveInType.Nodes:
         if (!this.moveIn.activeNode) {
@@ -978,6 +1000,10 @@ export class Topology {
           this.offscreen.render();
 
           this.hoverLayer.line = null;
+          break;
+        case MoveInType.AutoAnchor:
+          this.activeLayer.updateLines();
+          this.dispatch('addLine', this.hoverLayer.line);
           break;
         case MoveInType.Rotate:
           this.activeLayer.updateRotate();
@@ -1281,6 +1307,12 @@ export class Topology {
             break;
           }
         }
+
+        if (this.options.autoAnchor && node.rect.center.hit(pt, this.options.anchorSize)) {
+          this.moveIn.hoverNode = node;
+          this.moveIn.type = MoveInType.AutoAnchor;
+          this.divLayer.canvas.style.cursor = 'crosshair';
+        }
       }
 
       if (!inChild) {
@@ -1358,23 +1390,33 @@ export class Topology {
     return null;
   }
 
-  private getLineDock(point: Point) {
+  private getLineDock(point: Point, mode: AnchorMode = AnchorMode.Default) {
     this.hoverLayer.dockAnchor = null;
     for (const item of this.data.pens) {
       if (item instanceof Node) {
         if (item.rect.hit(point, 10)) {
           this.hoverLayer.node = item;
         }
+
+        if (this.options.autoAnchor && item.rect.center.hit(point, 10)) {
+          point.id = item.id;
+          point.autoAnchor = true;
+          point.x = item.rect.center.x;
+          point.y = item.rect.center.y;
+          this.hoverLayer.dockAnchor = item.rect.center;
+        }
+
         for (let i = 0; i < item.rotatedAnchors.length; ++i) {
-          if (item.rotatedAnchors[i].mode && item.rotatedAnchors[i].mode !== AnchorMode.In) {
+          if (item.rotatedAnchors[i].mode && item.rotatedAnchors[i].mode !== mode) {
             continue;
           }
           if (item.rotatedAnchors[i].hit(point, 10)) {
             point.id = item.id;
             point.anchorIndex = i;
-            point.direction = item.rotatedAnchors[point.anchorIndex].direction;
-            point.x = item.rotatedAnchors[point.anchorIndex].x;
-            point.y = item.rotatedAnchors[point.anchorIndex].y;
+            point.autoAnchor = false;
+            point.direction = item.rotatedAnchors[i].direction;
+            point.x = item.rotatedAnchors[i].x;
+            point.y = item.rotatedAnchors[i].y;
             this.hoverLayer.dockAnchor = item.rotatedAnchors[i];
             break;
           }
