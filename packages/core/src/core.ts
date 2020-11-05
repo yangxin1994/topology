@@ -1222,12 +1222,16 @@ export class Topology {
 
     this.divLayer.canvas.style.cursor = 'default';
     const len = this.data.pens.length;
+    let inLine: Pen;
     for (let i = len - 1; i > -1; --i) {
       if (this.data.pens[i].type === PenType.Node && this.inNode(pt, this.data.pens[i] as Node)) {
+        if (inLine && this.moveIn.type !== MoveInType.HoverAnchors) {
+          this.inLine(pt, inLine as Line);
+        }
         return;
       } else if (this.data.pens[i].type === PenType.Line && this.inLine(pt, this.data.pens[i] as Line)) {
-        // 需要优先判断十分在节点锚点上
-        // return;
+        // 优先判断是否在节点锚点上
+        inLine = this.data.pens[i];
       }
     }
   }
