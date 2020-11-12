@@ -619,6 +619,11 @@ export class Node extends Pen {
           this.rotate = item.state.rotate;
           this.globalAlpha = item.state.globalAlpha;
           this.lineDashOffset = item.state.lineDashOffset || 0;
+
+          this.iconFamily = item.state.iconFamily;
+          this.icon = item.state.icon;
+          this.iconSize = item.state.iconSize;
+          this.iconColor = item.state.iconColor;
           if (item.state.rect && item.state.rect.width) {
             this.rect = new Rect(item.state.rect.x, item.state.rect.y, item.state.rect.width, item.state.rect.height);
             this.init();
@@ -643,6 +648,10 @@ export class Node extends Pen {
         this.fillStyle = item.state.fillStyle;
         this.text = item.state.text;
         this.font = item.state.font;
+        this.iconFamily = item.state.iconFamily;
+        this.icon = item.state.icon;
+        this.iconSize = item.state.iconSize;
+        this.iconColor = item.state.iconColor;
 
         const rate = (timeline - item.start) / item.duration;
 

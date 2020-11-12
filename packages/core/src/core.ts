@@ -1225,7 +1225,7 @@ export class Topology {
     let inLine: Pen;
     for (let i = len - 1; i > -1; --i) {
       if (this.data.pens[i].type === PenType.Node && this.inNode(pt, this.data.pens[i] as Node)) {
-        if (inLine && this.moveIn.type !== MoveInType.HoverAnchors) {
+        if (inLine && (this.moveIn.type as any) !== MoveInType.HoverAnchors) {
           this.inLine(pt, inLine as Line);
         }
         return;
