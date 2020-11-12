@@ -315,10 +315,20 @@ export abstract class Pen {
 
       for (const prop of props) {
         if (prop.key) {
+          const keys = prop.key.split('.');
+
           if (typeof prop.value === 'object') {
-            this[prop.key] = Object.assign(this[prop.key], prop.value);
+            if (keys[1]) {
+              this[keys[0]][keys[1]] = Object.assign(this[prop.key], prop.value);
+            } else {
+              this[keys[0]] = Object.assign(this[prop.key], prop.value);
+            }
           } else {
-            this[prop.key] = prop.value;
+            if (keys[1]) {
+              this[keys[0]][keys[1]] = prop.value;
+            } else {
+              this[keys[0]] = prop.value;
+            }
           }
         }
       }
