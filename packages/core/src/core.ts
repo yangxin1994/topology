@@ -622,7 +622,7 @@ export class Topology {
       }
       if (b) {
         const canvasPos = this.divLayer.canvas.getBoundingClientRect() as DOMRect;
-        this.translate(e.x - this.mouseDown.x - canvasPos.x, e.y - this.mouseDown.y - canvasPos.y, true);
+        this.translate(e.x - this.mouseDown.x - (canvasPos.x || canvasPos.left), e.y - this.mouseDown.y - (canvasPos.y || canvasPos.top), true);
         return false;
       }
     }
@@ -633,7 +633,7 @@ export class Topology {
 
     this.scheduledAnimationFrame = true;
     const canvasPos = this.divLayer.canvas.getBoundingClientRect() as DOMRect;
-    const pos = new Point(e.x - canvasPos.x, e.y - canvasPos.y);
+    const pos = new Point(e.x - (canvasPos.x || canvasPos.left), e.y - (canvasPos.y || canvasPos.top));
 
     if (this.raf) cancelAnimationFrame(this.raf);
     this.raf = requestAnimationFrame(() => {
@@ -810,7 +810,7 @@ export class Topology {
     if (e.button !== 0) return;
 
     const canvasPos = this.divLayer.canvas.getBoundingClientRect() as DOMRect;
-    this.mouseDown = { x: e.x - canvasPos.x, y: e.y - canvasPos.y };
+    this.mouseDown = { x: e.x - (canvasPos.x || canvasPos.left), y: e.y - (canvasPos.y || canvasPos.top) };
     if (e.altKey) {
       this.divLayer.canvas.style.cursor = 'move';
     }
@@ -1041,7 +1041,7 @@ export class Topology {
     if (this.moveIn.hoverNode) {
       this.dispatch('dblclick', this.moveIn.hoverNode);
 
-      if (this.moveIn.hoverNode.getTextRect().hit(new Point(e.x - canvasPos.x, e.y - canvasPos.y))) {
+      if (this.moveIn.hoverNode.getTextRect().hit(new Point(e.x - (canvasPos.x || canvasPos.left), e.y - (canvasPos.y || canvasPos.top)))) {
         this.showInput(this.moveIn.hoverNode);
       }
 
@@ -1051,7 +1051,7 @@ export class Topology {
 
       if (
         !this.moveIn.hoverLine.text ||
-        this.moveIn.hoverLine.getTextRect().hit(new Point(e.x - canvasPos.x, e.y - canvasPos.y))
+        this.moveIn.hoverLine.getTextRect().hit(new Point(e.x - (canvasPos.x || canvasPos.left), e.y - (canvasPos.y || canvasPos.top)))
       ) {
         this.showInput(this.moveIn.hoverLine);
       }
