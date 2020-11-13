@@ -620,7 +620,7 @@ export class Topology {
             b = true;
           }
       }
-      if (b) {
+      if (b && this.data.locked < Lock.NoMove) {
         const canvasPos = this.divLayer.canvas.getBoundingClientRect() as DOMRect;
         this.translate(e.x - this.mouseDown.x - canvasPos.x, e.y - this.mouseDown.y - canvasPos.y, true);
         return false;
