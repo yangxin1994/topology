@@ -1241,7 +1241,10 @@ export class Topology {
       return null;
     }
 
-    for (const item of children) {
+    const len = children.length;
+    for (let i = len - 1; i > -1; --i) {
+      const item = children[i];
+
       if (item.type === PenType.Line) {
         if (this.inLine(pt, item as Line)) {
           return item;
