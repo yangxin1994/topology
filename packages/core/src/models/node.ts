@@ -9,6 +9,7 @@ import { text, iconfont } from '../middles/nodes/text';
 import { Store } from 'le5le-store';
 import { abs, distance } from '../utils/math';
 import { s8 } from '../utils/uuid';
+import { pointInRect } from '../utils';
 
 export const images: {
   [key: string]: { img: HTMLImageElement; cnt: number };
@@ -865,6 +866,39 @@ export class Node extends Pen {
       index,
       direction: this.rotatedAnchors[index].direction,
     };
+  }
+
+  hitInSelf(point: Point, padding = 0) {
+    if (this.rotate % 360 === 0) {
+      return this.rect.hit(point, padding);
+    }
+
+    const pts = this.rect.toPoints();
+    for (const pt of pts) {
+      pt.rotate(this.rotate, this.rect.center);
+    }
+    return pointInRect(point, pts);
+  }
+
+  hit(pt: Point, padding = 0) {
+    let node: any;
+    if (this.hitInSelf(pt, padding)) {
+      node = this;
+    }
+
+    if (this.children) {
+      const len = this.children.length;
+      for (let i = len - 1; i > -1; --i) {
+        const pen = this.children[i];
+        const p = pen.hit(pt, padding);
+        if (p) {
+          node = p;
+          break;
+        }
+      }
+    }
+
+    return node;
   }
 
   round() {
