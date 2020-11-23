@@ -9,7 +9,7 @@ import { text, iconfont } from '../middles/nodes/text';
 import { Store } from 'le5le-store';
 import { abs, distance } from '../utils/math';
 import { s8 } from '../utils/uuid';
-import { pointInRect } from '../utils';
+import { pointInRect } from '../utils/canvas';
 
 export const images: {
   [key: string]: { img: HTMLImageElement; cnt: number };
