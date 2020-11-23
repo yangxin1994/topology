@@ -2,7 +2,7 @@ import * as mqtt from './mqtt.min.js';
 
 import { EventAction, EventType, TopologyData } from './models';
 import { Store } from 'le5le-store';
-import { find } from './utils/index.js';
+import { find } from './utils/index';
 
 export class MQTT {
   client: any;
