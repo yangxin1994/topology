@@ -223,6 +223,8 @@ export class Topology {
             return;
           }
           break;
+        case KeyType.Any:
+          break;
         default:
           if (!event.ctrlKey && !event.altKey) {
             return;
@@ -616,6 +618,9 @@ export class Topology {
           if (e.altKey) {
             b = true;
           }
+          break;
+        case KeyType.Any:
+          b = true;
           break;
         default:
           if (e.ctrlKey || e.altKey) {
