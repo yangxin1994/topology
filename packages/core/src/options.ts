@@ -64,6 +64,8 @@ export interface Options {
   autoExpandDistance?: number;
   keydown?: KeydownType;
   viewPadding?: Padding;
+  grid?: boolean;
+  rule?: boolean;
   on?: (event: string, data: any) => void;
 }
 

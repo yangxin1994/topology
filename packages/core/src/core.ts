@@ -47,7 +47,7 @@ interface ICaches {
 const dockOffset = 10;
 
 export class Topology {
-  id: String;
+  id: string;
   data: TopologyData = new TopologyData();
   clipboard: TopologyData;
   caches: ICaches = {
@@ -102,7 +102,6 @@ export class Topology {
   private raf: number;
   tipMarkdown: HTMLElement;
   tipElem: HTMLElement;
-  gridElem: HTMLElement = document.createElement('div');
 
   socket: Socket;
   mqtt: MQTT;
@@ -130,7 +129,6 @@ export class Topology {
     }
     this.parentElem.style.position = 'relative';
     this.parentElem.style.overflow = 'auto';
-    this.createGrid();
 
     const id = this.id;
     this.activeLayer = new ActiveLayer(this.options, id);
@@ -296,7 +294,6 @@ export class Topology {
     this.divLayer.resize(size);
 
     this.render();
-    this.showGrid();
     this.dispatch('resize', size);
   }
 
@@ -339,8 +336,6 @@ export class Topology {
         );
       } else {
         const node = new Node(json);
-        node.setTID(this.id);
-        node.clearChildrenIds();
         this.addNode(node, true);
         if (node.name === 'div') {
           this.dispatch('LT:addDiv', node);
@@ -373,8 +368,6 @@ export class Topology {
     this.touchedNode.rect.y = pos.offsetY - this.touchedNode.rect.height / 2;
 
     const node = new Node(this.touchedNode);
-    node.setTID(this.id);
-    node.clearChildrenIds();
     this.addNode(node, true);
     this.touchedNode = undefined;
   }
@@ -403,6 +396,7 @@ export class Topology {
       node.scale(this.data.scale);
     }
 
+    node.setTID(this.id);
     this.data.pens.push(node);
 
     if (focus) {
@@ -471,6 +465,7 @@ export class Topology {
     }
     this.data.fromArrow = data.fromArrow;
     this.data.toArrow = data.toArrow;
+    this.data.lineWidth = data.lineWidth;
 
     this.data.scale = data.scale || 1;
     Store.set(this.generateStoreKey('LT:scale'), this.data.scale);
@@ -484,6 +479,7 @@ export class Topology {
     // for old data.
     if (data.nodes) {
       for (const item of data.nodes) {
+        item.TID = this.id;
         this.data.pens.push(new Node(item));
       }
       for (const item of data.lines) {
@@ -494,7 +490,8 @@ export class Topology {
 
     if (data.pens) {
       for (const item of data.pens) {
-        if (!item.from) {
+        if (!item.type) {
+          item.TID = this.id;
           this.data.pens.push(new Node(item));
         } else {
           this.data.pens.push(new Line(item));
@@ -527,8 +524,6 @@ export class Topology {
     this.animate(true);
     this.openSocket();
     this.openMqtt();
-
-    this.showGrid();
   }
 
   openSocket(url?: string) {
@@ -883,6 +878,7 @@ export class Topology {
           ),
           toArrow: this.data.toArrow,
           strokeStyle: this.options.color,
+          lineWidth: this.data.lineWidth,
         });
         this.dispatch('anchor', {
           anchor: this.moveIn.hoverNode.rotatedAnchors[this.moveIn.hoverAnchorIndex],
@@ -906,6 +902,7 @@ export class Topology {
           to: new Point(this.moveIn.hoverNode.rect.center.x, this.moveIn.hoverNode.rect.center.y),
           toArrow: this.data.toArrow,
           strokeStyle: this.options.color,
+          lineWidth: this.data.lineWidth,
         });
         this.hoverLayer.line.from.autoAnchor = true;
         this.dispatch('nodeCenter', this.moveIn.hoverNode);
@@ -1386,7 +1383,7 @@ export class Topology {
   }
 
   inLine(point: Point, line: Line) {
-    if (!line.visible) {
+    if (this.data.locked === Lock.NoEvent || !line.visible || line.locked === Lock.NoEvent) {
       return null;
     }
 
@@ -2500,34 +2497,6 @@ export class Topology {
     });
 
     pen[attr] = val;
-  }
-
-  createGrid() {
-    this.gridElem.style.position = 'absolute';
-    this.gridElem.style.display = 'none';
-    this.gridElem.style.left = '0';
-    this.gridElem.style.top = '0';
-    this.gridElem.innerHTML = `<svg class="svg-grid" width="100%" height="100%" style="position:absolute;left:0;right:0;top:0;bottom:0"
-      xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
-          <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#f3f3f3" stroke-width="1" />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#grid)" />
-    </svg>`;
-    this.parentElem.appendChild(this.gridElem);
-  }
-
-  showGrid(show?: boolean) {
-    if (show === undefined) {
-      show = this.data.grid;
-    } else {
-      this.data.grid = show;
-    }
-    this.gridElem.style.width = this.canvas.width + 'px';
-    this.gridElem.style.height = this.canvas.height + 'px';
-    this.gridElem.style.display = show ? 'block' : 'none';
   }
 
   setLineName(name: 'curve' | 'line' | 'polyline' | 'mind', render = true) {

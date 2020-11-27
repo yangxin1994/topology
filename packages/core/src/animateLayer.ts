@@ -16,7 +16,7 @@ export class AnimateLayer extends Layer {
   private lastNow = 0;
   private subscribeUpdate: any;
   private subscribePlay: any;
-  constructor(public options: Options = {}, TID: String) {
+  constructor(public options: Options = {}, TID: string) {
     super(TID);
     this.data = Store.get(this.generateStoreKey('topology-data'));
     Store.set(this.generateStoreKey('LT:AnimateLayer'), this);

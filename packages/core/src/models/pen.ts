@@ -108,6 +108,7 @@ export abstract class Pen {
   value: number;
   constructor(json?: any) {
     if (json) {
+      this.TID = json.TID;
       this.id = json.id || s8();
       this.name = json.name || '';
       this.value = json.value;
@@ -118,9 +119,7 @@ export abstract class Pen {
       this.dash = json.dash || 0;
       this.lineDash = json.lineDash;
       this.lineDashOffset = json.lineDashOffset || 0;
-      if (json.lineWidth || json.lineWidth === 0) {
-        this.lineWidth = json.lineWidth;
-      }
+      this.lineWidth = json.lineWidth;
       this.strokeStyle = json.strokeStyle || '';
       this.fillStyle = json.fillStyle || '';
       this.lineCap = json.lineCap;
@@ -347,7 +346,7 @@ export abstract class Pen {
     return this.TID;
   }
 
-  setTID(id) {
+  setTID(id: string) {
     this.TID = id;
     return this;
   }

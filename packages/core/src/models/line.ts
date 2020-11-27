@@ -431,6 +431,7 @@ export class Line extends Pen {
     if (this.animatePos > this.length + this.animateSpan - this.animateFromSize - this.animateToSize) {
       if (++this.animateCycleIndex >= this.animateCycle && this.animateCycle > 0) {
         this.animateStart = 0;
+        this.animatePos = 0;
         Store.set(this.generateStoreKey('animateEnd'), {
           type: 'line',
           data: this,

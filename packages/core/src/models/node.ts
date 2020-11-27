@@ -224,6 +224,10 @@ export class Node extends Pen {
 
     this.calcAnchors();
     this.elementRendered = false;
+
+    if (this.TID) {
+      this.setChildrenIds();
+    }
     this.addToDiv();
   }
 
@@ -281,7 +285,13 @@ export class Node extends Pen {
     }
   }
 
-  clearChildrenIds() {
+  setTID(id: string) {
+    this.TID = id;
+    this.setChildrenIds();
+    return this;
+  }
+
+  setChildrenIds() {
     if (!this.children) {
       return;
     }
@@ -290,7 +300,7 @@ export class Node extends Pen {
       item.id = s8();
       switch (item.type) {
         case PenType.Node:
-          (item as Node).clearChildrenIds();
+          (item as Node).setChildrenIds();
           break;
       }
     }
@@ -912,7 +922,7 @@ export class Node extends Pen {
 
   clone() {
     const n = new Node(this);
-    n.clearChildrenIds();
+    n.setTID(this.TID);
     return n;
   }
 }
