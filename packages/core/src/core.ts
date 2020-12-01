@@ -17,7 +17,7 @@ import { AnimateLayer } from './animateLayer';
 import { DivLayer } from './divLayer';
 import { Rect } from './models/rect';
 import { s8 } from './utils/uuid';
-import { find, getParent, pointInRect } from './utils/canvas';
+import { del, find, getParent, pointInRect } from './utils/canvas';
 import { getRect } from './utils/rect';
 import { formatPadding } from './utils/padding';
 import { Socket } from './socket';
@@ -814,7 +814,7 @@ export class Topology {
   };
 
   private onmousedown = (e: MouseEvent) => {
-    if (e.button !== 0) return;
+    if (e.button !== 0 && e.button !== 2) return;
 
     const canvasPos = this.divLayer.canvas.getBoundingClientRect() as DOMRect;
     this.mouseDown = { x: e.x - (canvasPos.x || canvasPos.left), y: e.y - (canvasPos.y || canvasPos.top) };
@@ -1773,36 +1773,39 @@ export class Topology {
     a.dispatchEvent(evt);
   }
 
-  delete(force?: boolean) {
-    const pens: Pen[] = [];
-    for (let i = 0; i < this.activeLayer.pens.length; i++) {
-      const pen = this.activeLayer.pens[i];
-      if (!force && pen.locked) {
-        continue;
-      }
-
-      const found = this.findIndex(pen);
-      if (found > -1) {
-        if (this.data.pens[found].type === PenType.Node) {
-          this.divLayer.removeDiv(this.data.pens[found] as Node);
-        }
-        if (this.options.disableEmptyLine) {
-          this.delEmptyLines(pen.id);
-        }
-        pens.push.apply(pens, this.data.pens.splice(found, 1));
-        --i;
-      }
-
-      this.animateLayer.pens.delete(pen.id);
-    }
-
-    if (!pens.length) {
+  // param:
+  //       - string ->idOrTag
+  //       - Pen[]  -> will deletes
+  delete(param?: string | Pen[], force?: boolean) {
+    if (this.data.locked && !force) {
       return;
     }
-    this.render(true);
-    this.cache();
 
-    this.dispatch('delete', pens);
+    let deleted: Pen[] = [];
+    if (typeof param === 'string') {
+      deleted = del(param, this.data.pens);
+    } else {
+      const pens: Pen[] = param || this.activeLayer.pens;
+      pens.forEach((item) => {
+        if (del(item.id, this.data.pens).length) {
+          deleted.push(item);
+          if (item.type === PenType.Node) {
+            this.divLayer.removeDiv(item as Node);
+          }
+          if (this.options.disableEmptyLine) {
+            this.delEmptyLines(item.id);
+          }
+          this.animateLayer.pens.delete(item.id);
+        }
+      });
+    }
+
+    if (deleted.length) {
+      this.render(true);
+      this.cache();
+
+      this.dispatch('delete', deleted);
+    }
   }
 
   delEmptyLines(deleteedId?: string) {
@@ -1818,29 +1821,6 @@ export class Topology {
         --i;
       }
     }
-  }
-
-  removeNode(node: Node) {
-    const i = this.findIndex(node);
-    if (i > -1) {
-      this.divLayer.removeDiv(this.data.pens[i] as Node);
-      const nodes = this.data.pens.splice(i, 1);
-      this.dispatch('delete', nodes);
-    }
-
-    this.render(true);
-    this.cache();
-  }
-
-  removeLine(line: Line) {
-    const i = this.findIndex(line);
-    if (i > -1) {
-      const lines = this.data.pens.splice(i, 1);
-      this.dispatch('delete', lines);
-    }
-
-    this.render(true);
-    this.cache();
   }
 
   cut() {

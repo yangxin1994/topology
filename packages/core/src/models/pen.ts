@@ -80,7 +80,7 @@ export abstract class Pen {
   title: string;
 
   events: { type: EventType; action: EventAction; value: string; params: string; name?: string }[] = [];
-  private eventFns: string[] = ['link', 'doAnimate', 'doFn', 'doWindowFn'];
+  private eventFns: string[] = ['link', 'doAnimate', 'doFn', 'doWindowFn', '', 'stopAnimate'];
 
   parentId: string;
   rectInParent: {
@@ -119,7 +119,7 @@ export abstract class Pen {
       this.dash = json.dash || 0;
       this.lineDash = json.lineDash;
       this.lineDashOffset = json.lineDashOffset || 0;
-      this.lineWidth = json.lineWidth;
+      this.lineWidth = json.lineWidth || 1;
       this.strokeStyle = json.strokeStyle || '';
       this.fillStyle = json.fillStyle || '';
       this.lineCap = json.lineCap;
@@ -152,7 +152,12 @@ export abstract class Pen {
       this.hideRotateCP = json.hideRotateCP;
       this.hideSizeCP = json.hideSizeCP;
       this.hideAnchor = json.hideAnchor;
-      this.events = json.events || [];
+      if (json.events) {
+        this.events = JSON.parse(JSON.stringify(json.events));
+      } else {
+        this.events = [];
+      }
+
       this.markdown = json.markdown;
       this.tipId = json.tipId;
       this.title = json.title;
@@ -283,7 +288,7 @@ export abstract class Pen {
     msg: any,
     client: any
   ) {
-    if (item.action < EventAction.Function) {
+    if (item.action < EventAction.Function || item.action === EventAction.StopAnimate) {
       this[this.eventFns[item.action]](msg.value || msg || item.value, msg.params || item.params, client);
     } else if (item.action < EventAction.SetProps) {
       this[this.eventFns[item.action]](item.value, msg || item.params, client);
@@ -356,10 +361,21 @@ export abstract class Pen {
   }
 
   private doAnimate(tag: string, params: string) {
-    this.animateStart = Date.now();
+    if (!tag) {
+      this.animateStart = Date.now();
+    }
     Store.set(this.generateStoreKey('LT:AnimatePlay'), {
       tag,
-      pen: this,
+    });
+  }
+
+  private stopAnimate(tag: string, params: string) {
+    if (!tag) {
+      this.animateStart = 0;
+    }
+    Store.set(this.generateStoreKey('LT:AnimatePlay'), {
+      tag,
+      stop: true,
     });
   }
 
