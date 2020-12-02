@@ -225,9 +225,6 @@ export class Node extends Pen {
     this.calcAnchors();
     this.elementRendered = false;
 
-    if (this.TID) {
-      this.setChildrenIds();
-    }
     this.addToDiv();
   }
 
@@ -287,7 +284,20 @@ export class Node extends Pen {
 
   setTID(id: string) {
     this.TID = id;
-    this.setChildrenIds();
+
+    if (!this.children) {
+      return;
+    }
+
+    for (const item of this.children) {
+      this.TID = id;
+      switch (item.type) {
+        case PenType.Node:
+          (item as Node).setTID(id);
+          break;
+      }
+    }
+
     return this;
   }
 
@@ -923,6 +933,7 @@ export class Node extends Pen {
   clone() {
     const n = new Node(this);
     n.setTID(this.TID);
+    this.setChildrenIds();
     return n;
   }
 }

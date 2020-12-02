@@ -504,6 +504,10 @@ export class Topology {
     this.data.mqttOptions = data.mqttOptions || { clientId: s8() };
     this.data.mqttTopics = data.mqttTopics;
     this.data.grid = data.grid;
+    this.data.gridColor = data.gridColor;
+    this.data.gridSize = data.gridSize;
+    this.data.rule = data.rule;
+    this.data.ruleColor = data.ruleColor;
     if (typeof data.data === 'object') {
       this.data.data = JSON.parse(JSON.stringify(data.data));
     } else {
@@ -1786,9 +1790,13 @@ export class Topology {
       deleted = del(param, this.data.pens);
     } else {
       const pens: Pen[] = param || this.activeLayer.pens;
-      pens.forEach((item) => {
+
+      for (let i = 0; i < pens.length; i++) {
+        const item = pens[i];
+
         if (del(item.id, this.data.pens).length) {
           deleted.push(item);
+          --i;
           if (item.type === PenType.Node) {
             this.divLayer.removeDiv(item as Node);
           }
@@ -1797,7 +1805,7 @@ export class Topology {
           }
           this.animateLayer.pens.delete(item.id);
         }
-      });
+      }
     }
 
     if (deleted.length) {
