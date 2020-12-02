@@ -42,8 +42,8 @@ export class RenderLayer extends Canvas {
     this.bkImgRect = null;
   }
 
-  render() {
-    if (this.data.bkImage && !this.bkImgRect) {
+  render = () => {
+    if (this.data && this.data.bkImage && !this.bkImgRect) {
       this.loadBkImg(this.render);
       return;
     }
@@ -71,7 +71,7 @@ export class RenderLayer extends Canvas {
     }
 
     ctx.drawImage(this.offscreen, 0, 0, this.width, this.height);
-  }
+  };
 
   rule() {
     const ctx = this.canvas.getContext('2d');
