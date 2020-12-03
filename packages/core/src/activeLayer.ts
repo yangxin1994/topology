@@ -283,7 +283,6 @@ export class ActiveLayer extends Layer {
 
       ++i;
     }
-
     this.updateLines();
 
     this.topology.dispatch('move', this.pens);
@@ -324,13 +323,10 @@ export class ActiveLayer extends Layer {
     }
 
     const nodesLines = flatNodes(pens);
+    const allLines = flatNodes(this.data.pens);
     const lines: Line[] = [];
-    nodesLines.lines.push.apply(
-      nodesLines.lines,
-      this.data.pens.filter((pen: Pen) => pen.type)
-    );
     const allNodes = flatNodes(this.data.pens).nodes;
-    for (const line of nodesLines.lines) {
+    for (const line of allLines.lines) {
       let nodes: Pen[] = nodesLines.nodes;
       if (this.options.autoAnchor) {
         nodes = allNodes;
