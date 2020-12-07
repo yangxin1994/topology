@@ -2510,6 +2510,7 @@ export class Topology {
     document.body.removeChild(this.tipMarkdown);
     window.removeEventListener('resize', this.winResize);
     this.closeSocket();
+    this.closeMqtt();
     (window as any).topology = null;
   }
 }
