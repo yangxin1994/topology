@@ -136,7 +136,12 @@ export class ActiveLayer extends Layer {
     this.nodeRects = [];
     this.childrenRects = {};
     for (const item of this.pens) {
-      this.nodeRects.push(new Rect(item.rect.x, item.rect.y, item.rect.width, item.rect.height));
+      if (item.type) {
+        this.nodeRects.push(new Rect((item as Line).from.x, (item as Line).from.y, item.rect.width, item.rect.height));
+      } else {
+        this.nodeRects.push(new Rect(item.rect.x, item.rect.y, item.rect.width, item.rect.height));
+      }
+
       this.saveChildrenRects(item);
     }
 
@@ -149,11 +154,11 @@ export class ActiveLayer extends Layer {
   }
 
   private saveChildrenRects(node: Pen) {
-    if (!(node instanceof Node) || !node.children) {
+    if (node.type || !(node as Node).children) {
       return;
     }
 
-    for (const item of node.children) {
+    for (const item of (node as Node).children) {
       this.childrenRects[item.id] = new Rect(item.rect.x, item.rect.y, item.rect.width, item.rect.height);
       this.childrenRotate[item.id] = item.rotate;
       this.saveChildrenRects(item);
@@ -279,6 +284,9 @@ export class ActiveLayer extends Layer {
       }
 
       if (item instanceof Line) {
+        const offsetX = this.nodeRects[i].x + x - item.from.x;
+        const offsetY = this.nodeRects[i].y + y - item.from.y;
+        item.translate(offsetX, offsetY);
       }
 
       ++i;
