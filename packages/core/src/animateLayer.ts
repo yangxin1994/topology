@@ -110,7 +110,10 @@ export class AnimateLayer extends Layer {
 
       if (pen instanceof Node) {
         if (pen.animateStart > 0) {
-          pen.initAnimateProps();
+          if (!pen.animateReady) {
+            pen.initAnimateProps();
+          }
+
           readyPens.set(pen.id, pen);
         }
         if (pen.children && pen.children.length) {

@@ -207,7 +207,7 @@ export class HoverLayer extends Layer {
       ctx.fill();
     }
 
-    ctx.strokeStyle = rgba(0.5, this.options.dragColor);
+    ctx.strokeStyle = rgba(0.5, this.options.hoverColor);
     ctx.lineWidth = 1;
 
     if (this.dockLineX > 0) {
