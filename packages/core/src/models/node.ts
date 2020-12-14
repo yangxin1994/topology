@@ -75,6 +75,7 @@ export class Node extends Pen {
     state: Node;
   }[] = [];
   animateAlone: boolean;
+  animateReady: boolean;
 
   gif: boolean;
   video: string;
@@ -620,6 +621,8 @@ export class Node extends Pen {
       this.animateFrames[i].end = passed;
       this.animateFrames[i].initState = Node.cloneState(i ? this.animateFrames[i - 1].state : this);
     }
+
+    this.animateReady = true;
   }
 
   animate(now: number) {

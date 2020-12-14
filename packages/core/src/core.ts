@@ -23,6 +23,7 @@ import { formatPadding } from './utils/padding';
 import { Socket } from './socket';
 import { MQTT } from './mqtt';
 import { Direction } from './models';
+import { isMobile } from './utils';
 
 const resizeCursors = ['nw-resize', 'ne-resize', 'se-resize', 'sw-resize'];
 enum MoveInType {
@@ -122,6 +123,16 @@ export class Topology {
     options.font = font;
     this.options = Object.assign({}, DefalutOptions, options);
 
+    this.setupDom(parent);
+    this.setupSubscribe();
+    this.setupMouseEvent();
+
+    this.cache();
+
+    (window as any).topology = this;
+  }
+
+  private setupDom(parent: string | HTMLElement) {
     if (typeof parent === 'string') {
       this.parentElem = document.getElementById(parent);
     } else {
@@ -129,6 +140,8 @@ export class Topology {
     }
     this.parentElem.style.position = 'relative';
     this.parentElem.style.overflow = 'auto';
+    this.parentElem.onresize = this.winResize;
+    window.addEventListener('resize', this.winResize);
 
     const id = this.id;
     this.activeLayer = new ActiveLayer(this.options, id);
@@ -139,21 +152,22 @@ export class Topology {
     this.canvas = new RenderLayer(this.parentElem, this.options, id);
     this.divLayer = new DivLayer(this.parentElem, this.options, id);
 
-    this.resize();
+    this.input.style.position = 'absolute';
+    this.input.style.zIndex = '-1';
+    this.input.style.left = '-1000px';
+    this.input.style.width = '0';
+    this.input.style.height = '0';
+    this.input.style.outline = 'none';
+    this.input.style.border = '1px solid #cdcdcd';
+    this.input.style.resize = 'none';
+    this.parentElem.appendChild(this.input);
 
-    this.divLayer.canvas.ondragover = (event) => event.preventDefault();
-    this.divLayer.canvas.ondrop = (event) => {
-      if (this.data.locked) {
-        return;
-      }
-      try {
-        const json = event.dataTransfer.getData('Topology') || event.dataTransfer.getData('Text');
-        if (!json) return;
-        const obj = JSON.parse(json);
-        event.preventDefault();
-        this.dropNodes(Array.isArray(obj) ? obj : [obj], event.offsetX, event.offsetY);
-      } catch {}
-    };
+    this.createMarkdownTip();
+
+    this.resize();
+  }
+
+  private setupSubscribe() {
     this.subcribe = Store.subscribe(this.generateStoreKey('LT:render'), () => {
       this.render();
     });
@@ -190,10 +204,49 @@ export class Topology {
       this.divLayer.playNext(e.data.nextAnimate);
       this.dispatch('animateEnd', e);
     });
+  }
 
-    this.divLayer.canvas.onmousemove = this.onMouseMove;
-    this.divLayer.canvas.onmousedown = this.onmousedown;
-    this.divLayer.canvas.onmouseup = this.onmouseup;
+  private setupMouseEvent() {
+    this.divLayer.canvas.ondragover = (event) => event.preventDefault();
+    this.divLayer.canvas.ondrop = (event) => {
+      if (this.data.locked) {
+        return;
+      }
+      try {
+        const json = event.dataTransfer.getData('Topology') || event.dataTransfer.getData('Text');
+        if (!json) return;
+        const obj = JSON.parse(json);
+        event.preventDefault();
+        this.dropNodes(Array.isArray(obj) ? obj : [obj], event.offsetX, event.offsetY);
+      } catch {}
+    };
+    if (isMobile()) {
+      this.divLayer.canvas.ontouchstart = (event) => {
+        // event.preventDefault();
+        const canvasPos = this.divLayer.canvas.getBoundingClientRect() as DOMRect;
+        const pos = new Point(
+          event.changedTouches[0].pageX - (canvasPos.x || canvasPos.left),
+          event.changedTouches[0].pageY - (canvasPos.y || canvasPos.top)
+        );
+        this.getMoveIn(pos);
+        this.hoverLayer.node = this.moveIn.hoverNode;
+        this.onmousedown(Object.assign(event.changedTouches[0], { button: 0 }));
+      };
+
+      this.divLayer.canvas.ontouchmove = (event) => {
+        event.preventDefault();
+        this.onMouseMove(Object.assign(event.changedTouches[0], { buttons: 1 }));
+      };
+
+      this.divLayer.canvas.ontouchend = (event) => {
+        this.ontouchend(event);
+      };
+    } else {
+      this.divLayer.canvas.onmousedown = this.onmousedown;
+      this.divLayer.canvas.onmousemove = this.onMouseMove;
+      this.divLayer.canvas.onmouseup = this.onmouseup;
+    }
+
     this.divLayer.canvas.ondblclick = this.ondblclick;
     this.divLayer.canvas.tabIndex = 0;
     this.divLayer.canvas.onblur = () => {
@@ -245,36 +298,30 @@ export class Topology {
       return false;
     };
 
-    this.divLayer.canvas.ontouchend = (event) => {
-      this.ontouched(event);
-    };
-
     switch (this.options.keydown) {
       case KeydownType.Document:
-        document.onkeydown = this.onkeydown;
+        document.addEventListener('keydown', this.onkeydown);
         break;
       case KeydownType.Canvas:
-        this.divLayer.canvas.onkeydown = this.onkeydown;
+        this.divLayer.canvas.addEventListener('keydown', this.onkeydown);
         break;
     }
+  }
 
-    this.input.style.position = 'absolute';
-    this.input.style.zIndex = '-1';
-    this.input.style.left = '-1000px';
-    this.input.style.width = '0';
-    this.input.style.height = '0';
-    this.input.style.outline = 'none';
-    this.input.style.border = '1px solid #cdcdcd';
-    this.input.style.resize = 'none';
-    this.parentElem.appendChild(this.input);
+  private ontouchend(event: TouchEvent) {
+    this.onmouseup(event.changedTouches[0]);
 
-    this.createMarkdownTip();
+    if (!this.touchedNode) {
+      return;
+    }
 
-    this.cache();
+    const pos = this.getTouchOffset(event.changedTouches[0]);
+    this.touchedNode.rect.x = pos.offsetX - this.touchedNode.rect.width / 2;
+    this.touchedNode.rect.y = pos.offsetY - this.touchedNode.rect.height / 2;
 
-    this.parentElem.onresize = this.winResize;
-    window.addEventListener('resize', this.winResize);
-    (window as any).topology = this;
+    const node = new Node(this.touchedNode);
+    this.addNode(node, true);
+    this.touchedNode = undefined;
   }
 
   winResize = () => {
@@ -356,20 +403,6 @@ export class Topology {
       currentTarget = currentTarget.offsetParent;
     }
     return { offsetX: touch.pageX - x, offsetY: touch.pageY - y };
-  }
-
-  private ontouched(event: TouchEvent) {
-    if (!this.touchedNode) {
-      return;
-    }
-
-    const pos = this.getTouchOffset(event.changedTouches[0]);
-    this.touchedNode.rect.x = pos.offsetX - this.touchedNode.rect.width / 2;
-    this.touchedNode.rect.y = pos.offsetY - this.touchedNode.rect.height / 2;
-
-    const node = new Node(this.touchedNode);
-    this.addNode(node, true);
-    this.touchedNode = undefined;
   }
 
   addNode(node: Node | any, focus = false) {
@@ -585,7 +618,14 @@ export class Topology {
     this.inputObj = null;
   }
 
-  private onMouseMove = (e: MouseEvent) => {
+  onMouseMove = (e: {
+    pageX: number;
+    pageY: number;
+    buttons?: number;
+    ctrlKey?: boolean;
+    shiftKey?: boolean;
+    altKey?: boolean;
+  }) => {
     if (this.scheduledAnimationFrame || this.data.locked === Lock.NoEvent) {
       return;
     }
@@ -597,7 +637,7 @@ export class Topology {
       return;
     }
 
-    if (this.mouseDown && this.moveIn.type === MoveInType.None) {
+    if (this.mouseDown && this.data.locked) {
       let b = false;
       switch (this.options.translateKey) {
         case KeyType.None:
@@ -626,11 +666,12 @@ export class Topology {
             b = true;
           }
       }
+
       if (b && this.data.locked < Lock.NoMove) {
         const canvasPos = this.divLayer.canvas.getBoundingClientRect() as DOMRect;
         this.translate(
-          e.x - this.mouseDown.x - (canvasPos.x || canvasPos.left),
-          e.y - this.mouseDown.y - (canvasPos.y || canvasPos.top),
+          e.pageX - this.mouseDown.x - (canvasPos.x || canvasPos.left),
+          e.pageY - this.mouseDown.y - (canvasPos.y || canvasPos.top),
           true
         );
         return false;
@@ -643,7 +684,7 @@ export class Topology {
 
     this.scheduledAnimationFrame = true;
     const canvasPos = this.divLayer.canvas.getBoundingClientRect() as DOMRect;
-    const pos = new Point(e.x - (canvasPos.x || canvasPos.left), e.y - (canvasPos.y || canvasPos.top));
+    const pos = new Point(e.pageX - (canvasPos.x || canvasPos.left), e.pageY - (canvasPos.y || canvasPos.top));
 
     if (this.raf) cancelAnimationFrame(this.raf);
     this.raf = requestAnimationFrame(() => {
@@ -817,11 +858,18 @@ export class Topology {
     });
   };
 
-  private onmousedown = (e: MouseEvent) => {
+  onmousedown = (e: {
+    pageX: number;
+    pageY: number;
+    button?: number;
+    ctrlKey?: boolean;
+    shiftKey?: boolean;
+    altKey?: boolean;
+  }) => {
     if (e.button !== 0 && e.button !== 2) return;
 
     const canvasPos = this.divLayer.canvas.getBoundingClientRect() as DOMRect;
-    this.mouseDown = { x: e.x - (canvasPos.x || canvasPos.left), y: e.y - (canvasPos.y || canvasPos.top) };
+    this.mouseDown = { x: e.pageX - (canvasPos.x || canvasPos.left), y: e.pageY - (canvasPos.y || canvasPos.top) };
     if (e.altKey) {
       this.divLayer.canvas.style.cursor = 'move';
     }
@@ -957,7 +1005,7 @@ export class Topology {
     this.render();
   };
 
-  private onmouseup = (e: MouseEvent) => {
+  onmouseup = (e: { pageX: number; pageY: number }) => {
     if (!this.mouseDown) return;
 
     this.mouseDown = null;
@@ -1571,8 +1619,8 @@ export class Topology {
     return angle;
   }
 
-  showInput(item: Pen) {
-    if (this.data.locked || item.locked || item.hideInput || this.options.hideInput) {
+  showInput(item: Pen, force?: boolean) {
+    if (!force && (this.data.locked || item.locked || item.hideInput || this.options.hideInput)) {
       return;
     }
 
@@ -2476,15 +2524,11 @@ export class Topology {
   }
 
   setValue(idOrTag: string, val: any, attr = 'text') {
-    let pen: Pen;
     this.data.pens.forEach((item) => {
       if (item.id === idOrTag || item.tags.indexOf(idOrTag) > -1) {
-        pen = item;
-        return;
+        item[attr] = val;
       }
     });
-
-    pen[attr] = val;
   }
 
   setLineName(name: 'curve' | 'line' | 'polyline' | 'mind', render = true) {
@@ -2509,6 +2553,15 @@ export class Topology {
     this.divLayer.destroy();
     document.body.removeChild(this.tipMarkdown);
     window.removeEventListener('resize', this.winResize);
+
+    switch (this.options.keydown) {
+      case KeydownType.Document:
+        document.removeEventListener('keydown', this.onkeydown);
+        break;
+      case KeydownType.Canvas:
+        this.divLayer.canvas.removeEventListener('keydown', this.onkeydown);
+        break;
+    }
     this.closeSocket();
     this.closeMqtt();
     (window as any).topology = null;
