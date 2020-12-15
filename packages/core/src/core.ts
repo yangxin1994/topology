@@ -76,6 +76,9 @@ export class Topology {
   touchedNode: any;
   lastHoverNode: Node;
   lastHoverLine: Line;
+  touches?: TouchList;
+  touchScale?: number;
+
   input = document.createElement('textarea');
   inputObj: Pen;
   mouseDown: { x: number; y: number; restore?: boolean };
@@ -222,6 +225,12 @@ export class Topology {
     };
     if (isMobile()) {
       this.divLayer.canvas.ontouchstart = (event) => {
+        if (event.touches.length > 1) {
+          this.touches = event.touches;
+          this.touchScale = this.data.scale;
+          return;
+        }
+
         // event.preventDefault();
         const canvasPos = this.divLayer.canvas.getBoundingClientRect() as DOMRect;
         const pos = new Point(
@@ -235,10 +244,24 @@ export class Topology {
 
       this.divLayer.canvas.ontouchmove = (event) => {
         event.preventDefault();
+        event.stopPropagation();
+        if (event.touches.length > 1) {
+          const touches = event.touches;
+
+          const scale =
+            Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY) /
+            Math.hypot(this.touches[0].pageX - this.touches[1].pageX, this.touches[0].pageY - this.touches[1].pageY);
+
+          this.scaleTo(scale * this.touchScale);
+
+          return;
+        }
+
         this.onMouseMove(Object.assign(event.changedTouches[0], { buttons: 1 }));
       };
 
       this.divLayer.canvas.ontouchend = (event) => {
+        this.touches = null;
         this.ontouchend(event);
       };
     } else {
@@ -257,7 +280,7 @@ export class Topology {
         return;
       }
       switch (this.options.scaleKey) {
-        case KeyType.None:
+        case KeyType.Any:
           break;
         case KeyType.Ctrl:
           if (!event.ctrlKey) {
@@ -637,10 +660,10 @@ export class Topology {
       return;
     }
 
-    if (this.mouseDown && this.data.locked) {
+    if (this.mouseDown && (this.data.locked || !this.moveIn.type)) {
       let b = false;
       switch (this.options.translateKey) {
-        case KeyType.None:
+        case KeyType.Any:
           b = true;
           break;
         case KeyType.Ctrl:
@@ -658,16 +681,13 @@ export class Topology {
             b = true;
           }
           break;
-        case KeyType.Any:
-          b = true;
-          break;
         default:
           if (e.ctrlKey || e.altKey) {
             b = true;
           }
       }
 
-      if (b && this.data.locked < Lock.NoMove) {
+      if (!this.options.disableTranslate && b && this.data.locked < Lock.NoMove) {
         const canvasPos = this.divLayer.canvas.getBoundingClientRect() as DOMRect;
         this.translate(
           e.pageX - this.mouseDown.x - (canvasPos.x || canvasPos.left),

@@ -1,10 +1,9 @@
 export enum KeyType {
-  None = -1,
+  Any = -1,
   CtrlOrAlt,
   Ctrl,
   Shift,
   Alt,
-  Any,
 }
 
 export enum KeydownType {
@@ -51,6 +50,7 @@ export interface Options {
   disableEmptyLine?: boolean;
   disableRepeatLine?: boolean;
   disableScale?: boolean;
+  disableTranslate?: boolean;
   disableMoveOutParent?: boolean;
   disableDockLine?: boolean;
   playIcon?: string;
