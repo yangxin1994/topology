@@ -52,7 +52,7 @@ export class Point {
     return pt;
   }
 
-  hit(pt: Point, radius = 5) {
+  hit(pt: { x: number; y: number }, radius = 5) {
     return pt.x > this.x - radius && pt.x < this.x + radius && pt.y > this.y - radius && pt.y < this.y + radius;
   }
 

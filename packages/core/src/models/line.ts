@@ -246,7 +246,7 @@ export class Line extends Pen {
     }
   }
 
-  pointIn(pt: Point) {
+  pointIn(pt: { x: number; y: number }) {
     return drawLineFns[this.name].pointIn(pt, this);
   }
 

@@ -99,7 +99,7 @@ export function getParent(pens: Pen[], child: Pen): Node {
   return parent;
 }
 
-export function pointInRect(point: Point, vertices: Point[]): boolean {
+export function pointInRect(point: { x: number; y: number }, vertices: Point[]): boolean {
   if (vertices.length < 3) {
     return false;
   }

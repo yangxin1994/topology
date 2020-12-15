@@ -891,7 +891,7 @@ export class Node extends Pen {
     };
   }
 
-  hitInSelf(point: Point, padding = 0) {
+  hitInSelf(point: { x: number; y: number }, padding = 0) {
     if (this.rotate % 360 === 0) {
       return this.rect.hit(point, padding);
     }
@@ -903,7 +903,7 @@ export class Node extends Pen {
     return pointInRect(point, pts);
   }
 
-  hit(pt: Point, padding = 0) {
+  hit(pt: { x: number; y: number }, padding = 0) {
     let node: any;
     if (this.hitInSelf(pt, padding)) {
       node = this;

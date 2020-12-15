@@ -404,6 +404,6 @@ export abstract class Pen {
   abstract animate(now: number): void;
   abstract translate(x: number, y: number): void;
   abstract scale(scale: number, center?: Point): void;
-  abstract hit(point: Point, padding?: number): any;
+  abstract hit(point: { x: number; y: number }, padding?: number): any;
   abstract clone(): Pen;
 }
