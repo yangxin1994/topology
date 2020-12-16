@@ -78,6 +78,7 @@ export class Topology {
   lastHoverLine: Line;
   touches?: TouchList;
   touchScale?: number;
+  touchStart?: number;
 
   input = document.createElement('textarea');
   inputObj: Pen;
@@ -231,22 +232,24 @@ export class Topology {
     };
 
     if (isMobile()) {
-      this.divLayer.canvas.ontouchstart = (event) => {
-        if (event.touches.length > 1) {
-          this.touches = event.touches;
-          this.touchScale = this.data.scale;
-          return;
-        }
+      // ipad
+      document.addEventListener('gesturestart', this.preventDefault);
 
+      this.divLayer.canvas.ontouchstart = (event) => {
+        this.touchStart = new Date().getTime();
         const pos = new Point(
           event.changedTouches[0].pageX - window.scrollX - (this.canvasPos.left || this.canvasPos.x),
           event.changedTouches[0].pageY - window.scrollY - (this.canvasPos.top || this.canvasPos.y)
         );
 
-        if (this.data.pens.length) {
-          this.data.pens[0].text = `${parseInt(window.scrollX + '')},${parseInt(this.canvasPos.x + '')},${parseInt(
-            pos.x + ''
-          )},${parseInt(event.changedTouches[0].pageX + '')}`;
+        if (event.touches.length > 1) {
+          this.touches = event.touches;
+          this.touchScale = this.data.scale;
+
+          this.lastTranlated.x = pos.x;
+          this.lastTranlated.y = pos.y;
+
+          return;
         }
 
         this.getMoveIn(pos);
@@ -262,19 +265,46 @@ export class Topology {
       };
 
       this.divLayer.canvas.ontouchmove = (event) => {
-        event.preventDefault();
         event.stopPropagation();
-        if (event.touches.length > 1) {
-          const touches = event.touches;
+        const timeNow = new Date().getTime();
+        if (timeNow - this.touchStart < 20) {
+          return;
+        }
 
-          const scale =
-            Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY) /
-            Math.hypot(this.touches[0].pageX - this.touches[1].pageX, this.touches[0].pageY - this.touches[1].pageY);
+        const len = event.changedTouches.length;
+        if (len > 1) {
+          const touches = event.changedTouches;
 
-          this.scaleTo(scale * this.touchScale);
+          if (len === 2) {
+            const scale =
+              (event as any).scale ||
+              Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY) /
+                Math.hypot(
+                  this.touches[0].pageX - this.touches[1].pageX,
+                  this.touches[0].pageY - this.touches[1].pageY
+                );
+
+            const x0 = this.touches[0].pageX - touches[0].pageX;
+            const x1 = this.touches[1].pageX - touches[1].pageX;
+            const y0 = this.touches[0].pageY - touches[0].pageY;
+            const y1 = this.touches[1].pageY - touches[1].pageY;
+            if (!((x0 >= 0 && x1 >= 0) || (x0 <= 0 && x1 <= 0) || (y0 >= 0 && y1 >= 0) || (y0 <= 0 && y1 <= 0))) {
+              event.preventDefault();
+              this.scaleTo(scale * this.touchScale);
+            }
+          } else if (len === 3) {
+            const pos = new Point(
+              event.changedTouches[0].pageX - window.scrollX - (this.canvasPos.left || this.canvasPos.x),
+              event.changedTouches[0].pageY - window.scrollY - (this.canvasPos.top || this.canvasPos.y)
+            );
+
+            this.translate(pos.x, pos.y, true);
+          }
 
           return;
         }
+
+        event.preventDefault();
 
         const pos = new Point(
           event.changedTouches[0].pageX - window.scrollX - (this.canvasPos.left || this.canvasPos.x),
@@ -297,14 +327,17 @@ export class Topology {
       };
     } else {
       this.divLayer.canvas.onmousedown = (event: MouseEvent) => {
-        this.onmousedown({
+        const e = {
           x: event.pageX - window.scrollX - (this.canvasPos.left || this.canvasPos.x),
           y: event.pageY - window.scrollY - (this.canvasPos.top || this.canvasPos.y),
           ctrlKey: event.ctrlKey,
           shiftKey: event.shiftKey,
           altKey: event.altKey,
           button: event.button,
-        });
+        };
+        this.lastTranlated.x = e.x;
+        this.lastTranlated.y = e.y;
+        this.onmousedown(e);
       };
       this.divLayer.canvas.onmousemove = (event: MouseEvent) => {
         this.onMouseMove({
@@ -323,7 +356,6 @@ export class Topology {
           return;
         }
 
-        // const pos = this.getTouchOffset(event.changedTouches[0]);
         this.touchedNode.rect.x = event.pageX - window.scrollX - this.canvasPos.x - this.touchedNode.rect.width / 2;
         this.touchedNode.rect.y = event.pageY - window.scrollY - this.canvasPos.y - this.touchedNode.rect.height / 2;
 
@@ -400,6 +432,10 @@ export class Topology {
     this.canvasPos = this.divLayer.canvas.getBoundingClientRect();
   };
 
+  private preventDefault = (event: any) => {
+    event.preventDefault();
+  };
+
   private ontouchend(event: TouchEvent) {
     this.onmouseup();
 
@@ -407,7 +443,6 @@ export class Topology {
       return;
     }
 
-    // const pos = this.getTouchOffset(event.changedTouches[0]);
     this.touchedNode.rect.x =
       event.changedTouches[0].pageX - window.scrollX - this.canvasPos.x - this.touchedNode.rect.width / 2;
     this.touchedNode.rect.y =
@@ -486,18 +521,6 @@ export class Topology {
 
     this.divLayer.canvas.focus();
   }
-
-  // getTouchOffset(touch: Touch) {
-  //   let currentTarget: any = this.parentElem;
-  //   let x = 0;
-  //   let y = 0;
-  //   while (currentTarget) {
-  //     x += currentTarget.offsetLeft;
-  //     y += currentTarget.offsetTop;
-  //     currentTarget = currentTarget.offsetParent;
-  //   }
-  //   return { offsetX: touch.pageX - x, offsetY: touch.pageY - y };
-  // }
 
   addNode(node: Node | any, focus = false) {
     if (!drawNodeFns[node.name]) {
@@ -2354,7 +2377,6 @@ export class Topology {
   // scale for origin canvas:
   scaleTo(scale: number, center?: Point) {
     this.scale(scale / this.data.scale, center);
-    this.data.scale = scale;
   }
 
   round() {
@@ -2642,6 +2664,7 @@ export class Topology {
     window.removeEventListener('resize', this.winResize);
     this.parentElem.removeEventListener('scroll', this.onScroll);
     window.removeEventListener('scroll', this.onScroll);
+    document.removeEventListener('gesturestart', this.preventDefault);
 
     switch (this.options.keydown) {
       case KeydownType.Document:
