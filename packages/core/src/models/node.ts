@@ -731,6 +731,10 @@ export class Node extends Pen {
               this.lineDashOffset += item.state.lineDashOffset;
             }
           }
+
+          if (item.state.value !== item.initState.value) {
+            this.value = (item.initState.value || 0) + ((item.state.value || 0) - (item.initState.value || 0)) * rate;
+          }
         } else {
           this.rect = item.state.rect;
           this.lineWidth = item.state.lineWidth;
