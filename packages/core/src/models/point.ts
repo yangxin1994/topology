@@ -73,3 +73,5 @@ export class Point {
     return this.anchorIndex === pt.anchorIndex && this.direction === pt.direction && this.id === pt.id;
   }
 }
+
+(window as any).topologyPoint = Point;

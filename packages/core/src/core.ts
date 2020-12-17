@@ -8,7 +8,7 @@ import { Point } from './models/point';
 import { Line } from './models/line';
 import { TopologyData } from './models/data';
 import { Lock, AnchorMode } from './models/status';
-import { drawNodeFns, drawLineFns } from './middles/index';
+import { drawNodeFns, drawLineFns, calcTextRect } from './middles';
 import { Offscreen } from './offscreen';
 import { RenderLayer } from './renderLayer';
 import { HoverLayer } from './hoverLayer';
@@ -128,6 +128,8 @@ export class Topology {
     const font = Object.assign({}, DefalutOptions.font, options.font);
     options.font = font;
     this.options = Object.assign({}, DefalutOptions, options);
+    Store.set(this.generateStoreKey('LT:color'), this.options.color || '#222222');
+    Store.set(this.generateStoreKey('LT:fontColor'), this.options.font.color || '#222222');
 
     this.setupDom(parent);
     this.setupSubscribe();
@@ -545,6 +547,15 @@ export class Topology {
     if (this.data.scale !== 1) {
       node.scale(this.data.scale);
     }
+
+    // if (node.autoRect) {
+    //   const ctx = this.canvas.canvas.getContext('2d');
+    //   const rect = calcTextRect(ctx, node);
+    //   node.rect.width = rect.width + node.lineWidth * 2;
+    //   node.rect.height = rect.height;
+    //   node.init();
+    //   node.initRect();
+    // }
 
     node.setTID(this.id);
     this.data.pens.push(node);
@@ -2109,6 +2120,13 @@ export class Topology {
     }
     for (const pen of pens) {
       if (pen instanceof Node) {
+        if (pen.autoRect) {
+          const ctx = this.canvas.canvas.getContext('2d');
+          const rect = calcTextRect(ctx, pen);
+          pen.rect.width = rect.width + pen.lineWidth * 2;
+          pen.rect.height = rect.height;
+        }
+
         pen.init();
         pen.initRect();
       }
@@ -2649,6 +2667,23 @@ export class Topology {
     });
 
     render && this.render();
+  }
+
+  setColor(color: string) {
+    this.options.color = color;
+    Store.set(this.generateStoreKey('LT:color'), color);
+
+    this.options.font.color = color;
+    Store.set(this.generateStoreKey('LT:fontColor'), color);
+  }
+
+  setFontColor(color: string) {
+    this.options.font.color = color;
+    Store.set(this.generateStoreKey('LT:fontColor'), color);
+  }
+
+  setIconColor(color: string) {
+    Store.set(this.generateStoreKey('LT:iconColor'), color);
   }
 
   destroy() {

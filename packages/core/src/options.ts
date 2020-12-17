@@ -72,14 +72,14 @@ export interface Options {
 export const DefalutOptions: Options = {
   cacheLen: 30,
   font: {
-    color: '#222',
+    color: '#222222',
     fontFamily: '"Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial',
     fontSize: 12,
     lineHeight: 1.5,
     textAlign: 'center',
     textBaseline: 'middle',
   },
-  color: '#222',
+  color: '#222222',
   activeColor: '#1890ff',
   hoverColor: '#fa541c',
   anchorRadius: 4,

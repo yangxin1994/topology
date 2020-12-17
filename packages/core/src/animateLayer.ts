@@ -73,10 +73,10 @@ export class AnimateLayer extends Layer {
     l.strokeStyle = l.animateColor || this.options.animateColor;
     l.length = l.getLen();
     if (!l.fromArrowColor) {
-      l.fromArrowColor = l.strokeStyle || '#222';
+      l.fromArrowColor = l.strokeStyle || Store.get(this.generateStoreKey('LT:color'));
     }
     if (!l.toArrowColor) {
-      l.toArrowColor = l.strokeStyle || '#222';
+      l.toArrowColor = l.strokeStyle || Store.get(this.generateStoreKey('LT:color'));
     }
 
     return l;

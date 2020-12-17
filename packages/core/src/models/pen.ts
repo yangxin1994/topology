@@ -44,6 +44,8 @@ export abstract class Pen {
 
   text: string;
   textMaxLine: number;
+  whiteSpace: string;
+  autoRect: boolean;
   textRect: Rect;
   fullTextRect: Rect;
   textOffsetX: number;
@@ -133,6 +135,8 @@ export abstract class Pen {
       if (json.textMaxLine) {
         this.textMaxLine = +json.textMaxLine || 0;
       }
+      this.whiteSpace = json.whiteSpace;
+      this.autoRect = json.autoRect;
       this.textOffsetX = json.textOffsetX || 0;
       this.textOffsetY = json.textOffsetY || 0;
 
@@ -205,7 +209,7 @@ export abstract class Pen {
       ctx.lineWidth = this.lineWidth;
     }
 
-    ctx.strokeStyle = this.strokeStyle || '#222';
+    ctx.strokeStyle = this.strokeStyle || Store.get(this.generateStoreKey('LT:color'));
     this.fillStyle && (ctx.fillStyle = this.fillStyle);
 
     if (this.lineCap) {
@@ -393,7 +397,7 @@ export abstract class Pen {
     (window as any)[fn](this, params, client);
   }
 
-  protected generateStoreKey(key) {
+  generateStoreKey(key) {
     return `${this.TID}-${key}`;
   }
 
