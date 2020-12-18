@@ -676,6 +676,7 @@ export class Node extends Pen {
         this.icon = item.state.icon;
         this.iconSize = item.state.iconSize;
         this.iconColor = item.state.iconColor;
+        this.visible = item.state.visible;
 
         const rate = (timeline - item.start) / item.duration;
 

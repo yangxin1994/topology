@@ -580,6 +580,9 @@ export class Topology {
       line = new Line(line);
       line.calcControlPoints(true);
     }
+    if (this.data.scale !== 1) {
+      line.font.fontSize *= this.data.scale;
+    }
     this.data.pens.push(line);
 
     if (focus) {
@@ -2373,7 +2376,7 @@ export class Topology {
       return;
     }
 
-    this.data.scale *= scale;
+    this.data.scale = Math.round(this.data.scale * scale * 100) / 100;
     !center && (center = this.getRect().center);
 
     for (const item of this.data.pens) {
