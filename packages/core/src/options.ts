@@ -64,8 +64,12 @@ export interface Options {
   autoExpandDistance?: number;
   keydown?: KeydownType;
   viewPadding?: Padding;
+  bkColor?: string;
   grid?: boolean;
+  gridColor?: string;
+  gridSize?: number;
   rule?: boolean;
+  ruleColor?: string;
   on?: (event: string, data: any) => void;
 }
 
@@ -96,4 +100,7 @@ export const DefalutOptions: Options = {
   keydown: KeydownType.Document,
   viewPadding: 0,
   autoAnchor: true,
+  gridSize: 10,
+  gridColor: '#f3f3f3',
+  ruleColor: '#888888',
 };

@@ -19,7 +19,7 @@ export class TopologyData {
   gridColor = '#f3f3f3';
   gridSize = 10;
   rule?: boolean;
-  ruleColor = '#888';
+  ruleColor = '#888888';
   websocket?: string;
   mqttUrl?: string;
   mqttOptions?: {

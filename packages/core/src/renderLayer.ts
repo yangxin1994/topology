@@ -54,8 +54,8 @@ export class RenderLayer extends Canvas {
 
     const ctx = this.canvas.getContext('2d');
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    if (this.data.bkColor) {
-      ctx.fillStyle = this.data.bkColor;
+    if (this.data.bkColor || this.options.bkColor) {
+      ctx.fillStyle = this.data.bkColor || this.options.bkColor;
       ctx.fillRect(0, 0, this.width, this.height);
     }
 
@@ -77,7 +77,7 @@ export class RenderLayer extends Canvas {
     const ctx = this.canvas.getContext('2d');
     ctx.save();
     ctx.lineWidth = 1;
-    ctx.strokeStyle = rgba(0.7, this.data.ruleColor || '#aaa');
+    ctx.strokeStyle = rgba(0.7, this.data.ruleColor || this.options.ruleColor || '#888');
     ctx.beginPath();
     for (let i = 10; i < this.width; i += 10) {
       ctx.moveTo(i, 0);
@@ -91,7 +91,7 @@ export class RenderLayer extends Canvas {
     ctx.stroke();
 
     ctx.beginPath();
-    ctx.strokeStyle = this.data.ruleColor || '#888';
+    ctx.strokeStyle = this.data.ruleColor || this.options.ruleColor || '#888';
     ctx.fillStyle = ctx.strokeStyle;
     for (let i = 100; i < this.width; i += 100) {
       ctx.moveTo(i, 0);
@@ -120,9 +120,9 @@ export class RenderLayer extends Canvas {
     const ctx = this.canvas.getContext('2d');
     ctx.save();
     ctx.lineWidth = 1;
-    ctx.strokeStyle = this.data.gridColor || '#f3f3f3';
+    ctx.strokeStyle = this.data.gridColor || this.options.gridColor || '#f3f3f3';
     ctx.beginPath();
-    const size = this.data.gridSize;
+    const size = this.data.gridSize || this.options.gridSize;
     for (let i = size; i < this.width; i += size) {
       ctx.moveTo(i, 0);
       ctx.lineTo(i, this.height);

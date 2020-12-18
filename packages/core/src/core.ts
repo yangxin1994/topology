@@ -1912,8 +1912,8 @@ export class Topology {
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
-    if (this.data.bkColor) {
-      ctx.fillStyle = this.data.bkColor;
+    if (this.data.bkColor || this.options.bkColor) {
+      ctx.fillStyle = this.data.bkColor || this.options.bkColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
     if (this.data.bkImage) {
