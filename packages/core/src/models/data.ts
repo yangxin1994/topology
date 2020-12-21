@@ -16,10 +16,10 @@ export class TopologyData {
   bkImage: string;
   bkColor: string;
   grid?: boolean;
-  gridColor = '#f3f3f3';
-  gridSize = 10;
+  gridColor?: string;
+  gridSize?: string;
   rule?: boolean;
-  ruleColor = '#888888';
+  ruleColor?: string;
   websocket?: string;
   mqttUrl?: string;
   mqttOptions?: {

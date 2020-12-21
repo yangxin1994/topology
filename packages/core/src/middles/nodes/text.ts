@@ -293,10 +293,7 @@ export function iconfont(ctx: CanvasRenderingContext2D, node: Node) {
   } else {
     ctx.font = `${iconRect.width}px ${node.iconFamily}`;
   }
-  if (!node.iconColor) {
-    node.iconColor = '#2f54eb';
-  }
-  ctx.fillStyle = node.iconColor;
+  ctx.fillStyle = node.iconColor || node.font.color;
   ctx.beginPath();
   ctx.fillText(node.icon, x, y);
   ctx.restore();

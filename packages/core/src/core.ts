@@ -720,20 +720,24 @@ export class Topology {
     }
   }
 
-  overflow() {
+  overflow(padding = 50) {
     const rect = this.getRect();
-    let { width, height } = this.canvas;
-    const maxWidth = Math.max(rect.width, rect.ex);
-    const maxHeight = Math.max(rect.height, rect.ey);
-    const offset = 50;
-    if (width < maxWidth) {
-      width = maxWidth + offset;
+    let { width, height } = rect;
+    if (width < rect.ex) {
+      width = rect.ex + padding;
     }
-    if (height < maxHeight) {
-      height = maxHeight + offset;
+    if (width < this.canvas.width) {
+      width = this.canvas.width;
     }
-    this.resize({ width, height });
-    return rect;
+    if (height < rect.ey) {
+      height = rect.ey + padding;
+    }
+    if (height < this.canvas.height) {
+      height = this.canvas.height;
+    }
+    const size = { width, height };
+    this.resize(size);
+    return size;
   }
 
   private setNodeText() {
@@ -769,7 +773,7 @@ export class Topology {
     }
 
     if (this.mouseDown && (this.data.locked || !this.moveIn.type)) {
-      let b = false;
+      let b = !!this.data.locked;
       switch (this.options.translateKey) {
         case KeyType.Any:
           b = true;
@@ -801,7 +805,7 @@ export class Topology {
       }
     }
 
-    if (this.data.locked && this.mouseDown && this.moveIn.type !== MoveInType.None) {
+    if (this.data.locked && this.mouseDown) {
       return;
     }
 
@@ -2099,6 +2103,8 @@ export class Topology {
     } else if (this.activeLayer.pens.length > 0) {
       this.dispatch('paste', this.activeLayer.pens[0]);
     }
+
+    this.overflow();
   }
 
   newId(node: any, idMaps: any) {

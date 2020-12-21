@@ -562,6 +562,11 @@ export class ActiveLayer extends Layer {
       ctx.translate(-this.rect.center.x, -this.rect.center.y);
     }
 
+    if (this.data.locked || this.locked()) {
+      ctx.restore();
+      return;
+    }
+
     // Occupied territory.
     ctx.save();
     ctx.globalAlpha = 0.3;
@@ -574,11 +579,6 @@ export class ActiveLayer extends Layer {
     ctx.closePath();
     ctx.stroke();
     ctx.restore();
-
-    if (this.data.locked || this.locked()) {
-      ctx.restore();
-      return;
-    }
 
     // Draw rotate control point.
     ctx.beginPath();

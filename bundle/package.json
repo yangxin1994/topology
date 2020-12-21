@@ -1,6 +1,6 @@
 {
   "name": "topology-bundle",
-  "version": "0.3.18",
+  "version": "0.3.19",
   "description": "The bundle of topology libs.",
   "main": "index.js",
   "scripts": {
