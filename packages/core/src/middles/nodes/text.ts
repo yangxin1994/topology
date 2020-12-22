@@ -293,7 +293,7 @@ export function iconfont(ctx: CanvasRenderingContext2D, node: Node) {
   } else {
     ctx.font = `${iconRect.width}px ${node.iconFamily}`;
   }
-  ctx.fillStyle = node.iconColor || node.font.color;
+  ctx.fillStyle = node.iconColor || Store.get(node.generateStoreKey('LT:iconColor')) || node.font.color;
   ctx.beginPath();
   ctx.fillText(node.icon, x, y);
   ctx.restore();

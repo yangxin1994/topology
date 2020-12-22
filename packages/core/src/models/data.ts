@@ -17,7 +17,7 @@ export class TopologyData {
   bkColor: string;
   grid?: boolean;
   gridColor?: string;
-  gridSize?: string;
+  gridSize?: number;
   rule?: boolean;
   ruleColor?: string;
   websocket?: string;

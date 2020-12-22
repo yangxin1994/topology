@@ -2331,6 +2331,8 @@ export class Topology {
 
     this.activeLayer.clear();
     this.hoverLayer.clear();
+
+    this.dispatch('space', null);
   }
 
   find(idOrTag: string, pens?: Pen[]) {
@@ -2349,7 +2351,7 @@ export class Topology {
     return pens.findIndex((item: Pen) => item.id === pen.id);
   }
 
-  translate(x: number, y: number, process?: boolean) {
+  translate(x: number, y: number, process?: boolean, noNotice?: boolean) {
     if (!process) {
       this.lastTranlated.x = 0;
       this.lastTranlated.y = 0;
@@ -2371,7 +2373,7 @@ export class Topology {
     this.render();
     this.cache();
 
-    this.dispatch('translate', { x, y });
+    !noNotice && this.dispatch('translate', { x, y });
   }
 
   // scale for scaled canvas:
@@ -2693,6 +2695,61 @@ export class Topology {
 
   setIconColor(color: string) {
     Store.set(this.generateStoreKey('LT:iconColor'), color);
+  }
+
+  pureData() {
+    const data = JSON.parse(JSON.stringify(this.data));
+    data.pens.forEach((pen: any) => {
+      for (const key in pen) {
+        if (pen[key] === null || pen[key] === undefined || pen[key] === '') {
+          delete pen[key];
+        }
+      }
+
+      delete pen.TID;
+      delete pen.animateCycleIndex;
+      delete pen.img;
+      delete pen.lastImage;
+      delete pen.imgNaturalWidth;
+      delete pen.imgNaturalHeight;
+      delete pen.anchors;
+      delete pen.rotatedAnchors;
+      delete pen.dockWatchers;
+      delete pen.elementLoaded;
+      delete pen.elementRendered;
+
+      this.pureDataChildren(pen);
+    });
+
+    return data;
+  }
+
+  pureDataChildren(data: any) {
+    if (!data.children) {
+      return;
+    }
+
+    data.children.forEach((pen: any) => {
+      for (const key in pen) {
+        if (pen[key] === null || pen[key] === undefined || pen[key] === '') {
+          delete pen[key];
+        }
+      }
+
+      delete pen.TID;
+      delete pen.animateCycleIndex;
+      delete pen.img;
+      delete pen.lastImage;
+      delete pen.imgNaturalWidth;
+      delete pen.imgNaturalHeight;
+      delete pen.anchors;
+      delete pen.rotatedAnchors;
+      delete pen.dockWatchers;
+      delete pen.elementLoaded;
+      delete pen.elementRendered;
+
+      this.pureDataChildren(pen);
+    });
   }
 
   destroy() {
