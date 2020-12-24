@@ -75,7 +75,10 @@ export class Node extends Pen {
     state: Node;
   }[] = [];
   animateAlone: boolean;
-  animateReady: boolean;
+  animateReady: Node;
+  animateFrame = 0;
+  private _animateFrame: number;
+  private _animatePos: number;
 
   gif: boolean;
   video: string;
@@ -176,6 +179,7 @@ export class Node extends Pen {
     if (json.animateDuration) {
       this.animateDuration = json.animateDuration;
     }
+    this.animateFrame = json.animateFrame ?? 0;
     this.animateType = json.animateType ? json.animateType : json.animateDuration ? 'custom' : '';
     this.animateAlone = json.animateAlone;
 
@@ -204,6 +208,22 @@ export class Node extends Pen {
     const n = new Node(json);
     delete n.animateFrames;
     return n;
+  }
+
+  restore(state?: Node) {
+    if (!state) {
+      state = this.animateReady;
+    }
+    if (!state) {
+      return;
+    }
+    for (const key in this) {
+      if (key.indexOf('animate') < 0) {
+        this[key] = (state as any)[key];
+      }
+    }
+
+    this.init();
   }
 
   init() {
@@ -613,7 +633,7 @@ export class Node extends Pen {
     this.dockWatchers.unshift(this.rect.center);
   }
 
-  initAnimateProps() {
+  initAnimate() {
     let passed = 0;
     for (let i = 0; i < this.animateFrames.length; ++i) {
       this.animateFrames[i].start = passed;
@@ -621,37 +641,54 @@ export class Node extends Pen {
       this.animateFrames[i].end = passed;
       this.animateFrames[i].initState = Node.cloneState(i ? this.animateFrames[i - 1].state : this);
     }
+    this.animateDuration = passed;
 
-    this.animateReady = true;
+    this.animateReady = Node.cloneState(this);
+
+    this.animatePos = 0;
+    this.animateFrame = 0;
+  }
+
+  pauseAnimate() {
+    this.animateFrame = this._animateFrame;
+    this.animatePos = this._animatePos;
+    Store.set(this.generateStoreKey('LT:AnimatePlay'), {
+      pen: this,
+      stop: true,
+    });
+  }
+
+  stopAnimate() {
+    this.pauseAnimate();
+    if (this['restore']) {
+      this['restore']();
+    }
+    this.initAnimate();
   }
 
   animate(now: number) {
     let timeline = now - this.animateStart;
+
+    if (this.animateFrame > 0) {
+      this.animateFrames.forEach((item, index) => {
+        if (this.animateFrame < index + 1) {
+          timeline += item.duration;
+        }
+      });
+
+      timeline += this.animatePos;
+    }
+
+    // Finished on animate.
     if (timeline > this.animateDuration) {
+      this.animatePos = 0;
+      this.animateFrame = 0;
       if (++this.animateCycleIndex >= this.animateCycle && this.animateCycle > 0) {
         this.animateStart = 0;
         this.animateCycleIndex = 0;
         const item = this.animateFrames[this.animateFrames.length - 1];
         if (item) {
-          this.dash = item.state.dash;
-          this.strokeStyle = item.state.strokeStyle;
-          this.fillStyle = item.state.fillStyle;
-          this.text = item.state.text;
-          this.font = item.state.font;
-
-          this.lineWidth = item.state.lineWidth;
-          this.rotate = item.state.rotate;
-          this.globalAlpha = item.state.globalAlpha;
-          this.lineDashOffset = item.state.lineDashOffset || 0;
-
-          this.iconFamily = item.state.iconFamily;
-          this.icon = item.state.icon;
-          this.iconSize = item.state.iconSize;
-          this.iconColor = item.state.iconColor;
-          if (item.state.rect && item.state.rect.width) {
-            this.rect = new Rect(item.state.rect.x, item.state.rect.y, item.state.rect.width, item.state.rect.height);
-            this.init();
-          }
+          this.restore(item.state);
         }
         Store.set(this.generateStoreKey('animateEnd'), {
           type: 'node',
@@ -664,6 +701,7 @@ export class Node extends Pen {
     }
 
     let rectChanged = false;
+
     for (let i = 0; i < this.animateFrames.length; ++i) {
       const item = this.animateFrames[i];
       if (timeline >= item.start && timeline < item.end) {
@@ -678,7 +716,13 @@ export class Node extends Pen {
         this.iconColor = item.state.iconColor;
         this.visible = item.state.visible;
 
-        const rate = (timeline - item.start) / item.duration;
+        this._animateFrame = i + 1;
+        if (this._animateFrame > this.animateFrame) {
+          this.animateFrame = 0;
+          this.animatePos = 0;
+        }
+        this._animatePos = timeline - item.start;
+        const rate = this._animatePos / item.duration;
 
         if (item.linear) {
           if (item.state.rect.x !== item.initState.rect.x) {

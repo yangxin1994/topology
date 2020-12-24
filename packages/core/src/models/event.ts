@@ -7,9 +7,10 @@ export enum EventType {
 
 export enum EventAction {
   Link,
-  Animate,
+  StartAnimate,
   Function,
   WindowFn,
   SetProps,
+  PauseAnimate,
   StopAnimate,
 }

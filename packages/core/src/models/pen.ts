@@ -6,6 +6,7 @@ import { Rect } from './rect';
 import { EventType, EventAction } from './event';
 
 import { Lock } from './status';
+import { pentagon } from '../middles/nodes/pentagon';
 
 export enum PenType {
   Node,
@@ -68,6 +69,8 @@ export abstract class Pen {
   // Auto-play
   animatePlay: boolean;
 
+  animatePos = 0;
+
   locked: Lock;
   // 作为子节点，是否可以直接点击选中
   stand: boolean;
@@ -82,7 +85,7 @@ export abstract class Pen {
   title: string;
 
   events: { type: EventType; action: EventAction; value: string; params: string; name?: string }[] = [];
-  private eventFns: string[] = ['link', 'doAnimate', 'doFn', 'doWindowFn', '', 'stopAnimate'];
+  private eventFns: string[] = ['link', 'doStartAnimate', 'doFn', 'doWindowFn', '', 'doPauseAnimate', 'doStopAnimate'];
 
   parentId: string;
   rectInParent: {
@@ -149,6 +152,7 @@ export abstract class Pen {
       this.animateCycle = json.animateCycle;
       this.nextAnimate = json.nextAnimate;
       this.animatePlay = json.animatePlay;
+      this.animatePos = json.animatePos ?? 0;
 
       this.locked = json.locked;
       this.stand = json.stand;
@@ -360,27 +364,51 @@ export abstract class Pen {
     return this;
   }
 
+  startAnimate() {
+    this.animateStart = Date.now();
+    if (this.type === PenType.Node && !this['animateReady']) {
+      this['initAnimate']();
+    }
+
+    Store.set(this.generateStoreKey('LT:AnimatePlay'), {
+      pen: this,
+    });
+  }
+
   private link(url: string, params: string) {
     window.open(url, params === undefined ? '_blank' : params);
   }
 
-  private doAnimate(tag: string, params: string) {
-    if (!tag) {
-      this.animateStart = Date.now();
+  private doStartAnimate(tag: string, params: string) {
+    if (tag) {
+      Store.set(this.generateStoreKey('LT:AnimatePlay'), {
+        tag,
+      });
+    } else {
+      this.startAnimate();
     }
-    Store.set(this.generateStoreKey('LT:AnimatePlay'), {
-      tag,
-    });
   }
 
-  private stopAnimate(tag: string, params: string) {
-    if (!tag) {
-      this.animateStart = 0;
+  private doPauseAnimate(tag: string, params: string) {
+    if (tag) {
+      Store.set(this.generateStoreKey('LT:AnimatePlay'), {
+        tag,
+        stop: true,
+      });
+    } else {
+      this.pauseAnimate();
     }
-    Store.set(this.generateStoreKey('LT:AnimatePlay'), {
-      tag,
-      stop: true,
-    });
+  }
+
+  private doStopAnimate(tag: string, params: string) {
+    if (tag) {
+      Store.set(this.generateStoreKey('LT:AnimatePlay'), {
+        tag,
+        stop: true,
+      });
+    } else {
+      this.stopAnimate();
+    }
   }
 
   private doFn(fn: string, params: string, client?: any) {
@@ -405,9 +433,12 @@ export abstract class Pen {
   abstract calcRectInParent(parent: Pen): void;
   abstract calcRectByParent(parent: Pen): void;
   abstract draw(ctx: CanvasRenderingContext2D): void;
-  abstract animate(now: number): void;
   abstract translate(x: number, y: number): void;
   abstract scale(scale: number, center?: Point): void;
   abstract hit(point: { x: number; y: number }, padding?: number): any;
   abstract clone(): Pen;
+  abstract initAnimate(): void;
+  abstract animate(now: number): void;
+  abstract pauseAnimate(): void;
+  abstract stopAnimate(): void;
 }

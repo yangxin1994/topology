@@ -26,7 +26,7 @@ export class Line extends Pen {
 
   animateColor = '';
   animateSpan = 1;
-  animatePos = 0;
+
   animateLineDash: number[];
 
   isAnimate = false;
@@ -68,9 +68,6 @@ export class Line extends Pen {
       this.toArrowColor = json.toArrowColor;
       if (json.animateColor) {
         this.animateColor = json.animateColor;
-      }
-      if (json.animatePos) {
-        this.animatePos = json.animatePos;
       }
       if (json.animateSpan) {
         this.animateSpan = json.animateSpan;
@@ -397,6 +394,25 @@ export class Line extends Pen {
     }
 
     this.translate(x - this.from.x, y - this.from.y);
+  }
+
+  initAnimate() {
+    this.animatePos = 0;
+  }
+
+  pauseAnimate() {
+    Store.set(this.generateStoreKey('LT:AnimatePlay'), {
+      pen: this,
+      stop: true,
+    });
+  }
+
+  stopAnimate() {
+    this.pauseAnimate();
+    if (this['restore']) {
+      this['restore']();
+    }
+    this.initAnimate();
   }
 
   animate(now: number) {
