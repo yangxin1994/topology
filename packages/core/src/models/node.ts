@@ -179,7 +179,7 @@ export class Node extends Pen {
     if (json.animateDuration) {
       this.animateDuration = json.animateDuration;
     }
-    this.animateFrame = json.animateFrame ?? 0;
+    this.animateFrame = json.animateFrame || 0;
     this.animateType = json.animateType ? json.animateType : json.animateDuration ? 'custom' : '';
     this.animateAlone = json.animateAlone;
 
@@ -426,6 +426,9 @@ export class Node extends Pen {
   drawImg(ctx: CanvasRenderingContext2D) {
     if (this.lastImage !== this.image) {
       this.img = null;
+      if (this.lastImage && this.lastImage.indexOf('.gif') > 0) {
+        Store.set(this.generateStoreKey('LT:addDiv'), this);
+      }
     }
 
     const gif = this.image.indexOf('.gif') > 0;
@@ -659,11 +662,16 @@ export class Node extends Pen {
   }
 
   stopAnimate() {
-    this.pauseAnimate();
-    if (this['restore']) {
-      this['restore']();
-    }
+    this.restore();
     this.initAnimate();
+    Store.set(this.generateStoreKey('LT:AnimatePlay'), {
+      pen: this,
+      stop: true,
+    });
+    Store.set(this.generateStoreKey('LT:render'), {
+      pen: this,
+      stop: true,
+    });
   }
 
   animate(now: number) {
@@ -862,14 +870,15 @@ export class Node extends Pen {
 
     if (this.animateFrames && this.animateFrames.length) {
       for (const item of this.animateFrames) {
-        if (item.state) {
-          item.state = new Node(item.state);
-          item.state.scale(scale, center);
-        }
         if (item.initState) {
-          item.initState = new Node(item.initState);
           item.initState.scale(scale, center);
         }
+        if (item.state) {
+          item.state.scale(scale, center);
+        }
+
+        // fix bug
+        item.state.font.fontSize = item.initState.font.fontSize;
       }
     }
 
@@ -880,6 +889,10 @@ export class Node extends Pen {
       for (const item of this.children) {
         item.scale(scale, center);
       }
+    }
+
+    if (this.animateReady) {
+      this.animateReady.scale(scale, center);
     }
   }
 
@@ -908,6 +921,10 @@ export class Node extends Pen {
       for (const item of this.children) {
         item.translate(x, y);
       }
+    }
+
+    if (this.animateReady) {
+      this.animateReady.translate(x, y);
     }
   }
 

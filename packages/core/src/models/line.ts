@@ -409,9 +409,6 @@ export class Line extends Pen {
 
   stopAnimate() {
     this.pauseAnimate();
-    if (this['restore']) {
-      this['restore']();
-    }
     this.initAnimate();
   }
 

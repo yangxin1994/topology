@@ -421,7 +421,7 @@ export class DivLayer extends Layer {
     }
   }
 
-  clear() {
+  clear(shallow?: boolean) {
     this.canvas.innerHTML = '';
     this.audios = {};
     this.videos = {};
@@ -429,9 +429,11 @@ export class DivLayer extends Layer {
     this.elements = {};
     this.gifs = {};
 
-    // tslint:disable-next-line:forin
-    for (const key in images) {
-      delete images[key];
+    if (!shallow) {
+      // tslint:disable-next-line:forin
+      for (const key in images) {
+        delete images[key];
+      }
     }
 
     this.player.style.top = '-99999px';

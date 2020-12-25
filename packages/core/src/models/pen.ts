@@ -152,7 +152,7 @@ export abstract class Pen {
       this.animateCycle = json.animateCycle;
       this.nextAnimate = json.nextAnimate;
       this.animatePlay = json.animatePlay;
-      this.animatePos = json.animatePos ?? 0;
+      this.animatePos = json.animatePos || 0;
 
       this.locked = json.locked;
       this.stand = json.stand;

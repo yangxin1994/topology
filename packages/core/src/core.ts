@@ -1869,7 +1869,7 @@ export class Topology {
       return;
     }
 
-    this.divLayer.clear();
+    this.divLayer.clear(true);
     const data = new TopologyData(this.caches.list[--this.caches.index]);
     this.data.pens.splice(0, this.data.pens.length);
     this.data.pens.push.apply(this.data.pens, data.pens);
@@ -1887,7 +1887,7 @@ export class Topology {
     if ((!force && this.data.locked) || this.caches.index > this.caches.list.length - 2) {
       return;
     }
-    this.divLayer.clear();
+    this.divLayer.clear(true);
     const data = new TopologyData(this.caches.list[++this.caches.index]);
     this.data.pens.splice(0, this.data.pens.length);
     this.data.pens.push.apply(this.data.pens, data.pens);
