@@ -445,10 +445,7 @@ export class Line extends Pen {
       if (++this.animateCycleIndex >= this.animateCycle && this.animateCycle > 0) {
         this.animateStart = 0;
         this.animatePos = 0;
-        Store.set(this.generateStoreKey('animateEnd'), {
-          type: 'line',
-          data: this,
-        });
+        Store.set(this.generateStoreKey('animateEnd'), this);
         return;
       }
 

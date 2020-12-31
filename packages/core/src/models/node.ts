@@ -218,7 +218,7 @@ export class Node extends Pen {
       return;
     }
     for (const key in this) {
-      if (key.indexOf('animate') < 0) {
+      if (key !== 'TID' && key.indexOf('animate') < 0 && key.indexOf('Animate') < 0) {
         this[key] = (state as any)[key];
       }
     }
@@ -674,7 +674,7 @@ export class Node extends Pen {
     });
   }
 
-  animate(now: number) {
+  animate = (now: number) => {
     let timeline = now - this.animateStart;
 
     if (this.animateFrame > 0) {
@@ -698,10 +698,8 @@ export class Node extends Pen {
         if (item) {
           this.restore(item.state);
         }
-        Store.set(this.generateStoreKey('animateEnd'), {
-          type: 'node',
-          data: this,
-        });
+
+        Store.set(this.generateStoreKey('animateEnd'), this);
         return;
       }
       this.animateStart = now;
@@ -804,7 +802,7 @@ export class Node extends Pen {
         Store.set(this.generateStoreKey('LT:rectChanged'), this);
       }
     }
-  }
+  };
 
   scale(scale: number, center?: Point) {
     if (!center) {

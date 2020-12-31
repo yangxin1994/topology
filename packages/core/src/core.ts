@@ -208,17 +208,17 @@ export class Topology {
       }
       this.dispatch('mediaEnd', node);
     });
-    this.subcribeAnimateEnd = Store.subscribe(this.generateStoreKey('animateEnd'), (e: any) => {
-      if (!e) {
+    this.subcribeAnimateEnd = Store.subscribe(this.generateStoreKey('animateEnd'), (pen: Pen) => {
+      if (!pen) {
         return;
       }
-      switch (e.type) {
-        case 'node':
+      switch (pen.type) {
+        case PenType.Node:
           this.offscreen.render();
           break;
       }
-      this.divLayer.playNext(e.data.nextAnimate);
-      this.dispatch('animateEnd', e);
+      this.divLayer.playNext(pen.nextAnimate);
+      this.dispatch('animateEnd', pen);
     });
   }
 
