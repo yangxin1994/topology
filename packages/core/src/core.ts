@@ -959,6 +959,9 @@ export class Topology {
         case MoveInType.LineTo:
         case MoveInType.HoverAnchors:
         case MoveInType.AutoAnchor:
+          if (this.hoverLayer.dockAnchor && this.hoverLayer.dockAnchor.hit(e, 10)) {
+            break;
+          }
           let arrow = this.data.toArrow;
           if (this.moveIn.hoverLine) {
             arrow = this.moveIn.hoverLine.toArrow;
@@ -1667,6 +1670,7 @@ export class Topology {
           if (pen.rotatedAnchors[i].mode && pen.rotatedAnchors[i].mode !== mode) {
             continue;
           }
+
           if (pen.rotatedAnchors[i].hit(point, 10)) {
             point.id = pen.id;
             point.anchorIndex = i;
@@ -1678,6 +1682,10 @@ export class Topology {
             break;
           }
         }
+
+        if (this.hoverLayer.dockAnchor) {
+          break;
+        }
       } else if (item instanceof Line) {
         if (item.id === this.hoverLayer.line.id) {
           continue;
@@ -1687,14 +1695,14 @@ export class Topology {
           point.x = item.from.x;
           point.y = item.from.y;
           this.hoverLayer.dockAnchor = item.from;
-          break;
+          continue;
         }
 
         if (item.to.hit(point, 10)) {
           point.x = item.to.x;
           point.y = item.to.y;
           this.hoverLayer.dockAnchor = item.to;
-          break;
+          continue;
         }
 
         if (item.controlPoints) {
@@ -1707,10 +1715,6 @@ export class Topology {
             }
           }
         }
-      }
-
-      if (this.hoverLayer.dockAnchor) {
-        break;
       }
     }
 
