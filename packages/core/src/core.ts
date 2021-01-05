@@ -659,6 +659,7 @@ export class Topology {
     this.dispatch('scale', this.data.scale);
 
     this.data.bkColor = data.bkColor;
+    Store.set('LT:bkColor', data.bkColor);
     this.data.bkImage = data.bkImage;
     this.data.tooltip = data.tooltip;
     this.data.pens = [];
