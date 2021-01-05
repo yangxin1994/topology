@@ -2053,10 +2053,8 @@ export class Topology {
           this.divLayer.removeDiv(this.data.pens[found] as Node);
         }
         this.data.pens.splice(found, 1);
-        --i;
       }
     }
-
     this.cache();
 
     this.activeLayer.clear();
@@ -2090,6 +2088,7 @@ export class Topology {
     this.activeLayer.pens = [];
 
     const idMaps: any = {};
+    console.log(1231, this.clipboard.pens.length);
     for (const pen of this.clipboard.pens) {
       if (pen.type === PenType.Node) {
         this.newId(pen, idMaps);
@@ -2116,6 +2115,7 @@ export class Topology {
         pen.controlPoints = controlPoints;
       }
       this.data.pens.push(pen);
+
       this.activeLayer.add(pen);
     }
 
