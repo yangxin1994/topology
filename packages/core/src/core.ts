@@ -969,12 +969,20 @@ export class Topology {
           if (this.hoverLayer.line) {
             this.activeLayer.pens = [this.hoverLayer.line];
           }
-          this.hoverLayer.lineTo(this.getLineDock(new Point(e.x, e.y), AnchorMode.In), arrow);
+          if (e.ctrlKey || e.shiftKey || e.altKey) {
+            this.hoverLayer.lineTo(new Point(e.x, e.y), arrow);
+          } else {
+            this.hoverLayer.lineTo(this.getLineDock(new Point(e.x, e.y), AnchorMode.In), arrow);
+          }
           this.needCache = true;
           break;
 
         case MoveInType.LineFrom:
-          this.hoverLayer.lineFrom(this.getLineDock(new Point(e.x, e.y), AnchorMode.Out));
+          if (e.ctrlKey || e.shiftKey || e.altKey) {
+            this.hoverLayer.lineFrom(new Point(e.x, e.y));
+          } else {
+            this.hoverLayer.lineFrom(this.getLineDock(new Point(e.x, e.y), AnchorMode.Out));
+          }
           this.needCache = true;
           break;
         case MoveInType.LineMove:
