@@ -10,20 +10,11 @@ module.exports = {
     library: 'MA',
     libraryTarget: 'umd',
   },
-  target: ['web', 'es5'],
   module: {
     rules: [
       {
         test: /\.ts$/,
-        use: [
-          'ts-loader',
-          {
-            loader: 'babel-loader',
-            options: {
-              presets: ['@babel/preset-env'],
-            },
-          },
-        ],
+        use: ['babel-loader', 'ts-loader'],
         exclude: [path.resolve(__dirname, 'node_modules')],
       },
     ],
