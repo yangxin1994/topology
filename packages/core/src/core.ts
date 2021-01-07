@@ -79,6 +79,7 @@ export class Topology {
   touches?: TouchList;
   touchScale?: number;
   touchStart?: number;
+  touchCenter?: { x: number; y: number };
 
   input = document.createElement('textarea');
   inputObj: Pen;
@@ -282,15 +283,22 @@ export class Topology {
 
       this.divLayer.canvas.ontouchmove = (event) => {
         event.stopPropagation();
+
+        const touches = event.changedTouches;
+        const len = touches.length;
+        if (!this.touchCenter && len > 1) {
+          this.touchCenter = {
+            x: touches[0].pageX + (touches[1].pageX - touches[0].pageX) / 2,
+            y: touches[0].pageY + (touches[1].pageY - touches[0].pageY) / 2,
+          };
+        }
+
         const timeNow = new Date().getTime();
-        if (timeNow - this.touchStart < 20) {
+        if (timeNow - this.touchStart < 50) {
           return;
         }
 
-        const len = event.changedTouches.length;
         if (len > 1) {
-          const touches = event.changedTouches;
-
           if (len === 2) {
             const scale =
               (event as any).scale ||
@@ -300,18 +308,12 @@ export class Topology {
                   this.touches[0].pageY - this.touches[1].pageY
                 );
 
-            const x0 = this.touches[0].pageX - touches[0].pageX;
-            const x1 = this.touches[1].pageX - touches[1].pageX;
-            const y0 = this.touches[0].pageY - touches[0].pageY;
-            const y1 = this.touches[1].pageY - touches[1].pageY;
-            if (!((x0 >= 0 && x1 >= 0) || (x0 <= 0 && x1 <= 0) || (y0 >= 0 && y1 >= 0) || (y0 <= 0 && y1 <= 0))) {
-              event.preventDefault();
-              this.scaleTo(scale * this.touchScale);
-            }
+            event.preventDefault();
+            this.scaleTo(scale * this.touchScale, this.touchCenter);
           } else if (len === 3) {
             const pos = new Point(
-              event.changedTouches[0].pageX - window.scrollX - (this.canvasPos.left || this.canvasPos.x),
-              event.changedTouches[0].pageY - window.scrollY - (this.canvasPos.top || this.canvasPos.y)
+              touches[0].pageX - window.scrollX - (this.canvasPos.left || this.canvasPos.x),
+              touches[0].pageY - window.scrollY - (this.canvasPos.top || this.canvasPos.y)
             );
 
             this.translate(pos.x, pos.y, true);
@@ -2412,7 +2414,7 @@ export class Topology {
   // scale for scaled canvas:
   //   > 1, expand
   //   < 1, reduce
-  scale(scale: number, center?: Point) {
+  scale(scale: number, center?: { x: number; y: number }) {
     if (this.data.scale * scale < this.options.minScale || this.data.scale * scale > this.options.maxScale) {
       return;
     }
@@ -2434,7 +2436,7 @@ export class Topology {
   }
 
   // scale for origin canvas:
-  scaleTo(scale: number, center?: Point) {
+  scaleTo(scale: number, center?: { x: number; y: number }) {
     this.scale(scale / this.data.scale, center);
   }
 

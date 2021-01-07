@@ -804,7 +804,7 @@ export class Node extends Pen {
     }
   };
 
-  scale(scale: number, center?: Point) {
+  scale(scale: number, center?: { x: number; y: number }) {
     if (!center) {
       center = this.rect.center;
     }
