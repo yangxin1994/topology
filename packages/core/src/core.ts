@@ -1971,6 +1971,7 @@ export class Topology {
         pen = new Line(item);
       } else {
         pen = new Node(item);
+        (pen as Node).animateFrames = [];
       }
 
       pen.translate(-rect.x, -rect.y);
@@ -2727,6 +2728,11 @@ export class Topology {
 
   setIconColor(color: string) {
     Store.set(this.generateStoreKey('LT:iconColor'), color);
+  }
+
+  setBkColor(color: string) {
+    this.data.bkColor = color;
+    Store.set('LT:bkColor', color);
   }
 
   pureData() {
