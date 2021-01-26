@@ -61,7 +61,6 @@ export interface Options {
   scaleKey?: KeyType;
   minScale?: number;
   maxScale?: number;
-  autoExpandDistance?: number;
   keydown?: KeydownType;
   viewPadding?: Padding;
   bkColor?: string;
@@ -98,7 +97,6 @@ export const DefalutOptions: Options = {
   minScale: 0.25,
   maxScale: 5,
   anchorSize: 5,
-  autoExpandDistance: 200,
   keydown: KeydownType.Document,
   viewPadding: 0,
   gridSize: 10,

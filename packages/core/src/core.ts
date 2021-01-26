@@ -900,34 +900,15 @@ export class Topology {
       if (!this.options.disableMoveOutParent && (moveOutX || moveOutY)) {
         this.dispatch('moveOutParent', e);
 
-        if (this.options.autoExpandDistance > 0) {
-          let resize = false;
-          if (e.x + 50 > this.divLayer.canvas.clientWidth) {
-            this.canvas.width += this.options.autoExpandDistance;
-            resize = true;
-          }
-          if (e.y + 50 > this.divLayer.canvas.clientHeight) {
-            this.canvas.height += this.options.autoExpandDistance;
-            resize = true;
-          }
-          if (resize) {
-            this.resize({
-              width: this.canvas.width,
-              height: this.canvas.height,
-            });
-          }
-
-          this.scroll(
-            moveOutX ? this.options.autoExpandDistance / 2 : 0,
-            moveOutY ? this.options.autoExpandDistance / 2 : 0
-          );
+        let x = 0;
+        let y = 0;
+        if (e.x + 50 > this.divLayer.canvas.clientWidth) {
+          x = -5;
         }
-      }
-
-      const moveLeft = e.x - 100 < this.parentElem.scrollLeft;
-      const moveTop = e.y - 100 < this.parentElem.scrollTop;
-      if (moveLeft || moveTop) {
-        this.scroll(moveLeft ? -100 : 0, moveTop ? -100 : 0);
+        if (e.y + 50 > this.divLayer.canvas.clientHeight) {
+          y = -5;
+        }
+        this.translate(x, y, false);
       }
 
       this.hideTip();
