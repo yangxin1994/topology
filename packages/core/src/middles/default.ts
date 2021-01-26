@@ -56,6 +56,7 @@ import { messageIconRect, messageTextRect } from './nodes/message.rect';
 import { messageAnchors } from './nodes/message.anchor';
 import { file } from './nodes/file';
 import { imageIconRect, imageTextRect } from './nodes/image.rect';
+import { imageAnchors } from './nodes/image.anchor';
 import { cube } from './nodes/cube';
 import { cubeAnchors } from './nodes/cube.anchor';
 import { cubeIconRect, cubeTextRect } from './nodes/cube.rect';
@@ -178,6 +179,7 @@ function init() {
   drawNodeFns.image = (ctx: CanvasRenderingContext2D, node: Rect) => {};
   iconRectFns.image = imageIconRect;
   textRectFns.image = imageTextRect;
+  anchorsFns.image = imageAnchors;
 
   // Cube
   drawNodeFns.cube = cube;

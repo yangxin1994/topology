@@ -456,10 +456,9 @@ export class Node extends Pen {
           w = (this.imgNaturalWidth / this.imgNaturalHeight) * h;
         }
       }
-      if (this.name !== 'image') {
-        x += (rect.width - w) / 2;
-        y += (rect.height - h) / 2;
-      }
+      x += (rect.width - w) / 2;
+      y += (rect.height - h) / 2;
+
       switch (this.imageAlign) {
         case 'top':
           y = rect.y;

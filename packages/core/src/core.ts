@@ -84,6 +84,7 @@ export class Topology {
   input = document.createElement('textarea');
   inputObj: Pen;
   mouseDown: { x: number; y: number; restore?: boolean };
+  spaceDown: boolean;
   lastTranlated = { x: 0, y: 0 };
   moveIn: {
     type: MoveInType;
@@ -147,6 +148,7 @@ export class Topology {
     this.cache();
 
     (window as any).topology = this;
+    this.dispatch('loaded');
   }
 
   private setupDom(parent: string | HTMLElement) {
@@ -393,8 +395,6 @@ export class Topology {
         return;
       }
       switch (this.options.scaleKey) {
-        case KeyType.Any:
-          break;
         case KeyType.Ctrl:
           if (!event.ctrlKey) {
             return;
@@ -410,12 +410,6 @@ export class Topology {
             return;
           }
           break;
-        case KeyType.Any:
-          break;
-        default:
-          if (!event.ctrlKey && !event.altKey) {
-            return;
-          }
       }
 
       event.preventDefault();
@@ -439,6 +433,9 @@ export class Topology {
     switch (this.options.keydown) {
       case KeydownType.Document:
         document.addEventListener('keydown', this.onkeydown);
+        document.addEventListener('keyup', () => {
+          this.spaceDown = false;
+        });
         break;
       case KeydownType.Canvas:
         this.divLayer.canvas.addEventListener('keydown', this.onkeydown);
@@ -478,7 +475,6 @@ export class Topology {
     }
     timer = setTimeout(() => {
       this.resize();
-      this.overflow();
     }, 100);
   };
 
@@ -709,7 +705,6 @@ export class Topology {
 
     this.divLayer.clear();
 
-    this.overflow();
     this.render(true);
 
     this.parentElem.scrollLeft = 0;
@@ -718,6 +713,8 @@ export class Topology {
     this.animate(true);
     this.openSocket();
     this.openMqtt();
+
+    this.dispatch('opened');
   }
 
   openSocket(url?: string) {
@@ -768,6 +765,9 @@ export class Topology {
 
   private setNodeText() {
     this.inputObj.text = this.input.value;
+    if (this.inputObj.name === 'image') {
+      (this.inputObj as Node).init();
+    }
     this.input.style.zIndex = '-1';
     this.input.style.left = '-1000px';
     this.input.style.width = '0';
@@ -798,7 +798,7 @@ export class Topology {
       return;
     }
 
-    if (this.mouseDown && (this.data.locked || !this.moveIn.type)) {
+    if (this.mouseDown && (this.data.locked || this.spaceDown || !this.moveIn.type)) {
       let b = !!this.data.locked;
       switch (this.options.translateKey) {
         case KeyType.Any:
@@ -825,7 +825,7 @@ export class Topology {
           }
       }
 
-      if (!this.options.disableTranslate && b && this.data.locked < Lock.NoMove) {
+      if (this.spaceDown || (!this.options.disableTranslate && b && this.data.locked < Lock.NoMove)) {
         this.translate(e.x, e.y, true);
         return false;
       }
@@ -1267,38 +1267,14 @@ export class Topology {
     this.needCache = false;
   };
 
-  private ondblclick = (e: MouseEvent) => {
+  private ondblclick = () => {
     if (this.moveIn.hoverNode) {
       this.dispatch('dblclick', this.moveIn.hoverNode);
-
-      if (
-        this.moveIn.hoverNode
-          .getTextRect()
-          .hit(
-            new Point(
-              e.x - window.scrollX - (this.canvasPos.left || this.canvasPos.x),
-              e.y - window.scrollY - (this.canvasPos.top || this.canvasPos.y)
-            )
-          )
-      ) {
-        this.showInput(this.moveIn.hoverNode);
-      }
-
+      this.showInput(this.moveIn.hoverNode);
       this.moveIn.hoverNode.dblclick();
     } else if (this.moveIn.hoverLine) {
       this.dispatch('dblclick', this.moveIn.hoverLine);
-
-      if (
-        !this.moveIn.hoverLine.text ||
-        this.moveIn.hoverLine
-          .getTextRect()
-          .hit(
-            new Point(e.x - (this.canvasPos.x || this.canvasPos.left), e.y - (this.canvasPos.y || this.canvasPos.top))
-          )
-      ) {
-        this.showInput(this.moveIn.hoverLine);
-      }
-
+      this.showInput(this.moveIn.hoverLine);
       this.moveIn.hoverLine.dblclick();
     }
   };
@@ -1316,6 +1292,9 @@ export class Topology {
     let moveX = 0;
     let moveY = 0;
     switch (key.key) {
+      case ' ':
+        this.spaceDown = true;
+        break;
       case 'a':
       case 'A':
         this.activeLayer.setPens(this.data.pens);
@@ -1391,7 +1370,6 @@ export class Topology {
     if (moveX || moveY) {
       this.activeLayer.saveNodeRects();
       this.activeLayer.move(moveX, moveY);
-      this.overflow();
       this.animateLayer.animate();
     }
 
@@ -2142,8 +2120,6 @@ export class Topology {
     } else if (this.activeLayer.pens.length > 0) {
       this.dispatch('paste', this.activeLayer.pens[0]);
     }
-
-    this.overflow();
   }
 
   newId(node: any, idMaps: any) {
@@ -2484,7 +2460,14 @@ export class Topology {
     if (w > h) {
       ratio = h;
     }
-    this.scale(ratio);
+
+    if (this.data.scale * ratio < this.options.minScale) {
+      this.scaleTo(this.options.minScale);
+    } else if (this.data.scale * ratio > this.options.maxScale) {
+      this.scaleTo(this.options.maxScale);
+    } else {
+      this.scale(ratio);
+    }
   }
 
   hasView() {
@@ -2659,11 +2642,11 @@ export class Topology {
     this.canvas.clearBkImg();
   }
 
-  dispatch(event: string, data: any) {
+  dispatch(event: string, data?: any) {
     if (this.options.on) {
       this.options.on(event, data);
     }
-    this.fire(event, data);
+    this.emit(event, data);
     return this;
   }
 
@@ -2677,7 +2660,7 @@ export class Topology {
     return this;
   }
 
-  fire(eventType: EventType, params: any) {
+  emit(eventType: EventType, params: any) {
     this._emitter.emit(eventType, params);
     return this;
   }

@@ -101,7 +101,6 @@ export const DefalutOptions: Options = {
   autoExpandDistance: 200,
   keydown: KeydownType.Document,
   viewPadding: 0,
-  autoAnchor: true,
   gridSize: 10,
   gridColor: '#f3f3f3',
   ruleColor: '#888888',
