@@ -7,10 +7,10 @@ export function imageAnchors(node: Node) {
     ? node.paddingBottomNum || node.font.lineHeight * node.font.fontSize * (node.textMaxLine || 1)
     : 0;
 
-  node.anchors.push(new Point(node.rect.x, node.rect.y + node.rect.height / 2 - textHeight, Direction.Left));
+  node.anchors.push(new Point(node.rect.x, node.rect.y + (node.rect.height - textHeight) / 2, Direction.Left));
   node.anchors.push(new Point(node.rect.x + node.rect.width / 2, node.rect.y, Direction.Up));
   node.anchors.push(
-    new Point(node.rect.x + node.rect.width, node.rect.y + node.rect.height / 2 - textHeight, Direction.Right)
+    new Point(node.rect.x + node.rect.width, node.rect.y + (node.rect.height - textHeight) / 2, Direction.Right)
   );
   node.anchors.push(
     new Point(node.rect.x + node.rect.width / 2, node.rect.y + node.rect.height - textHeight, Direction.Bottom)

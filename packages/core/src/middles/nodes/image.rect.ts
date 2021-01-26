@@ -12,6 +12,11 @@ export function imageIconRect(node: Node) {
 
 export function imageTextRect(node: Node) {
   const height = node.paddingBottomNum || node.font.lineHeight * node.font.fontSize * (node.textMaxLine || 1);
-  node.textRect = new Rect(node.rect.x, node.rect.y + node.rect.height - height, node.rect.width, height);
+  node.textRect = new Rect(
+    node.rect.x,
+    node.rect.y + node.rect.height - height,
+    node.rect.width - node.textOffsetX * 2,
+    height
+  );
   node.fullTextRect = node.rect;
 }

@@ -499,6 +499,8 @@ export class Line extends Pen {
     if (this.text) {
       this.textRect = null;
     }
+    this.textOffsetX *= scale;
+    this.textOffsetY *= scale;
 
     for (const pt of this.controlPoints) {
       pt.x = center.x - (center.x - pt.x) * scale;
