@@ -28,6 +28,7 @@ export class Node extends Pen {
   iconFamily: string;
   iconSize: number;
   iconColor: string;
+  iconRotate: number;
 
   image: string;
   lastImage: string;
@@ -110,6 +111,7 @@ export class Node extends Pen {
     this.iconFamily = json.iconFamily;
     this.iconSize = +json.iconSize;
     this.iconColor = json.iconColor;
+    this.iconRotate = json.iconRotate;
 
     this.image = json.image;
     if (json.imgNaturalWidth) {
@@ -489,6 +491,13 @@ export class Node extends Pen {
           y = rect.ey - h;
           break;
       }
+
+      if (this.iconRotate) {
+        ctx.translate(rect.center.x, rect.center.y);
+        ctx.rotate((this.iconRotate * Math.PI) / 180);
+        ctx.translate(-rect.center.x, -rect.center.y);
+      }
+
       ctx.drawImage(this.img, x, y, w, h);
       ctx.restore();
       return;
