@@ -12,7 +12,7 @@ import { s8 } from '../utils/uuid';
 import { pointInRect } from '../utils/canvas';
 
 export const images: {
-  [key: string]: { img: HTMLImageElement; cnt: number };
+  [key: string]: { img: HTMLImageElement; cnt: number; };
 } = {};
 
 export class Node extends Pen {
@@ -52,8 +52,8 @@ export class Node extends Pen {
   paddingLeft: number | string;
   paddingRight: number | string;
 
-  onlySizeX?: boolean;
-  onlySizeY?: boolean;
+  disableSizeX?: boolean;
+  disableSizeY?: boolean;
 
   iconRect: Rect;
   fullIconRect: Rect;
@@ -140,8 +140,8 @@ export class Node extends Pen {
     this.paddingLeft = json.paddingLeft || 0;
     this.paddingRight = json.paddingRight || 0;
 
-    this.onlySizeX = json.onlySizeX;
-    this.onlySizeY = json.onlySizeY;
+    this.disableSizeX = json.disableSizeX;
+    this.disableSizeY = json.disableSizeY;
 
     // 兼容老数据
     if (json.children && json.children[0] && json.children[0].parentRect) {
@@ -812,7 +812,7 @@ export class Node extends Pen {
     }
   };
 
-  scale(scale: number, center?: { x: number; y: number }) {
+  scale(scale: number, center?: { x: number; y: number; }) {
     if (!center) {
       center = this.rect.center;
     }
@@ -971,7 +971,7 @@ export class Node extends Pen {
     };
   }
 
-  hitInSelf(point: { x: number; y: number }, padding = 0) {
+  hitInSelf(point: { x: number; y: number; }, padding = 0) {
     if (this.rotate % 360 === 0) {
       return this.rect.hit(point, padding);
     }
@@ -983,7 +983,7 @@ export class Node extends Pen {
     return pointInRect(point, pts);
   }
 
-  hit(pt: { x: number; y: number }, padding = 0) {
+  hit(pt: { x: number; y: number; }, padding = 0) {
     let node: any;
     if (this.hitInSelf(pt, padding)) {
       node = this;

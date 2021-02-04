@@ -80,9 +80,8 @@ export function calcTextRect(ctx: CanvasRenderingContext2D, pen: Pen) {
   const lines = getLines(ctx, pen);
   let width = 0;
   for (const item of lines) {
-    ctx.font = `${pen.font.fontStyle || 'normal'} normal ${pen.font.fontWeight || 'normal'} ${pen.font.fontSize}px/${
-      pen.font.lineHeight
-    } ${pen.font.fontFamily}`;
+    ctx.font = `${pen.font.fontStyle || 'normal'} normal ${pen.font.fontWeight || 'normal'} ${pen.font.fontSize}px/${pen.font.lineHeight
+      } ${pen.font.fontFamily}`;
     const r = ctx.measureText(item);
     const w = r.width;
     if (w > width) {
@@ -179,9 +178,8 @@ export function text(ctx: CanvasRenderingContext2D, node: Pen) {
   ctx.beginPath();
   delete ctx.shadowColor;
   delete ctx.shadowBlur;
-  ctx.font = `${node.font.fontStyle || 'normal'} normal ${node.font.fontWeight || 'normal'} ${node.font.fontSize}px/${
-    node.font.lineHeight
-  } ${node.font.fontFamily}`;
+  ctx.font = `${node.font.fontStyle || 'normal'} normal ${node.font.fontWeight || 'normal'} ${node.font.fontSize}px/${node.font.lineHeight
+    } ${node.font.fontFamily}`;
 
   if (node.font.color) {
     ctx.fillStyle = node.font.color;
@@ -199,7 +197,7 @@ export function text(ctx: CanvasRenderingContext2D, node: Pen) {
   const lines = getLines(ctx, node);
 
   const lineHeight = node.font.fontSize * node.font.lineHeight;
-  let maxLineLen = node.textMaxLine || lines.length;
+  let maxLineLen = node.textMaxLine > lines.length ? node.textMaxLine : lines.length;
 
   // By default, the text is center aligned.
   let x = textRect.x + textRect.width / 2;

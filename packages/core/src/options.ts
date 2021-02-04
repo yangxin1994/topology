@@ -42,8 +42,8 @@ export interface Options {
   hideRotateCP?: boolean;
   hideSizeCP?: boolean;
   hideAnchor?: boolean;
-  onlySizeX?: boolean;
-  onlySizeY?: boolean;
+  disableSizeX?: boolean;
+  disableSizeY?: boolean;
   anchorSize?: number;
   alwaysAnchor?: boolean;
   autoAnchor?: boolean;

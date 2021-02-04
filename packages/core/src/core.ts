@@ -79,11 +79,11 @@ export class Topology {
   touches?: TouchList;
   touchScale?: number;
   touchStart?: number;
-  touchCenter?: { x: number; y: number };
+  touchCenter?: { x: number; y: number; };
 
   input = document.createElement('textarea');
   inputObj: Pen;
-  mouseDown: { x: number; y: number; restore?: boolean };
+  mouseDown: { x: number; y: number; restore?: boolean; };
   spaceDown: boolean;
   lastTranlated = { x: 0, y: 0 };
   moveIn: {
@@ -95,14 +95,14 @@ export class Topology {
     activeNode: Node;
     lineControlPoint: Point;
   } = {
-    type: MoveInType.None,
-    activeAnchorIndex: 0,
-    hoverAnchorIndex: 0,
-    hoverNode: null,
-    hoverLine: null,
-    activeNode: null,
-    lineControlPoint: null,
-  };
+      type: MoveInType.None,
+      activeAnchorIndex: 0,
+      hoverAnchorIndex: 0,
+      hoverNode: null,
+      hoverLine: null,
+      activeNode: null,
+      lineControlPoint: null,
+    };
   canvasPos?: DOMRect;
 
   needCache = false;
@@ -241,7 +241,7 @@ export class Topology {
         const obj = JSON.parse(json);
         event.preventDefault();
         this.dropNodes(Array.isArray(obj) ? obj : [obj], event.offsetX, event.offsetY);
-      } catch {}
+      } catch { }
     };
 
     if (isMobile()) {
@@ -305,10 +305,10 @@ export class Topology {
             const scale =
               (event as any).scale ||
               Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY) /
-                Math.hypot(
-                  this.touches[0].pageX - this.touches[1].pageX,
-                  this.touches[0].pageY - this.touches[1].pageY
-                );
+              Math.hypot(
+                this.touches[0].pageX - this.touches[1].pageX,
+                this.touches[0].pageY - this.touches[1].pageY
+              );
 
             event.preventDefault();
             this.scaleTo(scale * this.touchScale, this.touchCenter);
@@ -478,7 +478,7 @@ export class Topology {
     }, 100);
   };
 
-  resize(size?: { width: number; height: number }) {
+  resize(size?: { width: number; height: number; }) {
     this.canvas.resize(size);
     this.offscreen.resize(size);
     this.divLayer.resize(size);
@@ -1327,7 +1327,7 @@ export class Topology {
         break;
       case 'y':
       case 'Y':
-        if (key.ctrlKey) {
+        if (key.ctrlKey || key.metaKey) {
           this.redo();
         }
         break;
@@ -1335,7 +1335,7 @@ export class Topology {
       case 'Z':
         if (key.shiftKey) {
           this.redo();
-        } else {
+        } else if (key.ctrlKey || key.metaKey) {
           this.undo();
         }
         break;
@@ -1358,7 +1358,7 @@ export class Topology {
     this.cache();
   };
 
-  private getMoveIn(pt: { x: number; y: number }) {
+  private getMoveIn(pt: { x: number; y: number; }) {
     this.lastHoverNode = this.moveIn.hoverNode;
     this.lastHoverLine = this.moveIn.hoverLine;
     this.moveIn.type = MoveInType.None;
@@ -1438,7 +1438,7 @@ export class Topology {
     }
   }
 
-  inChildNode(pt: { x: number; y: number }, children: Pen[]) {
+  inChildNode(pt: { x: number; y: number; }, children: Pen[]) {
     if (!children) {
       return null;
     }
@@ -1467,7 +1467,7 @@ export class Topology {
     return null;
   }
 
-  inNode(pt: { x: number; y: number }, node: Node, inChild = false) {
+  inNode(pt: { x: number; y: number; }, node: Node, inChild = false) {
     if (this.data.locked === Lock.NoEvent || !node.visible || node.locked === Lock.NoEvent) {
       return null;
     }
@@ -1559,7 +1559,7 @@ export class Topology {
     return null;
   }
 
-  inLine(point: { x: number; y: number }, line: Line) {
+  inLine(point: { x: number; y: number; }, line: Line) {
     if (this.data.locked === Lock.NoEvent || !line.visible || line.locked === Lock.NoEvent) {
       return null;
     }
@@ -1719,7 +1719,7 @@ export class Topology {
     }
   }
 
-  private getAngle(pt: { x: number; y: number }) {
+  private getAngle(pt: { x: number; y: number; }) {
     if (pt.x === this.activeLayer.rect.center.x) {
       return pt.y <= this.activeLayer.rect.center.y ? 0 : 180;
     }
@@ -2058,7 +2058,6 @@ export class Topology {
     this.activeLayer.pens = [];
 
     const idMaps: any = {};
-    console.log(1231, this.clipboard.pens.length);
     for (const pen of this.clipboard.pens) {
       if (pen.type === PenType.Node) {
         this.newId(pen, idMaps);
@@ -2372,7 +2371,7 @@ export class Topology {
   // scale for scaled canvas:
   //   > 1, expand
   //   < 1, reduce
-  scale(scale: number, center?: { x: number; y: number }) {
+  scale(scale: number, center?: { x: number; y: number; }) {
     if (this.data.scale * scale < this.options.minScale || this.data.scale * scale > this.options.maxScale) {
       return;
     }
@@ -2394,7 +2393,7 @@ export class Topology {
   }
 
   // scale for origin canvas:
-  scaleTo(scale: number, center?: { x: number; y: number }) {
+  scaleTo(scale: number, center?: { x: number; y: number; }) {
     this.scale(scale / this.data.scale, center);
   }
 
@@ -2486,7 +2485,7 @@ export class Topology {
     document.body.appendChild(this.tipMarkdown);
   }
 
-  private showTip(data: Pen, pos: { x: number; y: number }) {
+  private showTip(data: Pen, pos: { x: number; y: number; }) {
     if (!data || data.id === this.tip || this.data.tooltip === false || this.data.tooltip === 0) {
       return;
     }

@@ -29,8 +29,8 @@ export class ActiveLayer extends Layer {
   // 备份初始位置，方便移动事件处理
   initialSizeCPs: Point[] = [];
   nodeRects: Rect[] = [];
-  childrenRects: { [key: string]: Rect } = {};
-  childrenRotate: { [key: string]: number } = {};
+  childrenRects: { [key: string]: Rect; } = {};
+  childrenRotate: { [key: string]: number; } = {};
 
   // nodes移动时，停靠点的参考位置
   dockWatchers: Point[] = [];
@@ -167,7 +167,10 @@ export class ActiveLayer extends Layer {
 
   // pt1 - the point of mouse down.
   // pt2 - the point of mouse move.
-  resize(type: number, pt1: { x: number; y: number }, pt2: { x: number; y: number }) {
+  resize(type: number, pt1: { x: number; y: number; }, pt2: {
+    x: number; y: number; ctrlKey?: boolean;
+    altKey?: boolean;
+  }) {
     const p1 = new Point(pt1.x, pt1.y);
     const p2 = new Point(pt2.x, pt2.y);
     if (this.pens.length === 1 && this.pens[0].rotate % 360) {
@@ -177,12 +180,7 @@ export class ActiveLayer extends Layer {
 
     let offsetX = p2.x - p1.x;
     let offsetY = p2.y - p1.y;
-    if (this.options.onlySizeX) {
-      offsetY = 0;
-    }
-    if (this.options.onlySizeY) {
-      offsetX = 0;
-    }
+
     const lines: Line[] = [];
 
     switch (type) {
@@ -208,18 +206,12 @@ export class ActiveLayer extends Layer {
         case PenType.Line:
           break;
         default:
-          if (!(item as Node).onlySizeX) {
+
+          if (!this.options.disableSizeX && !pt2.altKey && !(item as Node).disableSizeX) {
             item.rect.width = this.nodeRects[i].width + offsetX;
           }
-          if (!(item as Node).onlySizeY) {
+          if (!this.options.disableSizeY && !pt2.ctrlKey && !(item as Node).disableSizeY) {
             item.rect.height = this.nodeRects[i].height + offsetY;
-          }
-
-          if (item.rect.width < 10) {
-            item.rect.width = 10;
-          }
-          if (item.rect.height < 10) {
-            item.rect.height = 10;
           }
 
           switch (type) {
