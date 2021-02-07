@@ -14,7 +14,7 @@ export function imageAnchors(node: Node) {
   }
 
   node.anchors.push(new Point(node.rect.x, node.rect.y + (node.rect.height - textHeight) / 2, Direction.Left));
-  node.anchors.push(new Point(node.rect.x + node.rect.width / 2, node.rect.y, Direction.Up));
+  node.anchors.push(new Point(node.rect.x + (node.rect.width - textWidth) / 2, node.rect.y, Direction.Up));
   node.anchors.push(
     new Point(
       node.rect.x + node.rect.width - textWidth,

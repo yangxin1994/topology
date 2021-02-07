@@ -419,12 +419,13 @@ export class Topology {
         event.x - window.scrollX - (this.canvasPos.left || this.canvasPos.x),
         event.y - window.scrollY - (this.canvasPos.top || this.canvasPos.y)
       );
+      let scale = this.data.scale;
       if (event.deltaY < 0) {
-        this.scale(1.1, pos);
+        scale += 0.1;
       } else {
-        this.scale(0.9, pos);
+        scale -= 0.1;
       }
-
+      this.scaleTo(scale, pos);
       this.divLayer.canvas.focus();
 
       return false;
@@ -2372,11 +2373,16 @@ export class Topology {
   //   > 1, expand
   //   < 1, reduce
   scale(scale: number, center?: { x: number; y: number; }) {
-    if (this.data.scale * scale < this.options.minScale || this.data.scale * scale > this.options.maxScale) {
-      return;
+    if (this.data.scale * scale < this.options.minScale) {
+      scale = this.options.minScale / this.data.scale;
+      this.data.scale = this.options.minScale;
+    } else if (this.data.scale * scale > this.options.maxScale) {
+      scale = this.options.maxScale / this.data.scale;
+      this.data.scale = this.options.maxScale;
+    } else {
+      this.data.scale = Math.round(this.data.scale * scale * 100) / 100;
     }
 
-    this.data.scale = Math.round(this.data.scale * scale * 100) / 100;
     !center && (center = this.getRect().center);
 
     for (const item of this.data.pens) {
@@ -2441,13 +2447,7 @@ export class Topology {
       ratio = h;
     }
 
-    if (this.data.scale * ratio < this.options.minScale) {
-      this.scaleTo(this.options.minScale);
-    } else if (this.data.scale * ratio > this.options.maxScale) {
-      this.scaleTo(this.options.maxScale);
-    } else {
-      this.scale(ratio);
-    }
+    this.scale(ratio);
   }
 
   hasView() {

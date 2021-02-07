@@ -94,7 +94,7 @@ export const DefalutOptions: Options = {
   dragColor: '#1890ff',
   rotateCursor: '/assets/img/rotate.cur',
   hoverCursor: 'pointer',
-  minScale: 0.25,
+  minScale: 0.3,
   maxScale: 5,
   anchorSize: 5,
   keydown: KeydownType.Document,
