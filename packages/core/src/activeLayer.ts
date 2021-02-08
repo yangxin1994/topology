@@ -16,8 +16,6 @@ import { flatNodes, getBboxOfPoints } from './utils';
 import { Topology } from './core';
 
 export class ActiveLayer extends Layer {
-  protected data: TopologyData;
-
   rotateCPs: Point[] = [];
   sizeCPs: Point[] = [];
   rect: Rect;
@@ -40,7 +38,6 @@ export class ActiveLayer extends Layer {
 
   constructor(public options: Options = {}, TID: string) {
     super(TID);
-    this.data = Store.get(this.generateStoreKey('topology-data'));
     Store.set(this.generateStoreKey('LT:ActiveLayer'), this);
   }
 

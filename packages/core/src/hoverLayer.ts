@@ -11,8 +11,6 @@ import { Layer } from './layer';
 import { rgba } from './utils/math';
 
 export class HoverLayer extends Layer {
-  protected data: TopologyData;
-
   line: Line;
   // for move line.
   initLine: Line;
@@ -31,7 +29,6 @@ export class HoverLayer extends Layer {
   dragRect: Rect;
   constructor(public options: Options = {}, TID: string) {
     super(TID);
-    this.data = Store.get(this.generateStoreKey('topology-data'));
     Store.set(this.generateStoreKey('LT:HoverLayer'), this);
   }
 
@@ -60,7 +57,7 @@ export class HoverLayer extends Layer {
     Store.set(this.generateStoreKey('LT:updateLines'), [this.line]);
   }
 
-  lineMove(pt: { x: number; y: number }, initPos: { x: number; y: number }) {
+  lineMove(pt: { x: number; y: number; }, initPos: { x: number; y: number; }) {
     if (this.line.locked) {
       return;
     }

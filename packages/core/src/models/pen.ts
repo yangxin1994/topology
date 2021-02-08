@@ -84,7 +84,7 @@ export abstract class Pen {
   tipId: string;
   title: string;
 
-  events: { type: EventType; action: EventAction; value: string; params: string; name?: string }[] = [];
+  events: { type: EventType; action: EventAction; value: string; params: string; name?: string; }[] = [];
   private eventFns: string[] = ['link', 'doStartAnimate', 'doFn', 'doWindowFn', '', 'doPauseAnimate', 'doStopAnimate'];
 
   parentId: string;
@@ -202,6 +202,7 @@ export abstract class Pen {
     if ((ctx as any).setAttrs) {
       (ctx as any).setAttrs(this);
     }
+    // end
 
     if (this.rotate || this.offsetRotate) {
       ctx.translate(this.rect.center.x, this.rect.center.y);
@@ -292,7 +293,7 @@ export abstract class Pen {
   }
 
   doSocketMqtt(
-    item: { type: EventType; action: EventAction; value: string; params: string; name?: string },
+    item: { type: EventType; action: EventAction; value: string; params: string; name?: string; },
     msg: any,
     client: any
   ) {
@@ -306,7 +307,7 @@ export abstract class Pen {
       if (typeof msg === 'string') {
         try {
           data = JSON.parse(msg);
-        } catch (error) {}
+        } catch (error) { }
       }
       if (Array.isArray(data)) {
         props = data;
@@ -434,8 +435,8 @@ export abstract class Pen {
   abstract calcRectByParent(parent: Pen): void;
   abstract draw(ctx: CanvasRenderingContext2D): void;
   abstract translate(x: number, y: number): void;
-  abstract scale(scale: number, center?: { x: number; y: number }): void;
-  abstract hit(point: { x: number; y: number }, padding?: number): any;
+  abstract scale(scale: number, center?: { x: number; y: number; }): void;
+  abstract hit(point: { x: number; y: number; }, padding?: number): any;
   abstract clone(): Pen;
   abstract initAnimate(): void;
   abstract animate(now: number): void;

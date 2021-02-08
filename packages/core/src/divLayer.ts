@@ -7,7 +7,6 @@ import { PenType } from './models/pen';
 import { Layer } from './layer';
 
 export class DivLayer extends Layer {
-  protected data: TopologyData;
   canvas = document.createElement('div');
   player = document.createElement('div');
   curNode: Node;
@@ -17,17 +16,16 @@ export class DivLayer extends Layer {
   progress: HTMLElement;
   loop: HTMLElement;
   media: HTMLMediaElement;
-  videos: { [key: string]: { player: HTMLElement; current: HTMLElement; media: HTMLMediaElement } } = {};
-  audios: { [key: string]: { player: HTMLElement; current: HTMLElement; media: HTMLMediaElement } } = {};
-  iframes: { [key: string]: HTMLIFrameElement } = {};
-  elements: { [key: string]: HTMLElement } = {};
-  gifs: { [key: string]: HTMLImageElement } = {};
+  videos: { [key: string]: { player: HTMLElement; current: HTMLElement; media: HTMLMediaElement; }; } = {};
+  audios: { [key: string]: { player: HTMLElement; current: HTMLElement; media: HTMLMediaElement; }; } = {};
+  iframes: { [key: string]: HTMLIFrameElement; } = {};
+  elements: { [key: string]: HTMLElement; } = {};
+  gifs: { [key: string]: HTMLImageElement; } = {};
 
-  private subcribe: Observer;
+  private subcribeDiv: Observer;
   private subcribeNode: Observer;
   constructor(public parentElem: HTMLElement, public options: Options = {}, TID: string) {
     super(TID);
-    this.data = Store.get(this.generateStoreKey('topology-data'));
     if (!this.options.playIcon) {
       this.options.playIcon = 'iconfont icon-play';
     }
@@ -50,7 +48,7 @@ export class DivLayer extends Layer {
     parentElem.appendChild(this.player);
     this.createPlayer();
 
-    this.subcribe = Store.subscribe(this.generateStoreKey('LT:addDiv'), this.addDiv);
+    this.subcribeDiv = Store.subscribe(this.generateStoreKey('LT:addDiv'), this.addDiv);
 
     this.subcribeNode = Store.subscribe(this.generateStoreKey('LT:activeNode'), (node: Node) => {
       if (!node || (!node.video && !node.audio)) {
@@ -457,7 +455,7 @@ export class DivLayer extends Layer {
     return txt;
   }
 
-  resize(size?: { width: number; height: number }) {
+  resize(size?: { width: number; height: number; }) {
     if (size) {
       this.canvas.style.width = size.width + 'px';
       this.canvas.style.height = size.height + 'px';
@@ -485,8 +483,9 @@ export class DivLayer extends Layer {
   }
 
   destroy() {
+    super.destroy();
     this.clear();
-    this.subcribe.unsubscribe();
+    this.subcribeDiv.unsubscribe();
     this.subcribeNode.unsubscribe();
   }
 }

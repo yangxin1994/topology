@@ -6,7 +6,7 @@ import { Pen, PenType } from './models/pen';
 import { Node } from './models/node';
 import { Point } from './models/point';
 import { Line } from './models/line';
-import { TopologyData } from './models/data';
+import { createData, TopologyData } from './models/data';
 import { Lock, AnchorMode } from './models/status';
 import { drawNodeFns, drawLineFns, calcTextRect } from './middles';
 import { Offscreen } from './offscreen';
@@ -48,8 +48,8 @@ interface ICaches {
 const dockOffset = 10;
 
 export class Topology {
-  id: string;
-  data: TopologyData = new TopologyData();
+  id = s8();
+  data: TopologyData = createData(null, this.id);
   clipboard: TopologyData;
   caches: ICaches = {
     index: 0,
@@ -119,16 +119,9 @@ export class Topology {
   private scheduledAnimationFrame = false;
   private scrolling = false;
   private rendering = false;
-  constructor(parent: string | HTMLElement, options?: Options) {
-    this.id = s8();
+  constructor(parent: string | HTMLElement, options: Options = {}) {
     this._emitter = mitt();
-    Store.set(this.generateStoreKey('topology-data'), this.data);
-
-    if (!options) {
-      options = {};
-    }
-    const font = Object.assign({}, DefalutOptions.font, options.font);
-    options.font = font;
+    options.font = Object.assign({}, DefalutOptions.font, options.font);
     this.options = Object.assign({}, DefalutOptions, options);
     Store.set(this.generateStoreKey('LT:color'), this.options.color || '#222222');
     Store.set(this.generateStoreKey('LT:fontColor'), this.options.font.color || '#222222');
@@ -636,70 +629,11 @@ export class Topology {
 
   // open - redraw by the data
   open(data?: any) {
-    if (!data) {
-      data = { pens: [] };
-    }
-    if (typeof data === 'string') {
-      data = JSON.parse(data);
-    }
-
-    this.animateLayer.stop();
-    this.lock(data.locked || Lock.None);
-
-    if (data.lineName) {
-      this.data.lineName = data.lineName;
-    }
-    this.data.fromArrow = data.fromArrow;
-    this.data.toArrow = data.toArrow;
-    this.data.lineWidth = data.lineWidth;
-
-    this.data.scale = data.scale || 1;
+    this.data = createData(data, this.id);
     Store.set(this.generateStoreKey('LT:scale'), this.data.scale);
     this.dispatch('scale', this.data.scale);
-
-    this.data.bkColor = data.bkColor;
-    Store.set('LT:bkColor', data.bkColor);
-    this.data.bkImage = data.bkImage;
-    this.data.tooltip = data.tooltip;
-    this.data.pens = [];
-
-    // for old data.
-    if (data.nodes) {
-      for (const item of data.nodes) {
-        item.TID = this.id;
-        this.data.pens.push(new Node(item));
-      }
-      for (const item of data.lines) {
-        this.data.pens.push(new Line(item));
-      }
-    }
-    // end.
-
-    if (data.pens) {
-      for (const item of data.pens) {
-        if (!item.type) {
-          item.TID = this.id;
-          this.data.pens.push(new Node(item));
-        } else {
-          this.data.pens.push(new Line(item));
-        }
-      }
-    }
-
-    this.data.websocket = data.websocket;
-    this.data.mqttUrl = data.mqttUrl;
-    this.data.mqttOptions = data.mqttOptions || { clientId: s8() };
-    this.data.mqttTopics = data.mqttTopics;
-    this.data.grid = data.grid;
-    this.data.gridColor = data.gridColor;
-    this.data.gridSize = data.gridSize;
-    this.data.rule = data.rule;
-    this.data.ruleColor = data.ruleColor;
-    if (typeof data.data === 'object') {
-      this.data.data = JSON.parse(JSON.stringify(data.data));
-    } else {
-      this.data.data = data.data || '';
-    }
+    Store.set('LT:bkColor', this.data.bkColor);
+    this.lock(this.data.locked);
 
     this.caches.list = [];
     this.cache();
@@ -1828,7 +1762,7 @@ export class Topology {
     if (this.caches.index < this.caches.list.length - 1) {
       this.caches.list.splice(this.caches.index + 1, this.caches.list.length - this.caches.index - 1);
     }
-    const data = new TopologyData(this.data);
+    const data = createData(this.data);
     this.caches.list.push(data);
     if (this.caches.list.length > this.options.cacheLen) {
       this.caches.list.shift();
@@ -1868,9 +1802,7 @@ export class Topology {
     }
 
     this.divLayer.clear(true);
-    const data = new TopologyData(this.caches.list[--this.caches.index]);
-    this.data.pens.splice(0, this.data.pens.length);
-    this.data.pens.push.apply(this.data.pens, data.pens);
+    this.data = createData(this.caches.list[--this.caches.index], this.id);
     this.render(true);
     this.divLayer.render();
 
@@ -1886,9 +1818,7 @@ export class Topology {
       return;
     }
     this.divLayer.clear(true);
-    const data = new TopologyData(this.caches.list[++this.caches.index]);
-    this.data.pens.splice(0, this.data.pens.length);
-    this.data.pens.push.apply(this.data.pens, data.pens);
+    this.data = createData(this.caches.list[++this.caches.index], this.id);
     this.render(true);
     this.divLayer.render();
 
@@ -2012,7 +1942,7 @@ export class Topology {
       return;
     }
 
-    this.clipboard = new TopologyData({
+    this.clipboard = createData({
       pens: [],
     });
     for (let i = 0; i < this.activeLayer.pens.length; i++) {
@@ -2039,7 +1969,7 @@ export class Topology {
   }
 
   copy() {
-    this.clipboard = new TopologyData({
+    this.clipboard = createData({
       pens: [],
     });
     for (const pen of this.activeLayer.pens) {
@@ -2762,6 +2692,10 @@ export class Topology {
     this.subcribeMediaEnd.unsubscribe();
     this.animateLayer.destroy();
     this.divLayer.destroy();
+    this.canvas.destroy();
+    this.activeLayer.destroy();
+    this.hoverLayer.destroy();
+    this.offscreen.destroy();
     document.body.removeChild(this.tipMarkdown);
     window.removeEventListener('resize', this.winResize);
     this.parentElem.removeEventListener('scroll', this.onScroll);
