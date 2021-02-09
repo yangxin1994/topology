@@ -49,33 +49,30 @@ export function createData(json?: any, tid?: string) {
   }
 
   data = Object.assign(data, json);
+  data.pens = [];
 
   if (json) {
-    const pens = [];
-
     // for old data.
     if (json.nodes) {
       for (const item of json.nodes) {
         item.TID = tid;
-        pens.push(new Node(item));
+        data.pens.push(new Node(item));
       }
       for (const item of json.lines) {
         item.TID = tid;
-        pens.push(new Line(item));
+        data.pens.push(new Line(item));
       }
     }
     // end.
 
-    json?.pens?.forEach((item: any) => {
+    json.pens?.forEach((item: any) => {
       item.TID = tid;
       if (!item.type) {
-        pens.push(new Node(item));
+        data.pens.push(new Node(item));
       } else {
-        pens.push(new Line(item));
+        data.pens.push(new Line(item));
       }
     });
-
-    data.pens = pens;
   }
 
   if (data.mqttOptions) {

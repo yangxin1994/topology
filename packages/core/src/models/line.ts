@@ -70,10 +70,10 @@ export class Line extends Pen {
         json.autoAnchor
       );
     }
+
     if (json.to) {
       this.to = new Point(json.to.x, json.to.y, json.to.direction, json.to.anchorIndex, json.to.id, json.autoAnchor);
     }
-
 
     // 暂时兼容老数据
     if (json.name === 'mind' && json.controlPoints && json.controlPoints.length < 3) {
@@ -83,6 +83,7 @@ export class Line extends Pen {
     // end
 
     if (json.controlPoints) {
+      this.controlPoints = [];
       for (const item of json.controlPoints) {
         this.controlPoints.push(new Point(item.x, item.y, item.direction, item.anchorIndex, item.id));
       }

@@ -146,14 +146,14 @@ export class DivLayer extends Layer {
       }
     }
 
-    if (node.children) {
-      for (const child of node.children) {
-        if (child.type === PenType.Line) {
-          continue;
-        }
-        this.addDiv(child as Node);
-      }
-    }
+    // if (node.children) {
+    //   for (const child of node.children) {
+    //     if (child.type === PenType.Line) {
+    //       continue;
+    //     }
+    //     this.addDiv(child as Node);
+    //   }
+    // }
   };
 
   createPlayer() {

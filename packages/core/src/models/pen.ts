@@ -15,8 +15,6 @@ export enum PenType {
 const eventFns: string[] = ['link', 'doStartAnimate', 'doFn', 'doWindowFn', '', 'doPauseAnimate', 'doStopAnimate'];
 
 const defaultPen: any = {
-  type: PenType.Node,
-  id: s8(),
   name: '',
   tags: [],
   visible: true,
@@ -148,6 +146,7 @@ export abstract class Pen {
       json = JSON.parse(json);
     }
 
+    defaultPen.id = s8();
     defaultData = Object.assign({}, defaultPen, defaultData);
     for (let key in defaultData) {
       this[key] = defaultData[key];

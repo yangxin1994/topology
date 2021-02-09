@@ -109,6 +109,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     if (!this.canvas) {
       return;
     }
+
     switch (event.name) {
       case 'new':
         this.onNew();
@@ -338,24 +339,12 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
       const text = e.target.result + '';
       try {
         const data = JSON.parse(text);
-        if (data && data.lineName) {
-          Store.set('lineName', data.lineName);
-          Store.set('fromArrow', data.fromArrow);
-          Store.set('toArrow', data.toArrow);
-          this.data = {
-            id: '',
-            version: '',
-            data,
-            name: name,
-            desc: '',
-            image: '',
-            userId: '',
-            class: '',
-            component: false,
-            shared: false,
-          };
-          this.canvas.open(data);
-        }
+        Store.set('lineName', data.lineName);
+        Store.set('fromArrow', data.fromArrow);
+        Store.set('toArrow', data.toArrow);
+        data.name = name;
+        this.data = data;
+        this.canvas.open(data);
       } catch (e) {
         return false;
       }

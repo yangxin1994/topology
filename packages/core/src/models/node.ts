@@ -109,7 +109,8 @@ export class Node extends Pen {
       paddingBottom: 0,
       paddingLeft: 0,
       paddingRight: 0,
-      animateFrame: 0
+      animateFrame: 0,
+      children: []
     };
 
     this.fromData(defaultData, json);
@@ -143,18 +144,14 @@ export class Node extends Pen {
     // 兼容老数据 end
 
     if (json.animateFrames) {
-      this.animateFrames = json.animateFrames;
-      for (const item of this.animateFrames) {
-        if (!item.state.init) {
-          item.state = new Node(item.state, true);
-        }
+      this.animateFrames = [];
+      for (const item of json.animateFrames) {
+        item.state = new Node(item.state, true);
       }
     }
     this.animateType = json.animateType ? json.animateType : json.animateDuration ? 'custom' : '';
-
     this.init();
-
-    if (!noChild) {
+    if (json.children && !noChild) {
       this.setChild(json.children);
     } else {
       this.children = null;
@@ -207,7 +204,7 @@ export class Node extends Pen {
   }
 
   addToDiv() {
-    if (this.audio || this.video || this.iframe || this.elementId || this.hasGif()) {
+    if (this.audio || this.video || this.iframe || this.elementId || this.gif) {
       Store.set(this.generateStoreKey('LT:addDiv'), this);
     }
   }
@@ -219,7 +216,7 @@ export class Node extends Pen {
 
     if (this.children) {
       for (const item of this.children) {
-        if (item.type === PenType.Node && (item as Node).hasGif()) {
+        if (item.type === PenType.Node && (item as any).hasGif && (item as Node).hasGif()) {
           return true;
         }
       }
@@ -252,8 +249,8 @@ export class Node extends Pen {
           child = new Node(item);
           child.parentId = this.id;
           child.calcRectByParent(this);
-          (child as Node).init();
-          (child as Node).setChild(item.children);
+          // (child as Node).init();
+          // (child as Node).setChild(item.children);
           break;
       }
       this.children.push(child);

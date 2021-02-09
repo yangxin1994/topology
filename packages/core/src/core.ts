@@ -78,7 +78,7 @@ export class Topology {
   lastHoverLine: Line;
   touches?: TouchList;
   touchScale?: number;
-  touchStart?: number;
+  touchStart = 0;
   touchCenter?: { x: number; y: number; };
 
   input = document.createElement('textarea');
@@ -301,7 +301,6 @@ export class Topology {
                 this.touches[0].pageX - this.touches[1].pageX,
                 this.touches[0].pageY - this.touches[1].pageY
               );
-
             event.preventDefault();
             this.scaleTo(scale * this.touchScale, this.touchCenter);
           } else if (len === 3) {
@@ -383,6 +382,14 @@ export class Topology {
       this.mouseDown = null;
     };
     this.divLayer.canvas.onwheel = (event) => {
+      const timeNow = new Date().getTime();
+      if (timeNow - this.touchStart < 20) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+      this.touchStart = new Date().getTime();
+
       if (this.options.disableScale) {
         return;
       }
