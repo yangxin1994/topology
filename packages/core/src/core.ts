@@ -519,7 +519,6 @@ export class Topology {
         );
       } else {
         const node = new Node(json);
-        console.log(1111, node);
         this.addNode(node, true);
         if (node.name === 'div') {
           this.dispatch('LT:addDiv', node);
