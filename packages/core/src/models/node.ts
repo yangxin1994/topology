@@ -16,11 +16,10 @@ export const images: {
 } = {};
 
 export class Node extends Pen {
-  is3D = false;
+  is3D: boolean;
   z: number;
-  zRotate = 0;
+  zRotate: number;
 
-  // 0 -1 之间的小数
   borderRadius: number;
 
   // icon
@@ -98,50 +97,23 @@ export class Node extends Pen {
   elementRendered: boolean;
 
   constructor(json: any, noChild = false) {
-    super(json);
+    super();
 
+    const defaultData: any = {
+      zRotate: 0,
+      borderRadius: 0,
+      imageAlign: 'center',
+      gradientAngle: 0,
+      gradientRadius: 0.01,
+      paddingTop: 0,
+      paddingBottom: 0,
+      paddingLeft: 0,
+      paddingRight: 0,
+      animateFrame: 0
+    };
+
+    this.fromData(defaultData, json);
     this.type = PenType.Node;
-    this.is3D = json.is3D;
-    this.z = json.z;
-    this.zRotate = json.zRotate || 0;
-
-    this.borderRadius = +json.borderRadius || 0;
-
-    this.icon = json.icon;
-    this.iconFamily = json.iconFamily;
-    this.iconSize = +json.iconSize;
-    this.iconColor = json.iconColor;
-    this.iconRotate = json.iconRotate;
-
-    this.image = json.image;
-    if (json.imgNaturalWidth) {
-      this.imgNaturalWidth = json.imgNaturalWidth;
-    }
-    if (json.imgNaturalHeight) {
-      this.imgNaturalHeight = json.imgNaturalHeight;
-    }
-    if (json.imageWidth) {
-      this.imageWidth = json.imageWidth;
-    }
-    if (json.imageHeight) {
-      this.imageHeight = json.imageHeight;
-    }
-    this.imageRatio = json.imageRatio;
-    this.imageAlign = json.imageAlign || 'center';
-
-    this.bkType = json.bkType;
-    this.gradientFromColor = json.gradientFromColor;
-    this.gradientToColor = json.gradientToColor;
-    this.gradientAngle = json.gradientAngle || 0;
-    this.gradientRadius = json.gradientRadius || 0.01;
-
-    this.paddingTop = json.paddingTop || 0;
-    this.paddingBottom = json.paddingBottom || 0;
-    this.paddingLeft = json.paddingLeft || 0;
-    this.paddingRight = json.paddingRight || 0;
-
-    this.disableSizeX = json.disableSizeX;
-    this.disableSizeY = json.disableSizeY;
 
     // 兼容老数据
     if (json.children && json.children[0] && json.children[0].parentRect) {
@@ -178,24 +150,7 @@ export class Node extends Pen {
         }
       }
     }
-    if (json.animateDuration) {
-      this.animateDuration = json.animateDuration;
-    }
-    this.animateFrame = json.animateFrame || 0;
     this.animateType = json.animateType ? json.animateType : json.animateDuration ? 'custom' : '';
-    this.animateAlone = json.animateAlone;
-
-    this.iframe = json.iframe;
-    this.elementId = json.elementId;
-    this.audio = json.audio;
-    this.video = json.video;
-    this.play = json.play;
-    this.nextPlay = json.nextPlay;
-
-    // if (json.elementLoaded !== undefined) {
-    //   this.elementId = null;
-    //   this.elementLoaded = false;
-    // }
 
     this.init();
 
@@ -723,7 +678,15 @@ export class Node extends Pen {
         this.strokeStyle = item.state.strokeStyle;
         this.fillStyle = item.state.fillStyle;
         this.text = item.state.text;
-        this.font = item.state.font;
+        this.fontColor = item.state.fontColor;
+        this.fontFamily = item.state.fontFamily;
+        this.fontSize = item.state.fontSize;
+        this.lineHeight = item.state.lineHeight;
+        this.fontStyle = item.state.fontStyle;
+        this.fontWeight = item.state.fontWeight;
+        this.textAlign = item.state.textAlign;
+        this.textBaseline = item.state.textBaseline;
+        this.textBackground = item.state.textBackground;
         this.iconFamily = item.state.iconFamily;
         this.icon = item.state.icon;
         this.iconSize = item.state.iconSize;
@@ -832,7 +795,7 @@ export class Node extends Pen {
       this.imageHeight *= scale;
     }
     this.lastImage = null;
-    this.font.fontSize *= scale;
+    this.fontSize *= scale;
     this.iconSize *= scale;
     if (typeof this.paddingLeft === 'number') {
       this.paddingLeft *= scale;
@@ -892,7 +855,7 @@ export class Node extends Pen {
         }
 
         // fix bug
-        item.state.font.fontSize = item.initState.font.fontSize;
+        item.state.fontSize = item.initState.fontSize;
       }
     }
 

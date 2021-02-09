@@ -9,7 +9,7 @@ export function imageAnchors(node: Node) {
     if (node.paddingRightNum) {
       textWidth = node.paddingRightNum;
     } else {
-      textHeight = node.paddingBottomNum || node.font.lineHeight * node.font.fontSize * (node.textMaxLine || 1);
+      textHeight = node.paddingBottomNum || node.lineHeight * node.fontSize * (node.textMaxLine || 1);
     }
   }
 

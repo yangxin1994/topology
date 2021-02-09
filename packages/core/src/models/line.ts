@@ -11,30 +11,27 @@ import { abs } from '../utils/math';
 export class Line extends Pen {
   from: Point;
   to: Point;
-  controlPoints: Point[] = [];
+  controlPoints: Point[];
   fromArrow: string;
   toArrow: string;
-  fromArrowSize = 5;
-  toArrowSize = 5;
+  fromArrowSize: number;
+  toArrowSize: number;
   fromArrowColor: string;
   toArrowColor: string;
 
   length: number;
 
-  borderWidth = 0;
-  borderColor = '#000000';
+  borderWidth: number;
+  borderColor: string;
 
-  animateColor = '';
-  animateSpan = 1;
-
+  animateColor: string;
+  animateSpan: number;
   animateLineDash: number[];
-
-  isAnimate = false;
-  animateFromSize = 0;
-  animateToSize = 0;
-
-  animateDot: { x: number; y: number };
-  animateDotSize = 3;
+  isAnimate: boolean;
+  animateFromSize: number;
+  animateToSize: number;
+  animateDot: { x: number; y: number; };
+  animateDotSize: number;
 
   lineJoin: CanvasLineJoin;
 
@@ -42,74 +39,48 @@ export class Line extends Pen {
   disableEmptyLine: boolean;
 
   constructor(json?: any) {
-    super(json);
+    super();
 
+    const defaultData: any = {
+      name: 'curve',
+      fromArrow: '',
+      toArrow: 'triangleSolid',
+      controlPoints: [],
+      fromArrowSize: 5,
+      toArrowSize: 5,
+      borderWidth: 0,
+      borderColor: '#000000',
+      animateColor: '',
+      animateSpan: 1,
+      animateFromSize: 0,
+      animateToSize: 0,
+      animateDotSize: 3,
+      textBackground: '#ffffff'
+    };
+
+    this.fromData(defaultData, json);
     this.type = PenType.Line;
-    if (json) {
-      if (json.from) {
-        this.from = new Point(
-          json.from.x,
-          json.from.y,
-          json.from.direction,
-          json.from.anchorIndex,
-          json.from.id,
-          json.autoAnchor
-        );
-      }
-      if (json.to) {
-        this.to = new Point(json.to.x, json.to.y, json.to.direction, json.to.anchorIndex, json.to.id, json.autoAnchor);
-      }
-
-      this.fromArrow = json.fromArrow || '';
-      this.toArrow = json.toArrow || '';
-      this.fromArrowSize = json.fromArrowSize || 5;
-      this.toArrowSize = json.toArrowSize || 5;
-      this.fromArrowColor = json.fromArrowColor;
-      this.toArrowColor = json.toArrowColor;
-      if (json.animateColor) {
-        this.animateColor = json.animateColor;
-      }
-      if (json.animateSpan) {
-        this.animateSpan = json.animateSpan;
-      }
-      if (json.animateLineDash) {
-        this.animateLineDash = json.animateLineDash;
-      }
-      if (json.animatePlay) {
-        this.animatePlay = json.animatePlay;
-      }
-      if (json.animateStart) {
-        this.animateStart = json.animateStart;
-      }
-      if (json.length) {
-        this.length = json.length;
-      }
-      if (json.borderWidth) {
-        this.borderColor = json.borderColor;
-        this.borderWidth = json.borderWidth;
-      }
-      this.animateDotSize = json.animateDotSize || 3;
-      this.manualCps = json.manualCps;
-      this.disableEmptyLine = json.disableEmptyLine;
-
-      if (json.lineJoin) {
-        this.lineJoin = json.lineJoin;
-      }
-    } else {
-      this.name = 'curve';
-      this.fromArrow = 'triangleSolid';
+    if (json.from) {
+      this.from = new Point(
+        json.from.x,
+        json.from.y,
+        json.from.direction,
+        json.from.anchorIndex,
+        json.from.id,
+        json.autoAnchor
+      );
+    }
+    if (json.to) {
+      this.to = new Point(json.to.x, json.to.y, json.to.direction, json.to.anchorIndex, json.to.id, json.autoAnchor);
     }
 
-    if (!this.font.background) {
-      this.font.background = '#fff';
-    }
 
     // 暂时兼容老数据
     if (json.name === 'mind' && json.controlPoints && json.controlPoints.length < 3) {
       json.controlPoints = null;
       this.calcControlPoints();
     }
-    //
+    // end
 
     if (json.controlPoints) {
       for (const item of json.controlPoints) {
@@ -243,7 +214,7 @@ export class Line extends Pen {
     }
   }
 
-  pointIn(pt: { x: number; y: number }) {
+  pointIn(pt: { x: number; y: number; }) {
     return drawLineFns[this.name].pointIn(pt, this);
   }
 
@@ -279,8 +250,8 @@ export class Line extends Pen {
       width = 100;
     }
     const height =
-      this.font.lineHeight *
-      this.font.fontSize *
+      this.lineHeight *
+      this.fontSize *
       (this.textMaxLine || (this.text && this.text.split('\n').length) || 1);
     this.textRect = new Rect(center.x - width / 2, center.y - height / 2, width, height);
   }
@@ -488,14 +459,14 @@ export class Line extends Pen {
     Store.set(this.generateStoreKey('pts-') + this.id, null);
   }
 
-  scale(scale: number, center: { x: number; y: number }) {
+  scale(scale: number, center: { x: number; y: number; }) {
     this.from.x = center.x - (center.x - this.from.x) * scale;
     this.from.y = center.y - (center.y - this.from.y) * scale;
     this.to.x = center.x - (center.x - this.to.x) * scale;
     this.to.y = center.y - (center.y - this.to.y) * scale;
     this.lineWidth *= scale;
     this.borderWidth *= scale;
-    this.font.fontSize *= scale;
+    this.fontSize *= scale;
     if (this.text) {
       this.textRect = null;
     }

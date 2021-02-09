@@ -28,14 +28,12 @@ export interface Options {
   dockFillStyle?: string;
   dragColor?: string;
   animateColor?: string;
-  font?: {
-    color?: string;
-    fontFamily?: string;
-    fontSize?: number;
-    lineHeight?: number;
-    textAlign?: string;
-    textBaseline?: string;
-  };
+  fontColor?: string;
+  fontFamily?: string;
+  fontSize?: number;
+  lineHeight?: number;
+  textAlign?: string;
+  textBaseline?: string;
   rotateCursor?: string;
   hoverCursor?: string;
   hideInput?: boolean;
@@ -73,17 +71,17 @@ export interface Options {
   on?: (event: string, data: any) => void;
 }
 
+export const fontKeys = ['fontColor', 'fontFamily', 'fontSize', 'lineHeight', 'textAlign', 'textBaseline'];
+
 export const DefalutOptions: Options = {
   cacheLen: 30,
   refresh: 30,
-  font: {
-    color: '#222222',
-    fontFamily: '"Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial',
-    fontSize: 12,
-    lineHeight: 1.5,
-    textAlign: 'center',
-    textBaseline: 'middle',
-  },
+  fontColor: '#222222',
+  fontFamily: '"Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial',
+  fontSize: 12,
+  lineHeight: 1.5,
+  textAlign: 'center',
+  textBaseline: 'middle',
   color: '#222222',
   activeColor: '#1890ff',
   hoverColor: '#fa541c',

@@ -6,42 +6,73 @@ import { Rect } from './rect';
 import { EventType, EventAction } from './event';
 
 import { Lock } from './status';
-import { pentagon } from '../middles/nodes/pentagon';
 
 export enum PenType {
   Node,
   Line,
 }
 
+const eventFns: string[] = ['link', 'doStartAnimate', 'doFn', 'doWindowFn', '', 'doPauseAnimate', 'doStopAnimate'];
+
+const defaultPen: any = {
+  type: PenType.Node,
+  id: s8(),
+  name: '',
+  tags: [],
+  visible: true,
+  rect: new Rect(0, 0, 0, 0),
+  fontColor: '',
+  fontFamily: '"Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial',
+  fontSize: 12,
+  lineHeight: 1.5,
+  fontStyle: 'normal',
+  fontWeight: 'normal',
+  textAlign: 'center',
+  textBaseline: 'middle',
+  textBackground: '',
+  animateCycleIndex: 0,
+  events: [],
+  dash: 0,
+  lineDashOffset: 0,
+  lineWidth: 1,
+  strokeStyle: '',
+  fillStyle: '',
+  globalAlpha: 1,
+  rotate: 0,
+  offsetRotate: 0,
+  textMaxLine: 0,
+  textOffsetX: 0,
+  textOffsetY: 0,
+  animatePos: 0,
+};
+
 export abstract class Pen {
   TID: string;
   id: string;
-  type = PenType.Node;
+  type: PenType;
   name: string;
   tags: string[];
-  rect: Rect = new Rect(0, 0, 0, 0);
-  lineWidth = 1;
-  rotate = 0;
-  offsetRotate = 0;
-  globalAlpha = 1;
+  rect: Rect;
+  lineWidth: number;
+  rotate: number;
+  offsetRotate: number;
+  globalAlpha: number;
 
-  dash = 0;
+  dash: number;
   lineDash: number[];
   lineDashOffset: number;
-  strokeStyle = '';
-  fillStyle = '';
+  strokeStyle: string;
+  fillStyle: string;
   lineCap: string;
-  font = {
-    color: '',
-    fontFamily: '"Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial',
-    fontSize: 12,
-    lineHeight: 1.5,
-    fontStyle: 'normal',
-    fontWeight: 'normal',
-    textAlign: 'center',
-    textBaseline: 'middle',
-    background: '',
-  };
+  fontColor: string;
+  fontFamily: string;
+  fontSize: number;
+  lineHeight: number;
+  fontStyle: string;
+  fontWeight: string;
+  textAlign: string;
+  textBaseline: string;
+  textBackground: string;
 
   text: string;
   textMaxLine: number;
@@ -64,12 +95,12 @@ export abstract class Pen {
   animateStart: number;
   // Cycle count. Infinite if <= 0.
   animateCycle: number;
-  animateCycleIndex = 0;
+  animateCycleIndex: number;
   nextAnimate: string;
   // Auto-play
   animatePlay: boolean;
 
-  animatePos = 0;
+  animatePos: number;
 
   locked: Lock;
   // 作为子节点，是否可以直接点击选中
@@ -84,9 +115,7 @@ export abstract class Pen {
   tipId: string;
   title: string;
 
-  events: { type: EventType; action: EventAction; value: string; params: string; name?: string; }[] = [];
-  private eventFns: string[] = ['link', 'doStartAnimate', 'doFn', 'doWindowFn', '', 'doPauseAnimate', 'doStopAnimate'];
-
+  events: { type: EventType; action: EventAction; value: string; params: string; name?: string; }[];
   parentId: string;
   rectInParent: {
     x: number | string;
@@ -111,79 +140,45 @@ export abstract class Pen {
   // User data.
   data: any;
   value: number;
-  constructor(json?: any) {
-    if (json) {
-      this.TID = json.TID;
-      this.id = json.id || s8();
-      this.name = json.name || '';
-      this.value = json.value;
-      this.tags = Object.assign([], json.tags);
-      if (json.rect) {
-        this.rect = new Rect(json.rect.x, json.rect.y, json.rect.width, json.rect.height);
-      }
-      this.dash = json.dash || 0;
-      this.lineDash = json.lineDash;
-      this.lineDashOffset = json.lineDashOffset || 0;
-      this.lineWidth = json.lineWidth || 1;
-      this.strokeStyle = json.strokeStyle || '';
-      this.fillStyle = json.fillStyle || '';
-      this.lineCap = json.lineCap;
-      this.globalAlpha = json.globalAlpha || 1;
-      this.rotate = json.rotate || 0;
-      this.offsetRotate = json.offsetRotate || 0;
-      if (json.font) {
-        Object.assign(this.font, json.font);
-      }
-      this.text = json.text;
-      if (json.textMaxLine) {
-        this.textMaxLine = +json.textMaxLine || 0;
-      }
-      this.whiteSpace = json.whiteSpace;
-      this.autoRect = json.autoRect;
-      this.textOffsetX = json.textOffsetX || 0;
-      this.textOffsetY = json.textOffsetY || 0;
 
-      this.shadowColor = json.shadowColor;
-      this.shadowBlur = json.shadowBlur;
-      this.shadowOffsetX = json.shadowOffsetX;
-      this.shadowOffsetY = json.shadowOffsetY;
+  fromData(defaultData: any, json: any) {
+    if (!json) {
+      json = {};
+    } else if (typeof json === 'string') {
+      json = JSON.parse(json);
+    }
 
-      this.animateType = json.animateType;
-      this.animateCycle = json.animateCycle;
-      this.nextAnimate = json.nextAnimate;
-      this.animatePlay = json.animatePlay;
-      this.animatePos = json.animatePos || 0;
+    defaultData = Object.assign({}, defaultPen, defaultData);
+    for (let key in defaultData) {
+      this[key] = defaultData[key];
+    }
+    for (let key in json) {
+      this[key] = json[key];
+    }
 
-      this.locked = json.locked;
-      this.stand = json.stand;
-      this.hideInput = json.hideInput;
-      this.hideRotateCP = json.hideRotateCP;
-      this.hideSizeCP = json.hideSizeCP;
-      this.hideAnchor = json.hideAnchor;
-      if (json.events) {
-        this.events = JSON.parse(JSON.stringify(json.events));
-      } else {
-        this.events = [];
-      }
+    this.tags = Object.assign([], json.tags);
+    if (json.rect) {
+      this.rect = new Rect(json.rect.x, json.rect.y, json.rect.width, json.rect.height);
+    }
 
-      this.markdown = json.markdown;
-      this.tipId = json.tipId;
-      this.title = json.title;
-      this.visible = json.visible !== false;
-
-      if (json.rectInParent) {
-        this.rectInParent = json.rectInParent;
-      }
-
-      if (typeof json.data === 'object') {
-        this.data = JSON.parse(JSON.stringify(json.data));
-      } else {
-        this.data = json.data || '';
-      }
-    } else {
-      this.id = s8();
-      this.textOffsetX = 0;
-      this.textOffsetY = 0;
+    // 兼容老格式
+    if (json.font) {
+      this.fontColor = json.font.color;
+      this.fontFamily = json.font.fontFamily;
+      this.fontSize = json.font.fontSize;
+      this.lineHeight = json.font.lineHeight;
+      this.fontStyle = json.font.fontStyle;
+      this.fontWeight = json.font.fontWeight;
+      this.textAlign = json.font.textAlign;
+      this.textBaseline = json.font.textBaseline;
+      this.textBackground = json.font.background;
+    }
+    // end
+    if (json.events) {
+      this.events = JSON.parse(JSON.stringify(json.events));
+    }
+    if (typeof json.data === 'object') {
+      this.data = JSON.parse(JSON.stringify(json.data));
     }
   }
 
@@ -274,7 +269,7 @@ export abstract class Pen {
         continue;
       }
 
-      this[this.eventFns[item.action]] && this[this.eventFns[item.action]](item.value, item.params);
+      this[eventFns[item.action]] && this[eventFns[item.action]](item.value, item.params);
     }
   }
 
@@ -288,7 +283,7 @@ export abstract class Pen {
         continue;
       }
 
-      this[this.eventFns[item.action]] && this[this.eventFns[item.action]](item.value, item.params);
+      this[eventFns[item.action]] && this[eventFns[item.action]](item.value, item.params);
     }
   }
 
@@ -298,9 +293,9 @@ export abstract class Pen {
     client: any
   ) {
     if (item.action < EventAction.Function || item.action === EventAction.StopAnimate) {
-      this[this.eventFns[item.action]](msg.value || msg || item.value, msg.params || item.params, client);
+      this[eventFns[item.action]](msg.value || msg || item.value, msg.params || item.params, client);
     } else if (item.action < EventAction.SetProps) {
-      this[this.eventFns[item.action]](item.value, msg || item.params, client);
+      this[eventFns[item.action]](item.value, msg || item.params, client);
     } else if (item.action === EventAction.SetProps) {
       let props: any[] = [];
       let data = msg;

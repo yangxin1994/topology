@@ -1,7 +1,7 @@
 import { Store, Observer } from 'le5le-store';
 // https://github.com/developit/mitt
 import { default as mitt, Emitter, EventType, Handler } from 'mitt';
-import { Options, KeyType, KeydownType, DefalutOptions, Padding } from './options';
+import { Options, KeyType, KeydownType, DefalutOptions, Padding, fontKeys } from './options';
 import { Pen, PenType } from './models/pen';
 import { Node } from './models/node';
 import { Point } from './models/point';
@@ -121,10 +121,9 @@ export class Topology {
   private rendering = false;
   constructor(parent: string | HTMLElement, options: Options = {}) {
     this._emitter = mitt();
-    options.font = Object.assign({}, DefalutOptions.font, options.font);
     this.options = Object.assign({}, DefalutOptions, options);
     Store.set(this.generateStoreKey('LT:color'), this.options.color || '#222222');
-    Store.set(this.generateStoreKey('LT:fontColor'), this.options.font.color || '#222222');
+    Store.set(this.generateStoreKey('LT:fontColor'), this.options.fontColor || '#222222');
 
     this.setupDom(parent);
     this.setupSubscribe();
@@ -520,6 +519,7 @@ export class Topology {
         );
       } else {
         const node = new Node(json);
+        console.log(1111, node);
         this.addNode(node, true);
         if (node.name === 'div') {
           this.dispatch('LT:addDiv', node);
@@ -544,24 +544,17 @@ export class Topology {
       node.strokeStyle = this.options.color;
     }
 
-    for (const key in node.font) {
-      if (!node.font[key]) {
-        node.font[key] = this.options.font[key];
+
+    fontKeys.forEach((key: string) => {
+      if (!node[key]) {
+        node[key] = this.options[key];
       }
-    }
+    });
 
     if (this.data.scale !== 1) {
       node.scale(this.data.scale);
     }
 
-    // if (node.autoRect) {
-    //   const ctx = this.canvas.canvas.getContext('2d');
-    //   const rect = calcTextRect(ctx, node);
-    //   node.rect.width = rect.width + node.lineWidth * 2;
-    //   node.rect.height = rect.height;
-    //   node.init();
-    //   node.initRect();
-    // }
 
     node.setTID(this.id);
     this.data.pens.push(node);
@@ -596,7 +589,7 @@ export class Topology {
       line.calcControlPoints(true);
     }
     if (this.data.scale !== 1) {
-      line.font.fontSize *= this.data.scale;
+      line.fontSize *= this.data.scale;
     }
     this.data.pens.push(line);
 
@@ -2610,12 +2603,12 @@ export class Topology {
     this.options.color = color;
     Store.set(this.generateStoreKey('LT:color'), color);
 
-    this.options.font.color = color;
+    this.options.fontColor = color;
     Store.set(this.generateStoreKey('LT:fontColor'), color);
   }
 
   setFontColor(color: string) {
-    this.options.font.color = color;
+    this.options.fontColor = color;
     Store.set(this.generateStoreKey('LT:fontColor'), color);
   }
 
