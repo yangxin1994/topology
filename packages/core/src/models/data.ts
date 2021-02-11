@@ -3,7 +3,6 @@ import { Node } from './node';
 import { Line } from './line';
 import { Lock } from './status';
 import { s8 } from '../utils';
-import { EventAction, EventType } from './event';
 import { Store } from 'le5le-store';
 
 export interface TopologyData {
@@ -29,9 +28,9 @@ export interface TopologyData {
     password?: string;
   };
   mqttTopics?: string;
-  events?: { type: EventType; action: EventAction; value: string; params: string; name?: string; }[];
   manualCps?: boolean;
   tooltip?: boolean | number;
+  socketEvent?: boolean | number;
 }
 
 export function createData(json?: any, tid?: string) {

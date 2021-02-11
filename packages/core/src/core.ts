@@ -119,6 +119,7 @@ export class Topology {
   private scheduledAnimationFrame = false;
   private scrolling = false;
   private rendering = false;
+  private actionTimer: any;
   constructor(parent: string | HTMLElement, options: Options = {}) {
     this._emitter = mitt();
     this.options = Object.assign({}, DefalutOptions, options);
@@ -244,7 +245,7 @@ export class Topology {
       // end
 
       this.divLayer.canvas.ontouchstart = (event) => {
-        this.touchStart = new Date().getTime();
+        this.touchStart = Date.now();
         const pos = new Point(
           event.changedTouches[0].pageX - window.scrollX - (this.canvasPos.left || this.canvasPos.x),
           event.changedTouches[0].pageY - window.scrollY - (this.canvasPos.top || this.canvasPos.y)
@@ -287,7 +288,7 @@ export class Topology {
           };
         }
 
-        const timeNow = new Date().getTime();
+        const timeNow = Date.now();
         if (timeNow - this.touchStart < 50) {
           return;
         }
@@ -654,7 +655,13 @@ export class Topology {
   openSocket(url?: string) {
     this.closeSocket();
     if (url || this.data.websocket) {
-      this.socket = new Socket(url || this.data.websocket, this.data);
+      this.socket = new Socket(url || this.data.websocket, (e) => {
+        this.data.socketEvent && this.dispatch('websocket', e);
+
+        if (this.data.socketEvent !== 1) {
+          this.doSocket(e);
+        }
+      });
     }
   }
 
@@ -667,13 +674,35 @@ export class Topology {
   openMqtt(url?: string, options?: any) {
     this.closeMqtt();
     if (url || this.data.mqttUrl) {
-      this.mqtt = new MQTT(url || this.data.mqttUrl, options || this.data.mqttOptions, this.data.mqttTopics, this.data);
+      this.mqtt = new MQTT(url || this.data.mqttUrl, options || this.data.mqttOptions, this.data.mqttTopics,
+        (topic: string, message: any) => {
+          this.data.socketEvent && this.dispatch('mqtt', { topic, message });
+
+          if (this.data.socketEvent !== 1) {
+            this.doSocket(message.toString());
+          }
+        }
+      );
     }
   }
 
   closeMqtt() {
     if (this.mqtt) {
       this.mqtt.close();
+    }
+  }
+
+  doSocket(message: any) {
+    try {
+      message = JSON.parse(message);
+      if (!Array.isArray(message)) {
+        message = [message];
+      }
+      message.forEach((item: any) => {
+        this.setValue(item.id || item.tag, item);
+      });
+    } catch (error) {
+      console.warn(error);
     }
   }
 
@@ -2586,12 +2615,25 @@ export class Topology {
     return pen[attr];
   }
 
-  setValue(idOrTag: string, val: any, attr = 'text') {
+  setValue(idOrTag: string, val: string | object, attr = 'text') {
     this.data.pens.forEach((item) => {
       if (item.id === idOrTag || item.tags.indexOf(idOrTag) > -1) {
-        item[attr] = val;
+        if (typeof val === 'string') {
+          item[attr] = val;
+        } else {
+          item.fromData(item, val);
+        }
+        item.doAction();
       }
     });
+
+    if (this.actionTimer) {
+      clearTimeout(this.actionTimer);
+    }
+    this.actionTimer = setTimeout(() => {
+      this.render();
+      this.actionTimer = null;
+    }, 500);
   }
 
   setLineName(name: 'curve' | 'line' | 'polyline' | 'mind', render = true) {

@@ -674,7 +674,9 @@ export class Node extends Pen {
         this.dash = item.state.dash;
         this.strokeStyle = item.state.strokeStyle;
         this.fillStyle = item.state.fillStyle;
-        this.text = item.state.text;
+        if (item.state.text) {
+          this.text = item.state.text;
+        }
         this.fontColor = item.state.fontColor;
         this.fontFamily = item.state.fontFamily;
         this.fontSize = item.state.fontSize;

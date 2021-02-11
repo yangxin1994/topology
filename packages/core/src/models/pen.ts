@@ -1,7 +1,6 @@
 import { Store } from 'le5le-store';
 
 import { s8 } from '../utils/uuid';
-import { Point } from './point';
 import { Rect } from './rect';
 import { EventType, EventAction } from './event';
 
@@ -10,6 +9,16 @@ import { Lock } from './status';
 export enum PenType {
   Node,
   Line,
+}
+
+export interface Action {
+  where?: any;
+  do?: string;
+  url?: string;
+  _blank?: string;
+  tag?: string;
+  fn?: string;
+  params?: any;
 }
 
 const eventFns: string[] = ['link', 'doStartAnimate', 'doFn', 'doWindowFn', '', 'doPauseAnimate', 'doStopAnimate'];
@@ -114,6 +123,9 @@ export abstract class Pen {
   title: string;
 
   events: { type: EventType; action: EventAction; value: string; params: string; name?: string; }[];
+  actions: Action[];
+  disposableActions: Action[];
+
   parentId: string;
   rectInParent: {
     x: number | string;
@@ -176,6 +188,13 @@ export abstract class Pen {
     if (json.events) {
       this.events = JSON.parse(JSON.stringify(json.events));
     }
+    if (json.actions) {
+      this.actions = JSON.parse(JSON.stringify(json.actions));
+    }
+    if (json.disposableActions) {
+      this.disposableActions = JSON.parse(JSON.stringify(json.disposableActions));
+    }
+
     if (typeof json.data === 'object') {
       this.data = JSON.parse(JSON.stringify(json.data));
     }
@@ -286,54 +305,42 @@ export abstract class Pen {
     }
   }
 
-  doSocketMqtt(
-    item: { type: EventType; action: EventAction; value: string; params: string; name?: string; },
-    msg: any,
-    client: any
-  ) {
-    if (item.action < EventAction.Function || item.action === EventAction.StopAnimate) {
-      this[eventFns[item.action]](msg.value || msg || item.value, msg.params || item.params, client);
-    } else if (item.action < EventAction.SetProps) {
-      this[eventFns[item.action]](item.value, msg || item.params, client);
-    } else if (item.action === EventAction.SetProps) {
-      let props: any[] = [];
-      let data = msg;
-      if (typeof msg === 'string') {
-        try {
-          data = JSON.parse(msg);
-        } catch (error) { }
-      }
-      if (Array.isArray(data)) {
-        props = data;
-      }
-
-      for (const prop of props) {
-        if (prop.key) {
-          const keys = prop.key.split('.');
-
-          if (typeof prop.value === 'object') {
-            if (keys[1]) {
-              this[keys[0]][keys[1]] = Object.assign(this[prop.key], prop.value);
-            } else {
-              this[keys[0]] = Object.assign(this[prop.key], prop.value);
-            }
-          } else {
-            if (keys[1]) {
-              this[keys[0]][keys[1]] = prop.value;
-            } else {
-              this[keys[0]] = prop.value;
-            }
-          }
+  doAction() {
+    const actions = this.disposableActions || this.actions;
+    actions?.forEach((action) => {
+      const where = action.where;
+      if (where?.fn) {
+        const fn = new Function('pen', where.fn);
+        if (!fn(this)) {
+          return;
         }
+      } else if (where && !new Function(`return ${this[where.key]} ${where.comparison} ${where.value}`)) {
+        return;
       }
 
-      if (this.type === PenType.Node) {
-        this['elementRendered'] = false;
+      switch (action.do) {
+        case 'Link':
+          this.link(action.url, action._blank);
+          break;
+        case 'StartAnimate':
+          this.doStartAnimate(action.tag);
+          break;
+        case 'PauseAnimate':
+          this.doPauseAnimate(action.tag);
+          break;
+        case 'StopAnimate':
+          this.doStopAnimate(action.tag);
+          break;
+        case 'Function':
+          this.doFn(action.fn, action.params);
+          break;
+        case 'WindowFn':
+          this.doWindowFn(action.fn, action.params);
+          break;
       }
-      if (item.params || item.params === undefined) {
-        Store.set(this.generateStoreKey('LT:render'), true);
-      }
-    }
+    });
+
+    this.disposableActions = null;
   }
 
   show() {
@@ -374,7 +381,7 @@ export abstract class Pen {
     window.open(url, params === undefined ? '_blank' : params);
   }
 
-  private doStartAnimate(tag: string, params: string) {
+  private doStartAnimate(tag: string, params?: string) {
     if (tag) {
       Store.set(this.generateStoreKey('LT:AnimatePlay'), {
         tag,
@@ -384,7 +391,7 @@ export abstract class Pen {
     }
   }
 
-  private doPauseAnimate(tag: string, params: string) {
+  private doPauseAnimate(tag: string, params?: string) {
     if (tag) {
       Store.set(this.generateStoreKey('LT:AnimatePlay'), {
         tag,
@@ -395,7 +402,7 @@ export abstract class Pen {
     }
   }
 
-  private doStopAnimate(tag: string, params: string) {
+  private doStopAnimate(tag: string, params?: string) {
     if (tag) {
       Store.set(this.generateStoreKey('LT:AnimatePlay'), {
         tag,
@@ -406,18 +413,13 @@ export abstract class Pen {
     }
   }
 
-  private doFn(fn: string, params: string, client?: any) {
-    let func: Function;
-    if (client) {
-      func = new Function('pen', 'params', 'client', fn);
-    } else {
-      func = new Function('pen', 'params', fn);
-    }
-    func(this, params, client);
+  private doFn(fn: string, params: string) {
+    const func: Function = new Function('pen', 'params', fn);
+    func(this, params);
   }
 
-  private doWindowFn(fn: string, params: string, client?: any) {
-    (window as any)[fn](this, params, client);
+  private doWindowFn(fn: string, params: string) {
+    (window as any)[fn](this, params);
   }
 
   generateStoreKey(key) {
