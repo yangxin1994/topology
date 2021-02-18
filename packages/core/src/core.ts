@@ -2673,7 +2673,7 @@ export class Topology {
     const data = JSON.parse(JSON.stringify(this.data));
     data.pens.forEach((pen: any) => {
       for (const key in pen) {
-        if (pen[key] === null || pen[key] === undefined || pen[key] === '') {
+        if (pen[key] === null || pen[key] === undefined) {
           delete pen[key];
         }
       }
