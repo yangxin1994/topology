@@ -174,15 +174,15 @@ export abstract class Pen {
 
     // 兼容老格式
     if (json.font) {
-      this.fontColor = json.font.color;
-      this.fontFamily = json.font.fontFamily;
-      this.fontSize = json.font.fontSize;
-      this.lineHeight = json.font.lineHeight;
-      this.fontStyle = json.font.fontStyle;
-      this.fontWeight = json.font.fontWeight;
-      this.textAlign = json.font.textAlign;
-      this.textBaseline = json.font.textBaseline;
-      this.textBackground = json.font.background;
+      this.fontColor = json.font.color || this.fontColor;
+      this.fontFamily = json.font.fontFamily || this.fontFamily;
+      this.fontSize = json.font.fontSize || this.fontSize;
+      this.lineHeight = json.font.lineHeight || this.lineHeight;
+      this.fontStyle = json.font.fontStyle || this.fontStyle;
+      this.fontWeight = json.font.fontWeight || this.fontWeight;
+      this.textAlign = json.font.textAlign || this.textAlign;
+      this.textBaseline = json.font.textBaseline || this.textBaseline;
+      this.textBackground = json.font.background || this.textBackground;
     }
     // end
     if (json.events) {
