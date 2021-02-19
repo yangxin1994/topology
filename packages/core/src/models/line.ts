@@ -44,7 +44,7 @@ export class Line extends Pen {
     const defaultData: any = {
       name: 'curve',
       fromArrow: '',
-      toArrow: 'triangleSolid',
+      toArrow: '',
       controlPoints: [],
       fromArrowSize: 5,
       toArrowSize: 5,
