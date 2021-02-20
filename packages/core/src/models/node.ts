@@ -449,7 +449,6 @@ export class Node extends Pen {
         ctx.rotate((this.iconRotate * Math.PI) / 180);
         ctx.translate(-rect.center.x, -rect.center.y);
       }
-
       ctx.drawImage(this.img, x, y, w, h);
       ctx.restore();
       return;
@@ -607,8 +606,6 @@ export class Node extends Pen {
     this.animateDuration = passed;
 
     this.animateReady = Node.cloneState(this);
-    console.log(12123);
-
     this.animatePos = 0;
     this.animateFrame = 0;
   }

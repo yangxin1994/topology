@@ -80,8 +80,6 @@ export const drawLineFns: any = {};
 export const drawArrowFns: any = {};
 
 function init() {
-  console.log('Init middles.');
-
   // ********Default nodes.*******
   // Combine
   drawNodeFns.combine = rectangle;
@@ -176,7 +174,7 @@ function init() {
   textRectFns.line = lineTextRect;
 
   // Image
-  drawNodeFns.image = (ctx: CanvasRenderingContext2D, node: Rect) => {};
+  drawNodeFns.image = (ctx: CanvasRenderingContext2D, node: Rect) => { };
   iconRectFns.image = imageIconRect;
   textRectFns.image = imageTextRect;
   anchorsFns.image = imageAnchors;

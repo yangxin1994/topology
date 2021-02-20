@@ -201,6 +201,8 @@ export abstract class Pen {
     if (typeof json.data === 'object') {
       this.data = JSON.parse(JSON.stringify(json.data));
     }
+
+    delete this['img'];
   }
 
   render(ctx: CanvasRenderingContext2D) {
@@ -309,8 +311,11 @@ export abstract class Pen {
   }
 
   doAction() {
-    const actions = this.disposableActions || this.actions;
+    const actions = this.disposableActions || this.actions || this.events;
     actions?.forEach((action) => {
+      if (action.type === 0 || action.type === 1) {
+        return;
+      }
       const where = action.where;
       if (where?.fn) {
         const fn = new Function('pen', where.fn);
@@ -321,22 +326,28 @@ export abstract class Pen {
         return;
       }
 
-      switch (action.do) {
+      switch (action.do || action.action) {
+        case 0:
         case 'Link':
           this.link(action.url, action._blank);
           break;
+        case 1:
         case 'StartAnimate':
           this.doStartAnimate(action.tag);
           break;
+        case 5:
         case 'PauseAnimate':
           this.doPauseAnimate(action.tag);
           break;
+        case 6:
         case 'StopAnimate':
           this.doStopAnimate(action.tag);
           break;
+        case 2:
         case 'Function':
           this.doFn(action.fn, action.params);
           break;
+        case 3:
         case 'WindowFn':
           this.doWindowFn(action.fn, action.params);
           break;
