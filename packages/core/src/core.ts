@@ -2616,7 +2616,11 @@ export class Topology {
   }
 
   setValue(idOrTag: string, val: string | object, attr = 'text') {
-    this.data.pens.forEach((item) => {
+    let pens: any = this.find(idOrTag);
+    if (!Array.isArray(pens)) {
+      pens = [pens];
+    }
+    pens.forEach((item) => {
       if (item.id === idOrTag || item.tags.indexOf(idOrTag) > -1) {
         if (typeof val === 'string') {
           item[attr] = val;
