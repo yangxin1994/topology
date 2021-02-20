@@ -143,11 +143,11 @@ export class Node extends Pen {
     }
     // 兼容老数据 end
 
-    if (json.animateFrames) {
-      this.animateFrames = [];
+    if (json.animateFrames?.length) {
       for (const item of json.animateFrames) {
         item.state = new Node(item.state, true);
       }
+      this.animateFrames = json.animateFrames;
     }
     this.animateType = json.animateType ? json.animateType : json.animateDuration ? 'custom' : '';
     this.init();
@@ -607,6 +607,7 @@ export class Node extends Pen {
     this.animateDuration = passed;
 
     this.animateReady = Node.cloneState(this);
+    console.log(12123);
 
     this.animatePos = 0;
     this.animateFrame = 0;
@@ -867,7 +868,7 @@ export class Node extends Pen {
       }
     }
 
-    if (this.animateReady) {
+    if (this.animateReady?.scale) {
       this.animateReady.scale(scale, center);
     }
   }
@@ -899,7 +900,7 @@ export class Node extends Pen {
       }
     }
 
-    if (this.animateReady) {
+    if (this.animateReady?.translate) {
       this.animateReady.translate(x, y);
     }
   }
