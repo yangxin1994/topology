@@ -1214,11 +1214,15 @@ export class Topology {
   private ondblclick = () => {
     if (this.moveIn.hoverNode) {
       this.dispatch('dblclick', this.moveIn.hoverNode);
-      this.showInput(this.moveIn.hoverNode);
+      if (!(this.data.locked || this.moveIn.hoverNode.locked || this.moveIn.hoverNode.hideInput || this.options.hideInput)) {
+        this.showInput(this.moveIn.hoverNode);
+      }
       this.moveIn.hoverNode.dblclick();
     } else if (this.moveIn.hoverLine) {
       this.dispatch('dblclick', this.moveIn.hoverLine);
-      this.showInput(this.moveIn.hoverLine);
+      if (!(this.data.locked || this.moveIn.hoverLine.locked || this.moveIn.hoverLine.hideInput || this.options.hideInput)) {
+        this.showInput(this.moveIn.hoverLine);
+      }
       this.moveIn.hoverLine.dblclick();
     }
   };
@@ -1708,11 +1712,7 @@ export class Topology {
     return angle;
   }
 
-  showInput(item: Pen, force?: boolean) {
-    if (!force && (this.data.locked || item.locked || item.hideInput || this.options.hideInput)) {
-      return;
-    }
-
+  showInput(item: Pen) {
     this.inputObj = item;
     const textRect = item.getTextRect();
     this.input.value = item.text || '';
