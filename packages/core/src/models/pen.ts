@@ -167,7 +167,10 @@ export abstract class Pen {
       this[key] = json[key];
     }
 
-    this.tags = Object.assign([], json.tags);
+    if (Array.isArray(json.tags)) {
+      this.tags = Object.assign([], json.tags);
+    }
+
     if (json.rect) {
       this.rect = new Rect(json.rect.x, json.rect.y, json.rect.width, json.rect.height);
     }
