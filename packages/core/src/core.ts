@@ -29,7 +29,6 @@ const resizeCursors = ['nw-resize', 'ne-resize', 'se-resize', 'sw-resize'];
 enum MoveInType {
   None,
   Line,
-  LineMove,
   LineFrom,
   LineTo,
   LineControlPoint,
@@ -931,10 +930,12 @@ export class Topology {
           }
           this.needCache = true;
           break;
-        case MoveInType.LineMove:
-          this.hoverLayer.lineMove(e, this.mouseDown);
-          this.animateLayer.updateLines([this.hoverLayer.line]);
-          this.needCache = true;
+        case MoveInType.Line:
+          if (this.mouseDown) {
+            this.hoverLayer.lineMove(e, this.mouseDown);
+            this.animateLayer.updateLines([this.hoverLayer.line]);
+            this.needCache = true;
+          }
           break;
         case MoveInType.LineControlPoint:
           this.moveIn.hoverLine.controlPoints[this.moveIn.lineControlPoint.id].x = e.x;
@@ -999,15 +1000,13 @@ export class Topology {
           this.activeLayer.pens = [this.moveIn.hoverLine];
           this.dispatch('line', this.moveIn.hoverLine);
         }
-        if (this.data.locked || this.moveIn.hoverLine.locked) {
-          this.moveIn.hoverLine.click();
-        }
-        break;
-      case MoveInType.LineMove:
+        this.hoverLayer.line = this.moveIn.hoverLine;
         this.hoverLayer.initLine = new Line(this.moveIn.hoverLine);
         if (this.data.locked || this.moveIn.hoverLine.locked) {
           this.moveIn.hoverLine.click();
         }
+
+        break;
       // tslint:disable-next-line:no-switch-case-fall-through
       case MoveInType.LineFrom:
       case MoveInType.LineTo:
@@ -1554,12 +1553,9 @@ export class Topology {
     }
 
     if (line.pointIn(point)) {
-      this.moveIn.type = MoveInType.LineMove;
+      this.moveIn.type = MoveInType.Line;
       this.moveIn.hoverLine = line;
       this.divLayer.canvas.style.cursor = this.options.hoverCursor;
-      if (line.from.id || line.to.id) {
-        this.moveIn.type = MoveInType.Line;
-      }
       return line;
     }
 

@@ -167,12 +167,12 @@ export abstract class Pen {
       this[key] = json[key];
     }
 
-    if (Array.isArray(json.tags)) {
-      this.tags = Object.assign([], json.tags);
+    if (Array.isArray(this.tags)) {
+      this.tags = Object.assign([], this.tags);
     }
 
-    if (json.rect) {
-      this.rect = new Rect(json.rect.x, json.rect.y, json.rect.width, json.rect.height);
+    if (this.rect) {
+      this.rect = new Rect(this.rect.x, this.rect.y, this.rect.width, this.rect.height);
     }
 
     // 兼容老格式
@@ -188,18 +188,19 @@ export abstract class Pen {
       this.textBackground = json.font.background || this.textBackground;
     }
     // end
-    if (json.events) {
-      this.events = JSON.parse(JSON.stringify(json.events));
+
+    if (this.events) {
+      this.events = JSON.parse(JSON.stringify(this.events));
     }
-    if (json.actions) {
-      this.actions = JSON.parse(JSON.stringify(json.actions));
+    if (this.actions) {
+      this.actions = JSON.parse(JSON.stringify(this.actions));
     }
-    if (json.disposableActions) {
-      this.disposableActions = JSON.parse(JSON.stringify(json.disposableActions));
+    if (this.disposableActions) {
+      this.disposableActions = JSON.parse(JSON.stringify(this.disposableActions));
     }
 
-    if (typeof json.data === 'object') {
-      this.data = JSON.parse(JSON.stringify(json.data));
+    if (typeof this.data === 'object') {
+      this.data = JSON.parse(JSON.stringify(this.data));
     }
 
     delete this['img'];
