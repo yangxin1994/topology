@@ -64,7 +64,7 @@ export function createData(json?: any, tid?: string) {
     }
     // end.
 
-    json.pens?.forEach((item: any) => {
+    json.pens && json.pens.forEach((item: any) => {
       item.TID = tid;
       if (!item.type) {
         data.pens.push(new Node(item));

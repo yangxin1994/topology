@@ -313,12 +313,12 @@ export abstract class Pen {
 
   doAction() {
     const actions = this.disposableActions || this.actions || this.events;
-    actions?.forEach((action) => {
+    actions && actions.forEach((action) => {
       if (action.type === 0 || action.type === 1) {
         return;
       }
       const where = action.where;
-      if (where?.fn) {
+      if (where && where.fn) {
         const fn = new Function('pen', where.fn);
         if (!fn(this)) {
           return;

@@ -143,7 +143,7 @@ export class Node extends Pen {
     }
     // 兼容老数据 end
 
-    if (json.animateFrames?.length) {
+    if (json.animateFrames && json.animateFrames.length) {
       for (const item of json.animateFrames) {
         item.state = new Node(item.state, true);
       }
@@ -865,7 +865,7 @@ export class Node extends Pen {
       }
     }
 
-    if (this.animateReady?.scale) {
+    if (this.animateReady && this.animateReady.scale) {
       this.animateReady.scale(scale, center);
     }
   }
@@ -897,7 +897,7 @@ export class Node extends Pen {
       }
     }
 
-    if (this.animateReady?.translate) {
+    if (this.animateReady && this.animateReady.translate) {
       this.animateReady.translate(x, y);
     }
   }
