@@ -976,6 +976,11 @@ export class Node extends Pen {
   clone() {
     const n = new Node(this);
     n.setTID(this.TID);
+    n.elementRendered = false;
+    n.elementLoaded = false;
+    if (this.name !== 'div') {
+      n.elementId = '';
+    }
     this.setChildrenIds();
     return n;
   }
