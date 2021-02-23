@@ -655,10 +655,10 @@ export class Topology {
     this.closeSocket();
     if (url || this.data.websocket) {
       this.socket = new Socket(url || this.data.websocket, (e) => {
-        this.data.socketEvent && this.dispatch('websocket', e);
+        this.data.socketEvent && this.dispatch('websocket', e.data);
 
         if (this.data.socketEvent !== 1) {
-          this.doSocket(e);
+          this.doSocket(e.data);
         }
       });
     }
