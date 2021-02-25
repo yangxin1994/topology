@@ -6,13 +6,12 @@ import { Node } from './models/node';
 import { Line } from './models/line';
 import { Rect } from './models/rect';
 import { Point } from './models/point';
-import { TopologyData } from './models/data';
 import { Lock } from './models/status';
 
 import { drawLineFns } from './middles';
 import { getBezierPoint } from './middles/lines/curve';
 import { Layer } from './layer';
-import { flatNodes, getBboxOfPoints } from './utils';
+import { flatNodes, getBboxOfPoints, rgba } from './utils';
 import { Topology } from './core';
 
 export class ActiveLayer extends Layer {
@@ -500,36 +499,13 @@ export class ActiveLayer extends Layer {
 
     const TID = this.TID;
     for (const item of this.pens) {
-      if (item instanceof Node) {
-        const tmp = new Node(item, true);
-        tmp.setTID(TID);
-        tmp.data = null;
-        tmp.fillStyle = null;
-        tmp.bkType = 0;
-        tmp.icon = '';
-        tmp.image = '';
-        tmp.text = '';
-        if (tmp.strokeStyle !== 'transparent') {
-          tmp.strokeStyle = '#ffffff';
-          tmp.lineWidth += 2;
-          tmp.render(ctx);
-
-          tmp.strokeStyle = this.options.activeColor;
-          tmp.lineWidth -= 2;
-        }
-        tmp.render(ctx);
-      }
-
       if (item instanceof Line) {
         const tmp = new Line(item);
+        tmp.lineWidth += 2;
+        tmp.toArrowSize -= 6;
+        tmp.fromArrowSize -= 6;
         tmp.setTID(TID);
-        if (tmp.lineWidth < 3) {
-          const bk = new Line(item);
-          bk.setTID(TID);
-          bk.strokeStyle = '#ffffff';
-          bk.render(ctx);
-        }
-        tmp.strokeStyle = this.options.activeColor;
+        tmp.strokeStyle = rgba(0.2, this.options.activeColor);
         tmp.fromArrowColor = this.options.activeColor;
         tmp.toArrowColor = this.options.activeColor;
         tmp.render(ctx);

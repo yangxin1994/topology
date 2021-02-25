@@ -561,7 +561,6 @@ export class Topology {
       node.scale(this.data.scale);
     }
 
-
     node.setTID(this.id);
     this.data.pens.push(node);
 
@@ -2611,17 +2610,17 @@ export class Topology {
     return pen[attr];
   }
 
-  setValue(idOrTag: string, val: string | object, attr = 'text') {
+  setValue(idOrTag: string, val: any, attr = 'text') {
     let pens: any = this.find(idOrTag);
     if (!Array.isArray(pens)) {
       pens = [pens];
     }
     pens.forEach((item) => {
       if (item.id === idOrTag || item.tags.indexOf(idOrTag) > -1) {
-        if (typeof val === 'string') {
-          item[attr] = val;
-        } else {
+        if (typeof val === 'object') {
           item.fromData(item, val);
+        } else {
+          item[attr] = val;
         }
         item.doAction();
       }

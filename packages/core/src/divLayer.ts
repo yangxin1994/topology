@@ -1,7 +1,6 @@
 import { Store, Observer } from 'le5le-store';
 import { Options } from './options';
 import { Node, images } from './models/node';
-import { TopologyData } from './models/data';
 import { Lock } from './models/status';
 import { PenType } from './models/pen';
 import { Layer } from './layer';
@@ -138,7 +137,7 @@ export class DivLayer extends Layer {
         node.gif = false;
         this.canvas.removeChild(this.gifs[node.id]);
         this.gifs[node.id] = null;
-      } else {
+      } else if (node.img) {
         if (this.gifs[node.id] && this.gifs[node.id].src !== node.image) {
           this.gifs[node.id].src = node.image;
         }
@@ -146,14 +145,14 @@ export class DivLayer extends Layer {
       }
     }
 
-    // if (node.children) {
-    //   for (const child of node.children) {
-    //     if (child.type === PenType.Line) {
-    //       continue;
-    //     }
-    //     this.addDiv(child as Node);
-    //   }
-    // }
+    if (node.children) {
+      for (const child of node.children) {
+        if (child.type === PenType.Line) {
+          continue;
+        }
+        this.addDiv(child as Node);
+      }
+    }
   };
 
   createPlayer() {

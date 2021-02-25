@@ -1,4 +1,3 @@
-import { TopologyData } from './models/data';
 import { Rect } from './models/rect';
 import { Point } from './models/point';
 import { Line } from './models/line';

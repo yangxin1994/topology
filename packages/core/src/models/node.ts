@@ -12,7 +12,7 @@ import { s8 } from '../utils/uuid';
 import { pointInRect } from '../utils/canvas';
 
 export const images: {
-  [key: string]: { img: HTMLImageElement; cnt: number; };
+  [key: string]: { img: HTMLImageElement; };
 } = {};
 
 export class Node extends Pen {
@@ -115,6 +115,9 @@ export class Node extends Pen {
 
     this.fromData(defaultData, json);
     this.type = PenType.Node;
+    if (this.gif) {
+      this.elementLoaded = false;
+    }
 
     // 兼容老数据
     if (json.children && json.children[0] && json.children[0].parentRect) {
@@ -158,9 +161,28 @@ export class Node extends Pen {
     }
   }
 
-  static cloneState(json: any) {
+  static cloneState(json: any, addFrame = true) {
     const n = new Node(json);
     delete n.animateFrames;
+
+    if (addFrame) {
+      delete n.text;
+      delete n.fontColor;
+      delete n.fontFamily;
+      delete n.fontSize;
+      delete n.lineHeight;
+      delete n.fontStyle;
+      delete n.fontWeight;
+      delete n.textAlign;
+      delete n.textBaseline;
+      delete n.textBackground;
+
+      delete n.iconFamily;
+      delete n.icon;
+      delete n.iconSize;
+      delete n.iconColor;
+    }
+
     return n;
   }
 
@@ -260,16 +282,14 @@ export class Node extends Pen {
   setTID(id: string) {
     this.TID = id;
 
-    if (!this.children) {
-      return;
-    }
-
-    for (const item of this.children) {
-      this.TID = id;
-      switch (item.type) {
-        case PenType.Node:
-          (item as Node).setTID(id);
-          break;
+    if (this.children) {
+      for (const item of this.children) {
+        this.TID = id;
+        switch (item.type) {
+          case PenType.Node:
+            (item as Node).setTID(id);
+            break;
+        }
       }
     }
 
@@ -317,11 +337,7 @@ export class Node extends Pen {
     // Draw image.
     if (this.image) {
       this.drawImg(ctx);
-      return;
-    }
-
-    // Draw icon
-    if (this.icon) {
+    } else if (this.icon) {
       ctx.save();
       ctx.shadowColor = '';
       ctx.shadowBlur = 0;
@@ -386,83 +402,85 @@ export class Node extends Pen {
     }
 
     const gif = this.image.indexOf('.gif') > 0;
+    if (!gif) {
+      if (this.img) {
+        ctx.save();
+        ctx.shadowColor = '';
+        ctx.shadowBlur = 0;
 
-    if (!gif && this.img) {
-      ctx.save();
-      ctx.shadowColor = '';
-      ctx.shadowBlur = 0;
-
-      const rect = this.getIconRect();
-      let x = rect.x;
-      let y = rect.y;
-      let w = rect.width;
-      let h = rect.height;
-      if (this.imageWidth) {
-        w = this.imageWidth;
-      }
-      if (this.imageHeight) {
-        h = this.imageHeight;
-      }
-      if (this.imageRatio) {
+        const rect = this.getIconRect();
+        let x = rect.x;
+        let y = rect.y;
+        let w = rect.width;
+        let h = rect.height;
         if (this.imageWidth) {
-          h = (this.imgNaturalHeight / this.imgNaturalWidth) * w;
-        } else {
-          w = (this.imgNaturalWidth / this.imgNaturalHeight) * h;
+          w = this.imageWidth;
         }
+        if (this.imageHeight) {
+          h = this.imageHeight;
+        }
+        if (this.imageRatio) {
+          if (this.imageWidth) {
+            h = (this.imgNaturalHeight / this.imgNaturalWidth) * w;
+          } else {
+            w = (this.imgNaturalWidth / this.imgNaturalHeight) * h;
+          }
+        }
+        x += (rect.width - w) / 2;
+        y += (rect.height - h) / 2;
+
+        switch (this.imageAlign) {
+          case 'top':
+            y = rect.y;
+            break;
+          case 'bottom':
+            y = rect.ey - h;
+            break;
+          case 'left':
+            x = rect.x;
+            break;
+          case 'right':
+            x = rect.ex - w;
+            break;
+          case 'left-top':
+            x = rect.x;
+            y = rect.y;
+            break;
+          case 'right-top':
+            x = rect.ex - w;
+            y = rect.y;
+            break;
+          case 'left-bottom':
+            x = rect.x;
+            y = rect.ey - h;
+            break;
+          case 'right-bottom':
+            x = rect.ex - w;
+            y = rect.ey - h;
+            break;
+        }
+
+        if (this.iconRotate) {
+          ctx.translate(rect.center.x, rect.center.y);
+          ctx.rotate((this.iconRotate * Math.PI) / 180);
+          ctx.translate(-rect.center.x, -rect.center.y);
+        }
+        ctx.drawImage(this.img, x, y, w, h);
+        ctx.restore();
+        return;
+      } else if (images[this.image]) {
+        this.img = images[this.image].img;
+        this.lastImage = this.image;
+        this.imgNaturalWidth = this.img.naturalWidth;
+        this.imgNaturalHeight = this.img.naturalHeight;
+        this.drawImg(ctx);
+        return;
       }
-      x += (rect.width - w) / 2;
-      y += (rect.height - h) / 2;
-
-      switch (this.imageAlign) {
-        case 'top':
-          y = rect.y;
-          break;
-        case 'bottom':
-          y = rect.ey - h;
-          break;
-        case 'left':
-          x = rect.x;
-          break;
-        case 'right':
-          x = rect.ex - w;
-          break;
-        case 'left-top':
-          x = rect.x;
-          y = rect.y;
-          break;
-        case 'right-top':
-          x = rect.ex - w;
-          y = rect.y;
-          break;
-        case 'left-bottom':
-          x = rect.x;
-          y = rect.ey - h;
-          break;
-        case 'right-bottom':
-          x = rect.ex - w;
-          y = rect.ey - h;
-          break;
+    } else if (this.img) {
+      if (this.TID && !this.elementLoaded) {
+        this.elementLoaded = true;
+        Store.set(this.generateStoreKey('LT:addDiv'), this);
       }
-
-      if (this.iconRotate) {
-        ctx.translate(rect.center.x, rect.center.y);
-        ctx.rotate((this.iconRotate * Math.PI) / 180);
-        ctx.translate(-rect.center.x, -rect.center.y);
-      }
-      ctx.drawImage(this.img, x, y, w, h);
-      ctx.restore();
-      return;
-    }
-
-    // Load image and draw it.
-    if (!gif && images[this.image]) {
-      this.img = images[this.image].img;
-      ++images[this.image].cnt;
-
-      this.lastImage = this.image;
-      this.imgNaturalWidth = this.img.naturalWidth;
-      this.imgNaturalHeight = this.img.naturalHeight;
-      this.drawImg(ctx);
       return;
     }
 
@@ -476,12 +494,14 @@ export class Node extends Pen {
       this.img = img;
       images[this.image] = {
         img,
-        cnt: 1,
       };
       Store.set(this.generateStoreKey('LT:imageLoaded'), true);
       if (!this.gif && gif) {
         this.gif = true;
-        Store.set(this.generateStoreKey('LT:addDiv'), this);
+        if (this.TID) {
+          this.elementLoaded = true;
+          Store.set(this.generateStoreKey('LT:addDiv'), this);
+        }
       }
     };
   }
@@ -601,11 +621,11 @@ export class Node extends Pen {
       this.animateFrames[i].start = passed;
       passed += this.animateFrames[i].duration;
       this.animateFrames[i].end = passed;
-      this.animateFrames[i].initState = Node.cloneState(i ? this.animateFrames[i - 1].state : this);
+      this.animateFrames[i].initState = Node.cloneState(i ? this.animateFrames[i - 1].state : this, false);
     }
     this.animateDuration = passed;
 
-    this.animateReady = Node.cloneState(this);
+    this.animateReady = Node.cloneState(this, false);
     this.animatePos = 0;
     this.animateFrame = 0;
   }
@@ -672,22 +692,22 @@ export class Node extends Pen {
         this.dash = item.state.dash;
         this.strokeStyle = item.state.strokeStyle;
         this.fillStyle = item.state.fillStyle;
-        if (item.state.text) {
-          this.text = item.state.text;
-        }
-        this.fontColor = item.state.fontColor;
-        this.fontFamily = item.state.fontFamily;
-        this.fontSize = item.state.fontSize;
-        this.lineHeight = item.state.lineHeight;
-        this.fontStyle = item.state.fontStyle;
-        this.fontWeight = item.state.fontWeight;
-        this.textAlign = item.state.textAlign;
-        this.textBaseline = item.state.textBaseline;
-        this.textBackground = item.state.textBackground;
-        this.iconFamily = item.state.iconFamily;
-        this.icon = item.state.icon;
-        this.iconSize = item.state.iconSize;
-        this.iconColor = item.state.iconColor;
+
+        item.state.text && (this.text = item.state.text);
+        item.state.fontColor && (this.fontColor = item.state.fontColor);
+        item.state.fontFamily && (this.fontFamily = item.state.fontFamily);
+        item.state.fontSize && (this.fontSize = item.state.fontSize);
+        item.state.lineHeight && (this.lineHeight = item.state.lineHeight);
+        item.state.fontStyle && (this.fontStyle = item.state.fontStyle);
+        item.state.fontWeight && (this.fontWeight = item.state.fontWeight);
+        item.state.textAlign && (this.textAlign = item.state.textAlign);
+        item.state.textBaseline && (this.textBaseline = item.state.textBaseline);
+        item.state.textBackground && (this.textBackground = item.state.textBackground);
+        item.state.iconFamily && (this.iconFamily = item.state.iconFamily);
+        item.state.icon && (this.icon = item.state.icon);
+        item.state.iconSize && (this.iconSize = item.state.iconSize);
+        item.state.iconColor && (this.iconColor = item.state.iconColor);
+
         this.visible = item.state.visible;
 
         this._animateFrame = i + 1;
