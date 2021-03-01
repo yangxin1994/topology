@@ -774,6 +774,16 @@ export class Node extends Pen {
           if (item.state.value !== item.initState.value) {
             this.value = (item.initState.value || 0) + ((item.state.value || 0) - (item.initState.value || 0)) * rate;
           }
+
+          if (item.state.data) {
+            for (let key in item.state.data) {
+              if (typeof item.state.data[key] === 'number') {
+                this.data[key] = (item.initState.data[key] || 0) + ((item.state.data[key] || 0) - (item.initState.data[key] || 0)) * rate;
+              } else if (item.state.data[key] !== undefined && item.state.data[key] !== null) {
+                this.data[key] = item.state.data[key];
+              }
+            }
+          }
         } else {
           this.rect = item.state.rect;
           this.lineWidth = item.state.lineWidth;

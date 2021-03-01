@@ -21,7 +21,7 @@ export interface Action {
   params?: any;
 }
 
-const eventFns: string[] = ['link', 'doStartAnimate', 'doFn', 'doWindowFn', '', 'doPauseAnimate', 'doStopAnimate'];
+const eventFns: string[] = ['link', 'doStartAnimate', 'doFn', 'doWindowFn', '', 'doPauseAnimate', 'doStopAnimate', 'doEmit'];
 
 const defaultPen: any = {
   name: '',
@@ -174,6 +174,8 @@ export abstract class Pen {
     if (this.rect) {
       this.rect = new Rect(this.rect.x, this.rect.y, this.rect.width, this.rect.height);
     }
+
+    this.lineWidth = this.lineWidth++;
 
     // 兼容老格式
     if (json.font) {
@@ -352,6 +354,10 @@ export abstract class Pen {
         case 'WindowFn':
           this.doWindowFn(action.fn, action.params);
           break;
+        case 7:
+        case 'Emit':
+          this.doEmit(action.fn, action.params);
+          break;
       }
     });
 
@@ -435,6 +441,13 @@ export abstract class Pen {
 
   private doWindowFn(fn: string, params: string) {
     (window as any)[fn](this, params);
+  }
+
+  private doEmit(event: string, params: string) {
+    Store.set(this.generateStoreKey('LT:emit'), {
+      event,
+      params,
+    });
   }
 
   generateStoreKey(key) {

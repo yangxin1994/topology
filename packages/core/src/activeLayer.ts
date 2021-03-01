@@ -501,9 +501,9 @@ export class ActiveLayer extends Layer {
     for (const item of this.pens) {
       if (item instanceof Line) {
         const tmp = new Line(item);
-        tmp.lineWidth += 2;
-        tmp.toArrowSize -= 6;
-        tmp.fromArrowSize -= 6;
+        tmp.lineWidth *= 2;
+        tmp.toArrowSize -= tmp.lineWidth * 2;
+        tmp.fromArrowSize -= tmp.lineWidth * 2;
         tmp.setTID(TID);
         tmp.strokeStyle = rgba(0.2, this.options.activeColor);
         tmp.fromArrowColor = this.options.activeColor;

@@ -71,6 +71,7 @@ export class Topology {
   private subcribeAnimateEnd: Observer;
   private subcribeAnimateMoved: Observer;
   private subcribeMediaEnd: Observer;
+  private subcribeEmit: Observer;
 
   touchedNode: any;
   lastHoverNode: Node;
@@ -214,6 +215,12 @@ export class Topology {
       }
       this.divLayer.playNext(pen.nextAnimate);
       this.dispatch('animateEnd', pen);
+    });
+    this.subcribeEmit = Store.subscribe('LT:emit', (e: {
+      event: string,
+      params: string;
+    }) => {
+      this.emit(e.event, e.params);
     });
   }
 
@@ -916,7 +923,10 @@ export class Topology {
           if (e.ctrlKey || e.shiftKey || e.altKey) {
             this.hoverLayer.lineTo(new Point(e.x, e.y), arrow);
           } else {
-            this.hoverLayer.lineTo(this.getLineDock(new Point(e.x, e.y), AnchorMode.In), arrow);
+            const to = this.getLineDock(new Point(e.x, e.y), AnchorMode.In);
+            if (to.x !== this.hoverLayer.line.from.x || to.y !== this.hoverLayer.line.from.y) {
+              this.hoverLayer.lineTo(to, arrow);
+            }
           }
           this.needCache = true;
           break;
@@ -930,7 +940,7 @@ export class Topology {
           this.needCache = true;
           break;
         case MoveInType.Line:
-          if (this.mouseDown) {
+          if (this.mouseDown && !this.hoverLayer.line.from.id && !this.hoverLayer.line.to.id) {
             this.hoverLayer.lineMove(e, this.mouseDown);
             this.animateLayer.updateLines([this.hoverLayer.line]);
             this.needCache = true;
@@ -2612,11 +2622,15 @@ export class Topology {
 
   setValue(idOrTag: string, val: any, attr = 'text') {
     let pens: any = this.find(idOrTag);
+    if (!pens) {
+      return;
+    }
+
     if (!Array.isArray(pens)) {
       pens = [pens];
     }
     pens.forEach((item) => {
-      if (item.id === idOrTag || item.tags.indexOf(idOrTag) > -1) {
+      if (item.id === idOrTag || (item.tags && item.tags.indexOf(idOrTag) > -1)) {
         if (typeof val === 'object') {
           item.fromData(item, val);
         } else {
@@ -2730,6 +2744,7 @@ export class Topology {
     this.subcribeAnimateEnd.unsubscribe();
     this.subcribeAnimateMoved.unsubscribe();
     this.subcribeMediaEnd.unsubscribe();
+    this.subcribeEmit.unsubscribe();
     this.animateLayer.destroy();
     this.divLayer.destroy();
     this.canvas.destroy();
