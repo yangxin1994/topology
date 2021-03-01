@@ -175,7 +175,7 @@ export abstract class Pen {
       this.rect = new Rect(this.rect.x, this.rect.y, this.rect.width, this.rect.height);
     }
 
-    this.lineWidth = this.lineWidth++;
+    this.lineWidth = this.lineWidth || 1;
 
     // 兼容老格式
     if (json.font) {
