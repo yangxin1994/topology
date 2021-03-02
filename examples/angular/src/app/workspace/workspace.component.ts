@@ -25,7 +25,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
   @ViewChild('workspace', { static: true }) workspace: ElementRef;
   tools: any[] = [];
   canvas: Topology;
-  canvasOptions: Options = {};
+  canvasOptions: Options = {translateKey:4}; // 开启右键拖动画布
   selection: {
     pen?: Pen;
     pens?: Pen[];
