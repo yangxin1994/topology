@@ -760,7 +760,7 @@ export class Topology {
     }
 
     // https://caniuse.com/#feat=mdn-api_mouseevent_buttons
-    if (this.mouseDown && !this.mouseDown.restore && e.buttons !== 1) {
+    if (this.mouseDown && !this.mouseDown.restore && (e.buttons !== 1&&e.buttons !== 2)) {
       // 防止异常情况导致mouseup事件没有触发
       this.onmouseup();
       return;
@@ -768,7 +768,12 @@ export class Topology {
 
     if (this.mouseDown && (this.data.locked || this.spaceDown || !this.moveIn.type)) {
       let b = !!this.data.locked;
-      switch (this.options.translateKey) {
+      switch (this.options.translateKey){
+        case KeyType.Right:
+          if (e.buttons==2) {
+            b = true;
+          }
+          break;
         case KeyType.Any:
           b = true;
           break;

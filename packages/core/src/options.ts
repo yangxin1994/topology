@@ -4,6 +4,7 @@ export enum KeyType {
   Ctrl,
   Shift,
   Alt,
+  Right,
 }
 
 export enum KeydownType {
