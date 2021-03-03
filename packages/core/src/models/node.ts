@@ -775,6 +775,22 @@ export class Node extends Pen {
             this.value = (item.initState.value || 0) + ((item.state.value || 0) - (item.initState.value || 0)) * rate;
           }
 
+          if (item.state.num !== item.initState.num) {
+            this.num = (item.initState.num || 0) + ((item.state.num || 0) - (item.initState.num || 0)) * rate;
+          }
+
+          if (item.state.num1 !== item.initState.num1) {
+            this.num1 = (item.initState.num1 || 0) + ((item.state.num1 || 0) - (item.initState.num1 || 0)) * rate;
+          }
+
+          if (item.state.num2 !== item.initState.num2) {
+            this.num2 = (item.initState.num2 || 0) + ((item.state.num2 || 0) - (item.initState.num2 || 0)) * rate;
+          }
+
+          if (item.state.num3 !== item.initState.num3) {
+            this.num3 = (item.initState.num3 || 0) + ((item.state.num3 || 0) - (item.initState.num3 || 0)) * rate;
+          }
+
           if (item.state.data) {
             for (let key in item.state.data) {
               if (typeof item.state.data[key] === 'number') {

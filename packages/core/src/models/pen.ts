@@ -150,6 +150,10 @@ export abstract class Pen {
   // User data.
   data: any;
   value: number;
+  num: number;
+  num1: number;
+  num2: number;
+  num3: number;
 
   fromData(defaultData: any, json: any) {
     if (!json) {
