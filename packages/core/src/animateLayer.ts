@@ -31,7 +31,7 @@ export class AnimateLayer extends Layer {
     });
     this.subscribePlay = Store.subscribe(
       this.generateStoreKey('LT:AnimatePlay'),
-      (params: { stop?: boolean; tag?: string; pen?: Pen }) => {
+      (params: { stop?: boolean; tag?: string; pen?: Pen; }) => {
         if (params.stop) {
           if (params.tag) {
             const pen = find(params.tag, this.data.pens);
@@ -53,6 +53,7 @@ export class AnimateLayer extends Layer {
           }
         } else {
           if (params.pen) {
+
             if (this.pens.has(params.pen.id)) {
               this.pens.get(params.pen.id).animateStart = Date.now();
             } else {

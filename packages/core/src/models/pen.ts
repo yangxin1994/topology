@@ -388,6 +388,12 @@ export abstract class Pen {
 
   setTID(id: string) {
     this.TID = id;
+    if ((this as any).children) {
+      for (const item of (this as any).children) {
+        item.setTID(id);
+      }
+    }
+
     return this;
   }
 

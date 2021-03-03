@@ -279,23 +279,6 @@ export class Node extends Pen {
     }
   }
 
-  setTID(id: string) {
-    this.TID = id;
-
-    if (this.children) {
-      for (const item of this.children) {
-        this.TID = id;
-        switch (item.type) {
-          case PenType.Node:
-            (item as Node).setTID(id);
-            break;
-        }
-      }
-    }
-
-    return this;
-  }
-
   setChildrenIds() {
     if (!this.children) {
       return;

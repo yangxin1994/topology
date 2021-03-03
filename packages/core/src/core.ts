@@ -548,6 +548,8 @@ export class Topology {
       return null;
     }
 
+    node.TID = this.id;
+
     // if it's not a Node
     if (!node.init) {
       node = new Node(node);
@@ -556,7 +558,6 @@ export class Topology {
     if (!node.strokeStyle && this.options.color) {
       node.strokeStyle = this.options.color;
     }
-
 
     fontKeys.forEach((key: string) => {
       if (!node[key]) {
@@ -568,7 +569,6 @@ export class Topology {
       node.scale(this.data.scale);
     }
 
-    node.setTID(this.id);
     this.data.pens.push(node);
 
     if (focus) {
@@ -596,10 +596,12 @@ export class Topology {
       return null;
     }
 
+    line.TID = this.id;
     if (!line.clone) {
       line = new Line(line);
       line.calcControlPoints(true);
     }
+
     if (this.data.scale !== 1) {
       line.fontSize *= this.data.scale;
     }
@@ -644,7 +646,7 @@ export class Topology {
     this.cache();
 
     this.divLayer.clear();
-
+    this.animateLayer.stop();
     this.render(true);
 
     this.parentElem.scrollLeft = 0;
@@ -1840,6 +1842,7 @@ export class Topology {
     }
 
     this.divLayer.clear(true);
+    this.animateLayer.stop();
     this.data = createData(this.caches.list[--this.caches.index], this.id);
     this.render(true);
     this.divLayer.render();
