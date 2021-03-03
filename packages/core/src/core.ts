@@ -2633,7 +2633,12 @@ export class Topology {
     return pen[attr];
   }
 
-  setValue(idOrTag: string, val: any, attr = 'text') {
+  setValue(idOrTag: any, val: any, attr = 'text') {
+    if (typeof idOrTag === 'object') {
+      val = idOrTag;
+      idOrTag = idOrTag.id || idOrTag.tag;
+    }
+
     let pens: any = this.find(idOrTag);
     if (!pens) {
       return;
