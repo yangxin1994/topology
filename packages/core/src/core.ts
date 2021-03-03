@@ -2617,13 +2617,18 @@ export class Topology {
   }
 
   getValue(idOrTag: string, attr = 'text') {
-    let pen: Pen;
-    this.data.pens.forEach((item) => {
-      if (item.id === idOrTag || item.tags.indexOf(idOrTag) > -1) {
-        pen = item;
-        return;
-      }
-    });
+    let pen: Pen | Pen[] = this.find(idOrTag);
+    if (!pen) {
+      return;
+    }
+
+    if (Array.isArray(pen)) {
+      pen = pen[0];
+    }
+
+    if (!pen) {
+      return;
+    }
 
     return pen[attr];
   }
