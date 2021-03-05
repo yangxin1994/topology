@@ -182,7 +182,7 @@ export abstract class Pen {
     this.lineWidth = this.lineWidth || 1;
 
     // 兼容老格式
-    if (json.font) {
+    if (!this.fontColor && json.font) {
       this.fontColor = json.font.color || this.fontColor;
       this.fontFamily = json.font.fontFamily || this.fontFamily;
       this.fontSize = json.font.fontSize || this.fontSize;
@@ -192,6 +192,7 @@ export abstract class Pen {
       this.textAlign = json.font.textAlign || this.textAlign;
       this.textBaseline = json.font.textBaseline || this.textBaseline;
       this.textBackground = json.font.background || this.textBackground;
+      delete this['font'];
     }
     // end
 
