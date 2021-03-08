@@ -880,8 +880,9 @@ export class Node extends Pen {
           item.state.scale(scale, center);
         }
 
-        // fix bug
-        item.state.fontSize = item.initState.fontSize;
+        if (item.initState && item.state) {
+          item.state.fontSize = item.initState.fontSize;
+        }
       }
     }
 

@@ -636,6 +636,7 @@ export class Topology {
 
   // open - redraw by the data
   open(data?: any) {
+    this.canvas.clearBkImg();
     this.data = createData(data, this.id);
     Store.set(this.generateStoreKey('LT:scale'), this.data.scale);
     this.dispatch('scale', this.data.scale);
