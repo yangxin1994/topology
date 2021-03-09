@@ -407,6 +407,18 @@ export abstract class Pen {
     Store.set(this.generateStoreKey('LT:AnimatePlay'), {
       pen: this,
     });
+
+    // 跟随动画播放
+    if (this['playType'] === 2) {
+      this.play();
+    }
+  }
+
+  play(pause?: boolean) {
+    Store.set(this.generateStoreKey('LT:play'), {
+      pen: this,
+      pause
+    });
   }
 
   private link(url: string, params: string) {

@@ -4,6 +4,7 @@ import { Node, images } from './models/node';
 import { Lock } from './models/status';
 import { PenType } from './models/pen';
 import { Layer } from './layer';
+import { find } from './utils';
 
 export class DivLayer extends Layer {
   canvas = document.createElement('div');
@@ -22,20 +23,21 @@ export class DivLayer extends Layer {
   gifs: { [key: string]: HTMLImageElement; } = {};
 
   private subcribeDiv: Observer;
+  private subcribePlay: Observer;
   private subcribeNode: Observer;
   constructor(public parentElem: HTMLElement, public options: Options = {}, TID: string) {
     super(TID);
     if (!this.options.playIcon) {
-      this.options.playIcon = 'iconfont icon-play';
+      this.options.playIcon = 't-icon t-play';
     }
     if (!this.options.pauseIcon) {
-      this.options.pauseIcon = 'iconfont icon-pause';
+      this.options.pauseIcon = 't-icon t-pause';
     }
     if (!this.options.fullScreenIcon) {
-      this.options.fullScreenIcon = 'iconfont icon-full-screen';
+      this.options.fullScreenIcon = 't-icon t-full-screen';
     }
     if (!this.options.loopIcon) {
-      this.options.loopIcon = 'iconfont icon-loop';
+      this.options.loopIcon = 't-icon t-loop';
     }
 
     this.canvas.style.position = 'absolute';
@@ -48,6 +50,9 @@ export class DivLayer extends Layer {
     this.createPlayer();
 
     this.subcribeDiv = Store.subscribe(this.generateStoreKey('LT:addDiv'), this.addDiv);
+    this.subcribePlay = Store.subscribe(this.generateStoreKey('LT:play'), (e: { pen: Node; pause?: boolean; }) => {
+      this.playOne(e.pen, e.pause);
+    });
 
     this.subcribeNode = Store.subscribe(this.generateStoreKey('LT:activeNode'), (node: Node) => {
       if (!node || (!node.video && !node.audio)) {
@@ -278,7 +283,7 @@ export class DivLayer extends Layer {
 
     player.style.background = 'transparent';
 
-    if (node.play === 1) {
+    if (node.playType === 1) {
       media.autoplay = true;
     }
     media.loop = node.playLoop;
@@ -301,7 +306,7 @@ export class DivLayer extends Layer {
       if (this.media === media) {
         this.playBtn.className = this.options.playIcon;
       }
-      this.playNext(node.nextPlay);
+      this.play(node.nextPlay);
     };
     media.onloadedmetadata = () => {
       this.getMediaCurrent();
@@ -320,21 +325,29 @@ export class DivLayer extends Layer {
     return player;
   }
 
-  playNext(next: string) {
-    if (!next) {
+  play(idOrTag: any, pause?: boolean) {
+    if (!idOrTag) {
       return;
     }
 
-    for (const item of this.data.pens) {
-      if (!(item instanceof Node)) {
-        continue;
+    const pens = find(idOrTag, this.data.pens);
+    pens.forEach((item: Node) => {
+      this.playOne(item, pause);
+    });
+  }
+
+  playOne(item: Node, pause?: boolean) {
+    if (item.audio && this.audios[item.id] && this.audios[item.id].media) {
+      if (pause) {
+        this.audios[item.id].media.pause();
+      } else if (this.audios[item.id].media.paused) {
+        this.audios[item.id].media.play();
       }
-      if (item.tags.indexOf(next) > -1) {
-        if (item.audio && this.audios[item.id] && this.audios[item.id].media && this.audios[item.id].media.paused) {
-          this.audios[item.id].media.play();
-        } else if (item.video && this.videos[item.id].media && this.videos[item.id].media.paused) {
-          this.videos[item.id].media.play();
-        }
+    } else if (item.video && this.videos[item.id].media) {
+      if (pause) {
+        this.videos[item.id].media.pause();
+      } else if (this.videos[item.id].media.paused) {
+        this.videos[item.id].media.play();
       }
     }
   }
@@ -486,5 +499,6 @@ export class DivLayer extends Layer {
     this.clear();
     this.subcribeDiv.unsubscribe();
     this.subcribeNode.unsubscribe();
+    this.subcribePlay.unsubscribe();
   }
 }

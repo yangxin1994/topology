@@ -84,7 +84,7 @@ export class Node extends Pen {
   video: string;
   audio: string;
   // 0 - 人工播放；1 - auto自动播放；2 - animate play
-  play: number;
+  playType: number;
   playLoop: boolean;
   nextPlay: string;
 

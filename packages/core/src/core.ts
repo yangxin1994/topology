@@ -213,7 +213,6 @@ export class Topology {
           this.offscreen.render();
           break;
       }
-      this.divLayer.playNext(pen.nextAnimate);
       this.dispatch('animateEnd', pen);
     });
     this.subcribeEmit = Store.subscribe('LT:emit', (e: {
@@ -2303,12 +2302,23 @@ export class Topology {
     this.dispatch('space', null);
   }
 
-  find(idOrTag: string, pens?: Pen[]) {
-    if (!pens) {
-      pens = this.data.pens;
+  find(idOrTag: string, pens?: Pen[] | boolean, array?: boolean) {
+    let list: Pen[];
+    if (Array.isArray(pens)) {
+      list = pens;
+    } else {
+      list = this.data.pens;
+      array = pens;
     }
 
-    return find(idOrTag, pens);
+    const result = find(idOrTag, list);
+    if (array) {
+      return result;
+    }
+
+    if (result.length === 1) {
+      return result[0];
+    }
   }
 
   findIndex(pen: Pen, pens?: Pen[]) {
@@ -2317,6 +2327,10 @@ export class Topology {
     }
 
     return pens.findIndex((item: Pen) => item.id === pen.id);
+  }
+
+  play(idOrTag: string, pause?: boolean) {
+    this.divLayer.play(idOrTag, pause);
   }
 
   translate(x: number, y: number, process?: boolean, noNotice?: boolean) {
@@ -2640,14 +2654,7 @@ export class Topology {
       idOrTag = idOrTag.id || idOrTag.tag;
     }
 
-    let pens: any = this.find(idOrTag);
-    if (!pens) {
-      return;
-    }
-
-    if (!Array.isArray(pens)) {
-      pens = [pens];
-    }
+    const pens = find(idOrTag, this.data.pens);
     pens.forEach((item) => {
       if (item.id === idOrTag || (item.tags && item.tags.indexOf(idOrTag) > -1)) {
         if (typeof val === 'object') {
