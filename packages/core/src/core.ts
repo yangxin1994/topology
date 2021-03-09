@@ -2319,6 +2319,8 @@ export class Topology {
     if (result.length === 1) {
       return result[0];
     }
+
+    return result;
   }
 
   findIndex(pen: Pen, pens?: Pen[]) {
