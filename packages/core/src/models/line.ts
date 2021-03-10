@@ -239,6 +239,10 @@ export class Line extends Pen {
 
       case 'curve':
         return curveLen(this.from, this.controlPoints[0], this.controlPoints[1], this.to);
+      default:
+        if (drawLineFns[this.name].getLength) {
+          return drawLineFns[this.name].getLength(this);
+        }
     }
 
     return 0;
