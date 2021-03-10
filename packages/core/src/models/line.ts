@@ -279,6 +279,11 @@ export class Line extends Pen {
         break;
       case 'curve':
         center = getBezierPoint(0.5, this.to, this.controlPoints[1], this.controlPoints[0], this.from);
+        break;
+      default:
+        if (drawLineFns[this.name].getCenter) {
+          center = drawLineFns[this.name].getCenter(this);
+        }
     }
 
     return center;
@@ -314,6 +319,10 @@ export class Line extends Pen {
         }
       case 'curve':
         return getBezierPoint(pos / this.getLen(), this.from, this.controlPoints[0], this.controlPoints[1], this.to);
+      default:
+        if (drawLineFns[this.name].getPointByPos) {
+          return drawLineFns[this.name].getPointByPos(pos, this);
+        }
     }
     return null;
   }

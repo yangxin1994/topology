@@ -279,6 +279,8 @@ export function registerLine(
   dockControlPointFn?: (point: Point, line: Line) => void,
   pointInFn?: (point: Point, line: Line) => boolean,
   getLength?: (line: Line) => void,
+  getCenter?: (line: Line) => void,
+  getPointByPos?: (line: Line) => void,
   force = true
 ) {
   // Exist
@@ -292,7 +294,9 @@ export function registerLine(
     controlPointsFn: controlPointsFn,
     dockControlPointFn,
     pointIn: pointInFn,
-    getLength
+    getLength,
+    getCenter,
+    getPointByPos
   };
   return true;
 }
