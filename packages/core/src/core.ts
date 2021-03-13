@@ -37,6 +37,7 @@ enum MoveInType {
   HoverAnchors,
   AutoAnchor,
   Rotate,
+  Graffti,
 }
 
 interface ICaches {
@@ -582,9 +583,16 @@ export class Topology {
       }
     }
 
-    this.render();
-    this.animate(true);
-    this.cache();
+    if (node.name !== 'graffti' || !node.doing) {
+      this.render();
+      this.animate(true);
+      this.cache();
+    } else {
+      this.moveIn.type = MoveInType.Graffti;
+      this.moveIn.hoverNode = node;
+    }
+
+
     this.dispatch('addNode', node);
 
     return node;
@@ -973,6 +981,9 @@ export class Topology {
           }
           this.needCache = true;
           break;
+        case MoveInType.Graffti:
+          this.moveIn.hoverNode.pushPoint(new Point(e.x, e.y));
+          break;
       }
 
       this.render();
@@ -1114,6 +1125,9 @@ export class Topology {
         }
 
         break;
+      case MoveInType.Graffti:
+        this.moveIn.hoverNode.pushPoint(new Point(e.x, e.y));
+        break;
     }
 
     // Save node rects to move.
@@ -1213,6 +1227,11 @@ export class Topology {
             this.activeLayer.clear();
             this.data.pens.splice(this.findIndex(this.hoverLayer.line), 1);
           }
+          break;
+        case MoveInType.Graffti:
+          this.moveIn.type = MoveInType.Nodes;
+          this.moveIn.hoverNode['doing'] = null;
+          this.moveIn.hoverNode.calcAnchors();
           break;
       }
     }
@@ -1341,6 +1360,9 @@ export class Topology {
   };
 
   private getMoveIn(pt: { x: number; y: number; }) {
+    if (this.moveIn.type === MoveInType.Graffti) {
+      return;
+    }
     this.lastHoverNode = this.moveIn.hoverNode;
     this.lastHoverLine = this.moveIn.hoverLine;
     this.moveIn.type = MoveInType.None;

@@ -202,7 +202,7 @@ export class ActiveLayer extends Layer {
         case PenType.Line:
           break;
         default:
-
+          item['oldRect'] = item.rect.clone();
           if (!this.options.disableSizeX && !pt2.altKey && !(item as Node).disableSizeX) {
             item.rect.width = this.nodeRects[i].width + offsetX;
           }
@@ -228,6 +228,7 @@ export class ActiveLayer extends Layer {
               item.rect.ey = item.rect.y + item.rect.height;
               break;
           }
+          (item as Node).scalePoints();
           item.rect.calcCenter();
           (item as Node).init();
           (item as Node).calcChildrenRect();

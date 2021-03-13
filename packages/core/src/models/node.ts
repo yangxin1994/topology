@@ -57,6 +57,8 @@ export class Node extends Pen {
   iconRect: Rect;
   fullIconRect: Rect;
 
+  points: Point[] = [];
+
   anchors: Point[] = [];
   rotatedAnchors: Point[] = [];
 
@@ -145,6 +147,13 @@ export class Node extends Pen {
       this.paddingRight = json.parentRect.marginX;
     }
     // 兼容老数据 end
+
+    if (json.points) {
+      this.points = [];
+      json.points.forEach((pt: any) => {
+        this.points.push(new Point(pt.x, pt.y));
+      });
+    }
 
     if (json.animateFrames && json.animateFrames.length) {
       for (const item of json.animateFrames) {
@@ -805,6 +814,7 @@ export class Node extends Pen {
     if (!center) {
       center = this.rect.center;
     }
+    this['oldRect'] = this.rect.clone();
     this.rect.x = center.x - (center.x - this.rect.x) * scale;
     this.rect.y = center.y - (center.y - this.rect.y) * scale;
     this.textOffsetX *= scale;
@@ -886,6 +896,8 @@ export class Node extends Pen {
       }
     }
 
+    this.scalePoints(scale, scale);
+
     this.elementRendered = false;
     this.init();
 
@@ -897,6 +909,21 @@ export class Node extends Pen {
 
     if (this.animateReady && this.animateReady.scale) {
       this.animateReady.scale(scale, center);
+    }
+  }
+
+  scalePoints(scaleX?: number, scaleY?: number) {
+    if (this.points && this['oldRect']) {
+      if (!scaleX) {
+        scaleX = this.rect.width / this['oldRect'].width;
+      }
+      if (!scaleY) {
+        scaleY = this.rect.height / this['oldRect'].height;
+      }
+      this.points.forEach((pt: Point) => {
+        pt.x = this.rect.x + (pt.x - this['oldRect'].x) * scaleX;
+        pt.y = this.rect.y + (pt.y - this['oldRect'].y) * scaleY;
+      });
     }
   }
 
@@ -917,6 +944,13 @@ export class Node extends Pen {
           state.translate(x, y);
         }
       }
+    }
+
+    if (this.points) {
+      this.points.forEach((pt: Point) => {
+        pt.x += x;
+        pt.y += y;
+      });
     }
 
     this.init();
@@ -942,6 +976,31 @@ export class Node extends Pen {
         }
       }
     }
+  }
+
+  pushPoint(pt: Point) {
+    this.points.push(pt);
+    if (!this.rect) {
+      this.rect = new Rect(0, 0, 0, 0);
+    }
+
+    this.points.forEach((p: Point) => {
+      if (!this.rect.x || this.rect.x > p.x) {
+        this.rect.x = p.x;
+      }
+      if (!this.rect.y || this.rect.y > p.y) {
+        this.rect.y = p.y;
+      }
+      if (this.rect.ex < p.x) {
+        this.rect.ex = p.x;
+      }
+      if (this.rect.ey < p.y) {
+        this.rect.ey = p.y;
+      }
+    });
+
+    this.rect.width = this.rect.ex - this.rect.x;
+    this.rect.height = this.rect.ey - this.rect.y;
   }
 
   nearestAnchor(pt: Point) {
