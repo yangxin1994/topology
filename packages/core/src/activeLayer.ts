@@ -11,7 +11,7 @@ import { Lock } from './models/status';
 import { drawLineFns } from './middles';
 import { getBezierPoint } from './middles/lines/curve';
 import { Layer } from './layer';
-import { flatNodes, getBboxOfPoints, rgba } from './utils';
+import { find, flatNodes, getBboxOfPoints, rgba } from './utils';
 import { Topology } from './core';
 
 export class ActiveLayer extends Layer {
@@ -107,11 +107,23 @@ export class ActiveLayer extends Layer {
         }
         points.push.apply(points, pts);
       } else if (item instanceof Line) {
-        points.push(item.from);
-        points.push(item.to);
-        if (item.name === 'curve') {
-          for (let i = 0.01; i < 1; i += 0.02) {
-            points.push(getBezierPoint(i, item.from, item.controlPoints[0], item.controlPoints[1], item.to));
+        if (item.children) {
+          item.children.forEach((child: Line) => {
+            points.push(child.from);
+            points.push(child.to);
+            if (child.name === 'curve') {
+              for (let i = 0.01; i < 1; i += 0.02) {
+                points.push(getBezierPoint(i, child.from, child.controlPoints[0], child.controlPoints[1], child.to));
+              }
+            }
+          });
+        } else if (item.from) {
+          points.push(item.from);
+          points.push(item.to);
+          if (item.name === 'curve') {
+            for (let i = 0.01; i < 1; i += 0.02) {
+              points.push(getBezierPoint(i, item.from, item.controlPoints[0], item.controlPoints[1], item.to));
+            }
           }
         }
       }
@@ -246,7 +258,7 @@ export class ActiveLayer extends Layer {
       return;
     }
     let i = 0;
-    for (const item of this.pens) {
+    for (let item of this.pens) {
       if (item.locked) {
         continue;
       }
@@ -275,7 +287,14 @@ export class ActiveLayer extends Layer {
       if (item instanceof Line) {
         const offsetX = this.nodeRects[i].x + x - item.from.x;
         const offsetY = this.nodeRects[i].y + y - item.from.y;
-        item.translate(offsetX, offsetY);
+        if (item.parentId) {
+          const items = find(item.parentId, this.data.pens);
+          items.forEach((l: Line) => {
+            l.translate(offsetX, offsetY);
+          });
+        } else {
+          item.translate(offsetX, offsetY);
+        }
       }
 
       ++i;
@@ -512,7 +531,7 @@ export class ActiveLayer extends Layer {
         tmp.render(ctx);
 
         if (!this.data.locked && !item.locked) {
-          drawLineFns[item.name].drawControlPointsFn(ctx, item);
+          drawLineFns[item.name] && drawLineFns[item.name].drawControlPointsFn(ctx, item);
         }
       }
     }

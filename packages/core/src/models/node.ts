@@ -1,7 +1,7 @@
 import { Pen, PenType } from './pen';
+import { Line } from './line';
 import { Rect } from './rect';
 import { Point } from './point';
-import { Line } from './line';
 import { anchorsFns, iconRectFns, textRectFns, drawNodeFns } from '../middles';
 import { defaultAnchors } from '../middles/default.anchor';
 import { defaultIconRect, defaultTextRect } from '../middles/default.rect';
@@ -62,8 +62,6 @@ export class Node extends Pen {
   anchors: Point[] = [];
   rotatedAnchors: Point[] = [];
 
-  children: Pen[];
-
   // nodes移动时，停靠点的参考位置
   dockWatchers: Point[];
 
@@ -98,7 +96,7 @@ export class Node extends Pen {
   // 外部dom是否已经渲染。当需要重绘时，设置为false（用于第三方库辅助变量）
   elementRendered: boolean;
 
-  constructor(json: any, noChild = false) {
+  constructor(json: any) {
     super();
 
     const defaultData: any = {
@@ -157,16 +155,32 @@ export class Node extends Pen {
 
     if (json.animateFrames && json.animateFrames.length) {
       for (const item of json.animateFrames) {
-        item.state = new Node(item.state, true);
+        item.children = null;
+        item.state = new Node(item.state);
       }
       this.animateFrames = json.animateFrames;
     }
     this.animateType = json.animateType ? json.animateType : json.animateDuration ? 'custom' : '';
     this.init();
-    if (json.children && !noChild) {
-      this.setChild(json.children);
-    } else {
-      this.children = null;
+
+    if (json.children) {
+      this.children = [];
+      json.children.forEach((item: Pen) => {
+        let child: Pen;
+        switch (item.type) {
+          case PenType.Line:
+            child = new Line(item);
+            child.calcRectByParent(this);
+            break;
+          default:
+            child = new Node(item);
+            child.parentId = this.id;
+            child.calcRectByParent(this);
+            (child as Node).init();
+            break;
+        }
+        this.children.push(child);
+      });
     }
   }
 
@@ -261,31 +275,6 @@ export class Node extends Pen {
     this.paddingRightNum = abs(this.rect.width, this.paddingRight);
     this.paddingTopNum = abs(this.rect.height, this.paddingTop);
     this.paddingBottomNum = abs(this.rect.height, this.paddingBottom);
-  }
-
-  setChild(children: any[]) {
-    if (!children) {
-      return;
-    }
-
-    this.children = [];
-    for (const item of children) {
-      let child: Pen;
-      switch (item.type) {
-        case PenType.Line:
-          child = new Line(item);
-          child.calcRectByParent(this);
-          break;
-        default:
-          child = new Node(item);
-          child.parentId = this.id;
-          child.calcRectByParent(this);
-          (child as Node).init();
-          // (child as Node).setChild(item.children);
-          break;
-      }
-      this.children.push(child);
-    }
   }
 
   setChildrenIds() {

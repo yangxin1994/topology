@@ -88,6 +88,13 @@ export class Line extends Pen {
         this.controlPoints.push(new Point(item.x, item.y, item.direction, item.anchorIndex, item.id));
       }
     }
+
+    if (json.children) {
+      this.children = [];
+      json.children.forEach((item: Pen) => {
+        this.children.push(new Line(item));
+      });
+    }
   }
 
   setFrom(from: Point, fromArrow: string = '') {
@@ -457,39 +464,55 @@ export class Line extends Pen {
   }
 
   translate(x: number, y: number) {
-    this.from.x += x;
-    this.from.y += y;
-    this.to.x += x;
-    this.to.y += y;
-    if (this.text) {
-      this.textRect = null;
+    if (this.from) {
+      this.from.x += x;
+      this.from.y += y;
+      this.to.x += x;
+      this.to.y += y;
+      if (this.text) {
+        this.textRect = null;
+      }
+
+      for (const pt of this.controlPoints) {
+        pt.x += x;
+        pt.y += y;
+      }
     }
 
-    for (const pt of this.controlPoints) {
-      pt.x += x;
-      pt.y += y;
+    if (this.children) {
+      for (const item of this.children) {
+        item.translate(x, y);
+      }
     }
 
     Store.set(this.generateStoreKey('pts-') + this.id, null);
   }
 
   scale(scale: number, center: { x: number; y: number; }) {
-    this.from.x = center.x - (center.x - this.from.x) * scale;
-    this.from.y = center.y - (center.y - this.from.y) * scale;
-    this.to.x = center.x - (center.x - this.to.x) * scale;
-    this.to.y = center.y - (center.y - this.to.y) * scale;
-    this.lineWidth *= scale;
-    this.borderWidth *= scale;
-    this.fontSize *= scale;
-    if (this.text) {
-      this.textRect = null;
-    }
-    this.textOffsetX *= scale;
-    this.textOffsetY *= scale;
+    if (this.from) {
+      this.from.x = center.x - (center.x - this.from.x) * scale;
+      this.from.y = center.y - (center.y - this.from.y) * scale;
+      this.to.x = center.x - (center.x - this.to.x) * scale;
+      this.to.y = center.y - (center.y - this.to.y) * scale;
+      this.lineWidth *= scale;
+      this.borderWidth *= scale;
+      this.fontSize *= scale;
+      if (this.text) {
+        this.textRect = null;
+      }
+      this.textOffsetX *= scale;
+      this.textOffsetY *= scale;
 
-    for (const pt of this.controlPoints) {
-      pt.x = center.x - (center.x - pt.x) * scale;
-      pt.y = center.y - (center.y - pt.y) * scale;
+      for (const pt of this.controlPoints) {
+        pt.x = center.x - (center.x - pt.x) * scale;
+        pt.y = center.y - (center.y - pt.y) * scale;
+      }
+    }
+
+    if (this.children) {
+      for (const item of this.children) {
+        item.scale(scale, center);
+      }
     }
 
     Store.set(this.generateStoreKey('pts-') + this.id, null);

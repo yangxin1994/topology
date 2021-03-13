@@ -147,6 +147,9 @@ export abstract class Pen {
 
   visible: boolean;
 
+
+  children: Pen[];
+
   // User data.
   data: any;
   value: number;
@@ -219,6 +222,11 @@ export abstract class Pen {
     }
 
     if ((this as any).from && !(this as any).to) {
+      if (this.children) {
+        for (const item of this.children) {
+          item.render(ctx);
+        }
+      }
       return;
     }
 
@@ -283,8 +291,8 @@ export abstract class Pen {
 
     ctx.restore();
 
-    if ((this as any).children) {
-      for (const item of (this as any).children) {
+    if (this.children) {
+      for (const item of this.children) {
         item.render(ctx);
       }
     }
