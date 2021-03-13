@@ -63,8 +63,8 @@ import { cubeIconRect, cubeTextRect } from './nodes/cube.rect';
 import { people } from './nodes/people';
 import { peopleIconRect, peopleTextRect } from './nodes/people.rect';
 import { rectangleIconRect, rectangleTextRect } from './nodes/rectangle.rect';
-import { graffti } from './nodes/graffti';
-import { grafftiAnchors } from './nodes/graffti.anchor';
+import { graffiti } from './nodes/graffiti';
+import { graffitiAnchors } from './nodes/graffiti.anchor';
 
 // Functions of drawing a node.
 export const drawNodeFns: any = {};
@@ -89,9 +89,9 @@ function init() {
   // Div
   drawNodeFns.div = rectangle;
 
-  // graffti
-  drawNodeFns.graffti = graffti;
-  anchorsFns.graffti = grafftiAnchors;
+  // graffiti
+  drawNodeFns.graffiti = graffiti;
+  anchorsFns.graffiti = graffitiAnchors;
 
   // Square
   drawNodeFns.square = rectangle;

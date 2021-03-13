@@ -2,7 +2,7 @@ import { Node } from '../../models/node';
 import { Point } from '../../models/point';
 import { Direction } from '../../models/direction';
 
-export function grafftiAnchors(node: Node) {
+export function graffitiAnchors(node: Node) {
   if (!node.points || !node.points.length) {
     return;
   }

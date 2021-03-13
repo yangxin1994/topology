@@ -1,7 +1,7 @@
 import { Node } from '../../models/node';
 import { Point } from '../../models/point';
 
-export function graffti(ctx: CanvasRenderingContext2D, node: Node) {
+export function graffiti(ctx: CanvasRenderingContext2D, node: Node) {
   if (!node.rect) {
     return;
   }
