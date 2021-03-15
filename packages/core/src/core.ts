@@ -697,11 +697,10 @@ export class Topology {
     this.closeSocket();
     if (url || this.data.websocket) {
       this.socket = new Socket(url || this.data.websocket, (e) => {
-        this.data.socketEvent && this.dispatch('websocket', e.data);
-
         if (this.data.socketEvent !== 1) {
           this.doSocket(e.data);
         }
+        this.data.socketEvent && this.dispatch('websocket', e.data);
       });
     }
   }
@@ -717,11 +716,10 @@ export class Topology {
     if (url || this.data.mqttUrl) {
       this.mqtt = new MQTT(url || this.data.mqttUrl, options || this.data.mqttOptions, this.data.mqttTopics,
         (topic: string, message: any) => {
-          this.data.socketEvent && this.dispatch('mqtt', { topic, message });
-
           if (this.data.socketEvent !== 1) {
             this.doSocket(message.toString());
           }
+          this.data.socketEvent && this.dispatch('mqtt', { topic, message });
         }
       );
     }
