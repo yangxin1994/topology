@@ -2457,7 +2457,7 @@ export class Topology {
 
     this.activeLayer.setPens([node]);
 
-    this.dispatch('node', node);
+    this.dispatch('combine', node);
 
     this.cache();
   }
@@ -2490,7 +2490,7 @@ export class Topology {
     this.activeLayer.clear();
     this.hoverLayer.clear();
 
-    this.dispatch('space', null);
+    this.dispatch('uncombine', node);
   }
 
   find(idOrTag: string, pens?: Pen[] | boolean, array?: boolean) {
