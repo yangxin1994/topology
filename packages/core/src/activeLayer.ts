@@ -144,7 +144,7 @@ export class ActiveLayer extends Layer {
     this.nodeRects = [];
     this.childrenRects = {};
     for (const item of this.pens) {
-      if (item.type) {
+      if (item.type && (item as Line).from) {
         this.nodeRects.push(new Rect((item as Line).from.x, (item as Line).from.y, item.rect.width, item.rect.height));
       } else {
         this.nodeRects.push(new Rect(item.rect.x, item.rect.y, item.rect.width, item.rect.height));
@@ -284,7 +284,7 @@ export class ActiveLayer extends Layer {
         }
       }
 
-      if (item instanceof Line) {
+      if (item instanceof Line && item.from) {
         const offsetX = this.nodeRects[i].x + x - item.from.x;
         const offsetY = this.nodeRects[i].y + y - item.from.y;
         if (item.parentId) {

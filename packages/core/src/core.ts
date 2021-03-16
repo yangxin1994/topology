@@ -37,7 +37,9 @@ enum MoveInType {
   HoverAnchors,
   AutoAnchor,
   Rotate,
+  GraffitiReady,
   Graffiti,
+  LinesReady,
   Lines
 }
 
@@ -240,6 +242,7 @@ export class Topology {
         if (!json) return;
         const obj = JSON.parse(json);
         event.preventDefault();
+
         this.dropNodes(Array.isArray(obj) ? obj : [obj], event.offsetX, event.offsetY);
       } catch { }
     };
@@ -346,6 +349,17 @@ export class Topology {
       };
     } else {
       this.divLayer.canvas.onmousedown = (event: MouseEvent) => {
+        if (this.touchedNode) {
+          if (this.touchedNode.name === 'graffiti') {
+            this.touchedNode.rect = new Rect(0, 0, 0, 0);
+            this.addNode(this.touchedNode);
+            this.touchedNode = undefined;
+          } else if (this.touchedNode.name === 'lines') {
+            this.addLine(this.touchedNode);
+            this.touchedNode = undefined;
+          }
+        }
+
         const e = {
           x: event.pageX - window.scrollX - (this.canvasPos.left || this.canvasPos.x),
           y: event.pageY - window.scrollY - (this.canvasPos.top || this.canvasPos.y),
@@ -516,14 +530,28 @@ export class Topology {
   }
 
   dropNodes(jsonList: any[], offsetX: number, offsetY: number) {
-    let x: number, y: number;
-    if (jsonList.length) {
+    let x = 0, y = 0;
+    if (jsonList.length && jsonList[0].rect) {
       const rect = jsonList[0].rect;
       x = rect.x;
       y = rect.y;
     }
     let firstNode;
     jsonList.forEach((json) => {
+      if (json.name === 'graffiti') {
+        json.rect = new Rect(0, 0, 0, 0);
+        this.addNode(json);
+        return;
+      } else if (json.name === 'lines') {
+        this.addLine(json);
+        this.mouseDown = {
+          x: offsetX,
+          y: offsetY
+        };
+        this.onmouseup(this.mouseDown);
+        return;
+      }
+
       if (!firstNode) {
         json.rect.x = (offsetX - json.rect.width / 2) << 0;
         json.rect.y = (offsetY - json.rect.height / 2) << 0;
@@ -553,11 +581,7 @@ export class Topology {
           true
         );
       } else {
-        const node = new Node(json);
-        this.addNode(node, true);
-        if (node.name === 'div') {
-          this.dispatch('LT:addDiv', node);
-        }
+        this.addNode(json, true);
       }
     });
 
@@ -1303,9 +1327,17 @@ export class Topology {
           }
           break;
         case MoveInType.Graffiti:
-          this.moveIn.type = MoveInType.Nodes;
-          this.moveIn.hoverNode['doing'] = null;
-          this.moveIn.hoverNode.calcAnchors();
+          if (!this.moveIn.hoverNode.points || this.moveIn.hoverNode.points.length < 2) {
+            this.moveIn.type = MoveInType.None;
+            this.data.pens.pop();
+          } else {
+            this.moveIn.type = MoveInType.Nodes;
+            this.moveIn.hoverNode['doing'] = null;
+            this.moveIn.hoverNode.calcAnchors();
+            this.activeLayer.setPens([this.moveIn.hoverNode]);
+            this.hoverLayer.node = this.moveIn.hoverNode;
+            this.needCache = true;
+          }
           break;
         case MoveInType.Lines:
           let previous: any;
@@ -1330,6 +1362,8 @@ export class Topology {
           });
           if (previous) {
             line.from.id = previous.id;
+            line.from.x = previous.to.x;
+            line.from.y = previous.to.y;
             previous.to.id = line.id;
           }
           this.moveIn.hoverLine.children.push(line);
@@ -2130,8 +2164,13 @@ export class Topology {
       const pens: Pen[] = param || this.activeLayer.pens;
 
       for (let i = 0; i < pens.length; i++) {
-        const item = pens[i];
-
+        let item = pens[i];
+        if (item.type === PenType.Line && item.parentId) {
+          const parent = find(item.parentId, this.data.pens)[0];
+          if (parent && parent.name === 'lines') {
+            item = parent;
+          }
+        }
         if (del(item.id, this.data.pens).length) {
           deleted.push(item);
           --i;
