@@ -317,10 +317,10 @@ export class ActiveLayer extends Layer {
       let fromIn = false;
       let toIn = false;
       for (const item of nodesLines.nodes) {
-        if (line.from.id === item.id) {
+        if (line.from && line.from.id === item.id) {
           fromIn = true;
         }
-        if (line.to.id === item.id) {
+        if (line.to && line.to.id === item.id) {
           toIn = true;
         }
       }
@@ -349,7 +349,7 @@ export class ActiveLayer extends Layer {
       }
       for (const item of nodes) {
         let cnt = 0;
-        if (line.from.id === item.id) {
+        if (line.from && line.from.id === item.id) {
           if (line.from.autoAnchor) {
             const autoAnchor = (item as Node).nearestAnchor(line.to);
             if (autoAnchor.index > -1) {
@@ -363,7 +363,7 @@ export class ActiveLayer extends Layer {
             ++cnt;
           }
         }
-        if (line.to.id === item.id) {
+        if (line.to && line.to.id === item.id) {
           if (line.to.autoAnchor) {
             const autoAnchor = (item as Node).nearestAnchor(line.from);
             if (autoAnchor.index > -1) {
