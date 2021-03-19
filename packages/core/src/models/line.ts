@@ -121,7 +121,7 @@ export class Line extends Pen {
 
   draw(ctx: CanvasRenderingContext2D) {
     if (this.animateDot) {
-      ctx.fillStyle = this.strokeStyle;
+      ctx.fillStyle = ctx.strokeStyle;
       if (this.animateType === 'dot') {
         ctx.beginPath();
         ctx.arc(this.animateDot.x, this.animateDot.y, this.animateDotSize, 0, 2 * Math.PI, false);
@@ -166,7 +166,7 @@ export class Line extends Pen {
       ctx.beginPath();
       ctx.lineDashOffset = 0;
       ctx.setLineDash([]);
-      ctx.fillStyle = this.fromArrowColor || this.strokeStyle || ctx.strokeStyle;
+      ctx.fillStyle = this.fromArrowColor || ctx.strokeStyle;
       ctx.strokeStyle = ctx.fillStyle;
       let f = this.to;
       if (this.name === 'curve') {
@@ -188,7 +188,7 @@ export class Line extends Pen {
       ctx.beginPath();
       ctx.lineDashOffset = 0;
       ctx.setLineDash([]);
-      ctx.fillStyle = this.toArrowColor || this.strokeStyle || ctx.strokeStyle;
+      ctx.fillStyle = this.toArrowColor || ctx.strokeStyle;
       ctx.strokeStyle = ctx.fillStyle;
       let f = this.from;
       if (this.name === 'curve') {

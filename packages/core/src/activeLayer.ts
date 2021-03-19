@@ -257,6 +257,7 @@ export class ActiveLayer extends Layer {
     if (this.nodeRects.length !== this.pens.length) {
       return;
     }
+
     let i = 0;
     for (let item of this.pens) {
       if (item.locked) {
@@ -519,6 +520,26 @@ export class ActiveLayer extends Layer {
 
     const TID = this.TID;
     for (const item of this.pens) {
+      if (this.data.locked && item instanceof Node) {
+        const tmp = new Node(item);
+        tmp.setTID(TID);
+        tmp.data = null;
+        tmp.fillStyle = null;
+        tmp.bkType = 0;
+        tmp.icon = '';
+        tmp.image = '';
+        tmp.text = '';
+        if (tmp.strokeStyle !== 'transparent') {
+          tmp.strokeStyle = '#ffffff';
+          tmp.lineWidth += 2;
+          tmp.render(ctx);
+
+          tmp.strokeStyle = this.options.activeColor;
+          tmp.lineWidth -= 2;
+        }
+        tmp.render(ctx);
+      }
+
       if (item instanceof Line) {
         const tmp = new Line(item);
         tmp.lineWidth *= 2;

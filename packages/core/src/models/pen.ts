@@ -53,6 +53,10 @@ const defaultPen: any = {
   animatePos: 0,
 };
 
+export const images: {
+  [key: string]: { img: HTMLImageElement; };
+} = {};
+
 export abstract class Pen {
   TID: string;
   id: string;
@@ -147,6 +151,12 @@ export abstract class Pen {
 
   visible: boolean;
 
+  fillImage: string;
+  strokeImage: string;
+  fillImg: HTMLImageElement;
+  strokeImg: HTMLImageElement;
+  lastFillImage: string;
+  lastStrokeImage: string;
 
   children: Pen[];
 
@@ -248,8 +258,25 @@ export abstract class Pen {
       ctx.lineWidth = this.lineWidth;
     }
 
-    ctx.strokeStyle = this.strokeStyle || Store.get(this.generateStoreKey('LT:color'));
-    this.fillStyle && (ctx.fillStyle = this.fillStyle);
+    if (this.strokeImage) {
+      if (this.strokeImg) {
+        ctx.strokeStyle = ctx.createPattern(this.strokeImg, "repeat");
+      } else {
+        this.loadStrokeImg();
+      }
+    } else {
+      ctx.strokeStyle = this.strokeStyle || Store.get(this.generateStoreKey('LT:color'));
+    }
+
+    if (this.fillImage) {
+      if (this.fillImg) {
+        ctx.fillStyle = ctx.createPattern(this.fillImg, "repeat");;
+      } else {
+        this.loadFillImg();
+      }
+    } else if (this.fillStyle) {
+      ctx.fillStyle = this.fillStyle;
+    }
 
     if (this.lineCap) {
       ctx.lineCap = this.lineCap as CanvasLineCap;
@@ -298,6 +325,41 @@ export abstract class Pen {
     }
   }
 
+  loadFillImg() {
+    if (!this.fillImage) {
+      return;
+    }
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = this.fillImage;
+    img.onload = () => {
+      this.lastFillImage = this.fillImage;
+      this.fillImg = img;
+      images[this.fillImage] = {
+        img,
+      };
+      Store.set(this.generateStoreKey('LT:imageLoaded'), true);
+    };
+  }
+
+  loadStrokeImg() {
+    if (!this.strokeImage) {
+      return;
+    }
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = this.strokeImage;
+    img.onload = () => {
+      this.lastStrokeImage = this.strokeImage;
+      this.strokeImg = img;
+      images[this.strokeImage] = {
+        img,
+      };
+      Store.set(this.generateStoreKey('LT:imageLoaded'), true);
+    };
+  }
+
   click() {
     if (!this.events) {
       return;
@@ -319,6 +381,34 @@ export abstract class Pen {
 
     for (const item of this.events) {
       if (item.type !== EventType.DblClick) {
+        continue;
+      }
+
+      this[eventFns[item.action]] && this[eventFns[item.action]](item.value, item.params);
+    }
+  }
+
+  moveIn() {
+    if (!this.events) {
+      return;
+    }
+
+    for (const item of this.events) {
+      if (item.type !== EventType.MoveIn) {
+        continue;
+      }
+
+      this[eventFns[item.action]] && this[eventFns[item.action]](item.value, item.params);
+    }
+  }
+
+  moveOut() {
+    if (!this.events) {
+      return;
+    }
+
+    for (const item of this.events) {
+      if (item.type !== EventType.MoveOut) {
         continue;
       }
 

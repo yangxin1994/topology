@@ -326,3 +326,4 @@ export function registerArrow(
 }
 
 (window as any).registerTopologyNode = registerNode;
+(window as any).registerTopologyLine = registerLine;

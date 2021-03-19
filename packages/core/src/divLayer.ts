@@ -1,8 +1,8 @@
 import { Store, Observer } from 'le5le-store';
 import { Options } from './options';
-import { Node, images } from './models/node';
+import { Node } from './models/node';
 import { Lock } from './models/status';
-import { PenType } from './models/pen';
+import { images, PenType } from './models/pen';
 import { Layer } from './layer';
 import { find } from './utils';
 

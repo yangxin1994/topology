@@ -668,6 +668,8 @@ export class Topology {
         this.dispatch('addLine', line);
       }
     } else {
+      this.activeLayer.clear();
+      this.hoverLayer.line = null;
       this.moveIn.type = MoveInType.Lines;
       this.moveIn.hoverLine = line;
     }
@@ -893,6 +895,7 @@ export class Topology {
         // Render hover anchors.
         if (this.moveIn.hoverNode !== this.lastHoverNode) {
           if (this.lastHoverNode) {
+            this.lastHoverNode.moveOut();
             // Send a move event.
             this.dispatch('moveOutNode', this.lastHoverNode);
 
@@ -903,6 +906,7 @@ export class Topology {
           }
           if (this.moveIn.hoverNode) {
             this.hoverLayer.node = this.moveIn.hoverNode;
+            this.moveIn.hoverNode.moveIn();
 
             // Send a move event.
             this.dispatch('moveInNode', this.moveIn.hoverNode);
@@ -913,10 +917,12 @@ export class Topology {
 
         if (this.moveIn.hoverLine !== this.lastHoverLine && !this.moveIn.hoverNode) {
           if (this.lastHoverLine) {
+            this.lastHoverLine.moveOut();
             this.dispatch('moveOutLine', this.lastHoverLine);
             this.hideTip();
           }
           if (this.moveIn.hoverLine) {
+            this.moveIn.hoverLine.moveIn();
             this.dispatch('moveInLine', this.moveIn.hoverLine);
 
             this.showTip(this.moveIn.hoverLine, e);
@@ -999,11 +1005,12 @@ export class Topology {
           if (this.hoverLayer.line) {
             this.activeLayer.pens = [this.hoverLayer.line];
           }
-          const toId = this.hoverLayer.line.to.id;
+          let toId = this.hoverLayer.line.to.id;
           if (e.ctrlKey || e.shiftKey || e.altKey) {
             this.hoverLayer.lineTo(new Point(e.x, e.y), arrow);
           } else {
             const to = this.getLineDock(new Point(e.x, e.y), AnchorMode.In);
+            toId = to.id;
             if (to.x !== this.hoverLayer.line.from.x || to.y !== this.hoverLayer.line.from.y) {
               this.hoverLayer.lineTo(to, arrow);
             }
@@ -1259,6 +1266,18 @@ export class Topology {
       }
     } else {
       switch (this.moveIn.type) {
+        case MoveInType.Nodes:
+          if (e.ctrlKey && e.shiftKey && e.altKey) {
+            if (!this.moveIn.hoverNode.manualAnchors) {
+              this.moveIn.hoverNode.manualAnchors = [];
+            }
+
+            this.moveIn.hoverNode.manualAnchors.push(new Point(e.x, e.y));
+            this.moveIn.hoverNode.calcAnchors();
+            this.needCache = true;
+          }
+          break;
+
         // Add the line.
         case MoveInType.HoverAnchors:
           // New active.
@@ -2953,6 +2972,10 @@ export class Topology {
       delete pen.animateCycleIndex;
       delete pen.img;
       delete pen.lastImage;
+      delete pen.fillImg;
+      delete pen.strokeImg;
+      delete pen.lastFillImage;
+      delete pen.lastStrokeImage;
       delete pen.imgNaturalWidth;
       delete pen.imgNaturalHeight;
       delete pen.anchors;
@@ -2960,6 +2983,45 @@ export class Topology {
       delete pen.dockWatchers;
       delete pen.elementLoaded;
       delete pen.elementRendered;
+
+      if (pen.animateFrames && pen.animateFrames.length) {
+        for (const item of pen.animateFrames) {
+          if (item.initState) {
+            delete item.initState.TID;
+            delete item.initState.animateCycleIndex;
+            delete item.initState.img;
+            delete item.initState.lastImage;
+            delete item.initState.imgNaturalWidth;
+            delete item.initState.imgNaturalHeight;
+            delete item.initState.anchors;
+            delete item.initState.rotatedAnchors;
+            delete item.initState.dockWatchers;
+            delete item.initState.elementLoaded;
+            delete item.initState.elementRendered;
+            delete item.initState.fillImg;
+            delete item.initState.strokeImg;
+            delete item.initState.lastFillImage;
+            delete item.initState.lastStrokeImage;
+          }
+          if (item.state) {
+            delete item.state.TID;
+            delete item.state.animateCycleIndex;
+            delete item.state.img;
+            delete item.state.lastImage;
+            delete item.state.imgNaturalWidth;
+            delete item.state.imgNaturalHeight;
+            delete item.state.anchors;
+            delete item.state.rotatedAnchors;
+            delete item.state.dockWatchers;
+            delete item.state.elementLoaded;
+            delete item.state.elementRendered;
+            delete item.state.fillImg;
+            delete item.state.strokeImg;
+            delete item.state.lastFillImage;
+            delete item.state.lastStrokeImage;
+          }
+        }
+      }
 
       this.pureDataChildren(pen);
     });

@@ -10,7 +10,6 @@ import { s8 } from './utils/uuid';
 import { find } from './utils/canvas';
 
 export class AnimateLayer extends Layer {
-  protected data: TopologyData;
   pens = new Map();
 
   private timer: any;
@@ -19,7 +18,6 @@ export class AnimateLayer extends Layer {
   private subscribePlay: any;
   constructor(public options: Options = {}, TID: string) {
     super(TID);
-    this.data = Store.get(this.generateStoreKey('topology-data'));
     Store.set(this.generateStoreKey('LT:AnimateLayer'), this);
 
     if (!this.options.animateColor) {

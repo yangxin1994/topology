@@ -1,4 +1,4 @@
-import { Pen, PenType } from './pen';
+import { images, Pen, PenType } from './pen';
 import { Line } from './line';
 import { Rect } from './rect';
 import { Point } from './point';
@@ -10,10 +10,7 @@ import { Store } from 'le5le-store';
 import { abs, distance } from '../utils/math';
 import { s8 } from '../utils/uuid';
 import { pointInRect } from '../utils/canvas';
-
-export const images: {
-  [key: string]: { img: HTMLImageElement };
-} = {};
+import { Direction } from './direction';
 
 export class Node extends Pen {
   is3D: boolean;
@@ -60,6 +57,7 @@ export class Node extends Pen {
   points: Point[] = [];
 
   anchors: Point[] = [];
+  manualAnchors: Point[] = [];
   rotatedAnchors: Point[] = [];
 
   // nodes移动时，停靠点的参考位置
@@ -153,9 +151,17 @@ export class Node extends Pen {
       });
     }
 
+    if (json.manualAnchors) {
+      this.manualAnchors = [];
+      json.manualAnchors.forEach((pt: any) => {
+        this.manualAnchors.push(new Point(pt.x, pt.y));
+      });
+    }
+
     if (json.animateFrames && json.animateFrames.length) {
       for (const item of json.animateFrames) {
         item.children = null;
+        item.initState = new Node(item.initState);
         item.state = new Node(item.state);
       }
       this.animateFrames = json.animateFrames;
@@ -163,8 +169,8 @@ export class Node extends Pen {
     this.animateType = json.animateType
       ? json.animateType
       : json.animateDuration
-      ? 'custom'
-      : '';
+        ? 'custom'
+        : '';
     this.init();
 
     if (json.children) {
@@ -236,6 +242,10 @@ export class Node extends Pen {
   checkData() {
     this.rect.width = this.rect.width < 0 ? 0 : this.rect.width;
     this.rect.height = this.rect.height < 0 ? 0 : this.rect.height;
+
+    if (!this.rect.calcCenter) {
+      this.rect = new Rect(this.rect.x, this.rect.y, this.rect.width, this.rect.height);
+    }
   }
 
   init() {
@@ -514,6 +524,28 @@ export class Node extends Pen {
       defaultAnchors(this);
     }
 
+    if (this.manualAnchors) {
+      this.manualAnchors.forEach((pt: Point) => {
+        const x = Math.abs(pt.x - this.rect.center.x);
+        const y = Math.abs(pt.y - this.rect.center.y);
+        if (x > y) {
+          if (pt.x < this.rect.center.x) {
+            pt.direction = Direction.Left;
+          } else {
+            pt.direction = Direction.Right;
+          }
+        } else {
+          if (pt.y < this.rect.center.y) {
+            pt.direction = Direction.Up;
+          } else {
+            pt.direction = Direction.Bottom;
+          }
+        }
+
+        this.anchors.push(pt);
+      });
+    }
+
     this.calcRotateAnchors();
   }
 
@@ -613,7 +645,7 @@ export class Node extends Pen {
     this.rectInParent = {
       x:
         ((this.rect.x - parent.rect.x - parent.paddingLeftNum) * 100) /
-          parentW +
+        parentW +
         '%',
       y:
         ((this.rect.y - parent.rect.y - parent.paddingTopNum) * 100) / parentH +
@@ -850,7 +882,7 @@ export class Node extends Pen {
                   (item.initState.data[key] || 0) +
                   ((item.state.data[key] || 0) -
                     (item.initState.data[key] || 0)) *
-                    rate;
+                  rate;
               } else if (
                 item.state.data[key] !== undefined &&
                 item.state.data[key] !== null
@@ -877,7 +909,7 @@ export class Node extends Pen {
     }
   };
 
-  scale(scale: number, center?: { x: number; y: number }) {
+  scale(scale: number, center?: { x: number; y: number; }) {
     if (!center) {
       center = this.rect.center;
     }
@@ -980,17 +1012,27 @@ export class Node extends Pen {
   }
 
   scalePoints(scaleX?: number, scaleY?: number) {
-    if (this.points && this['oldRect']) {
+    if ((this.points || this.manualAnchors) && this['oldRect']) {
       if (!scaleX) {
         scaleX = this.rect.width / this['oldRect'].width;
       }
       if (!scaleY) {
         scaleY = this.rect.height / this['oldRect'].height;
       }
-      this.points.forEach((pt: Point) => {
-        pt.x = this.rect.x + (pt.x - this['oldRect'].x) * scaleX;
-        pt.y = this.rect.y + (pt.y - this['oldRect'].y) * scaleY;
-      });
+
+      if (this.points) {
+        this.points.forEach((pt: Point) => {
+          pt.x = this.rect.x + (pt.x - this['oldRect'].x) * scaleX;
+          pt.y = this.rect.y + (pt.y - this['oldRect'].y) * scaleY;
+        });
+      }
+
+      if (this.manualAnchors) {
+        this.manualAnchors.forEach((pt: Point) => {
+          pt.x = this.rect.x + (pt.x - this['oldRect'].x) * scaleX;
+          pt.y = this.rect.y + (pt.y - this['oldRect'].y) * scaleY;
+        });
+      }
     }
   }
 
@@ -1015,6 +1057,13 @@ export class Node extends Pen {
 
     if (this.points) {
       this.points.forEach((pt: Point) => {
+        pt.x += x;
+        pt.y += y;
+      });
+    }
+
+    if (this.manualAnchors) {
+      this.manualAnchors.forEach((pt: Point) => {
         pt.x += x;
         pt.y += y;
       });
@@ -1087,7 +1136,7 @@ export class Node extends Pen {
     };
   }
 
-  hitInSelf(point: { x: number; y: number }, padding = 0) {
+  hitInSelf(point: { x: number; y: number; }, padding = 0) {
     if (this.rotate % 360 === 0) {
       return this.rect.hit(point, padding);
     }
@@ -1099,7 +1148,7 @@ export class Node extends Pen {
     return pointInRect(point, pts);
   }
 
-  hit(pt: { x: number; y: number }, padding = 0) {
+  hit(pt: { x: number; y: number; }, padding = 0) {
     let node: any;
     if (this.hitInSelf(pt, padding)) {
       node = this;
