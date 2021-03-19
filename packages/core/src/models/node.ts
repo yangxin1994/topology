@@ -233,16 +233,13 @@ export class Node extends Pen {
     this.init();
   }
 
-  /**
-   * 宽高不允许为负数
-   */
-  widthNotNegative() {
+  checkData() {
     this.rect.width = this.rect.width < 0 ? 0 : this.rect.width;
     this.rect.height = this.rect.height < 0 ? 0 : this.rect.height;
   }
 
   init() {
-    this.widthNotNegative();
+    this.checkData();
 
     this.calcAbsPadding();
 
