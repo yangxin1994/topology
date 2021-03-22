@@ -697,7 +697,7 @@ export class Topology {
 
   // open - redraw by the data
   open(data?: any) {
-    if (data.mqttOptions) {
+    if (data && data.mqttOptions) {
       data.mqttOptions.clientId = s8();
     }
     this.canvas.clearBkImg();
