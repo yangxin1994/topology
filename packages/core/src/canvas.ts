@@ -32,7 +32,7 @@ export class Canvas extends Layer {
           options.extDpiRatio = 0;
         }
       }
-      Canvas.dpiRatio = window ? window.devicePixelRatio : 0 + options.extDpiRatio;
+      Canvas.dpiRatio = (window ? window.devicePixelRatio : 0) + options.extDpiRatio;
 
 
       if (Canvas.dpiRatio < 1) {
