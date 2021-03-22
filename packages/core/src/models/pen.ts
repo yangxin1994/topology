@@ -259,7 +259,7 @@ export abstract class Pen {
     }
 
     if (this.strokeImage) {
-      if (this.strokeImg) {
+      if (this.strokeImage === this.lastStrokeImage && this.strokeImg) {
         ctx.strokeStyle = ctx.createPattern(this.strokeImg, "repeat");
       } else {
         this.loadStrokeImg();
@@ -269,7 +269,7 @@ export abstract class Pen {
     }
 
     if (this.fillImage) {
-      if (this.fillImg) {
+      if (this.fillImage === this.lastFillImage && this.fillImg) {
         ctx.fillStyle = ctx.createPattern(this.fillImg, "repeat");;
       } else {
         this.loadFillImg();
