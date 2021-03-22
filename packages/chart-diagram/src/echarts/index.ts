@@ -7,7 +7,10 @@ export function echarts(ctx: CanvasRenderingContext2D, node: Node) {
   rectangle(ctx, node);
 
   // tslint:disable-next-line:no-shadowed-variable
-  const echarts = echartsObjs.echarts || (window as any).echarts;
+  let echarts = echartsObjs.echarts;
+  if (!echarts && window) {
+    echarts = window['echarts'];
+  }
   if (!node.data || !echarts) {
     return;
   }

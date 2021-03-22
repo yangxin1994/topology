@@ -3,11 +3,12 @@ import { Store } from 'le5le-store';
 import { Pen, PenType } from './models/pen';
 import { Node } from './models/node';
 import { Line } from './models/line';
-import { TopologyData } from './models/data';
 import { Options } from './options';
 import { Layer } from './layer';
 import { s8 } from './utils/uuid';
 import { find } from './utils/canvas';
+
+declare const window: any;
 
 export class AnimateLayer extends Layer {
   pens = new Map();
@@ -184,8 +185,8 @@ export class AnimateLayer extends Layer {
         if (pen.animateFn) {
           if (typeof pen.animateFn === 'function') {
             pen.animateFn();
-          } else if ((window as any)[pen.animateFn]) {
-            (window as any)[pen.animateFn]();
+          } else if (window && window[pen.animateFn]) {
+            window[pen.animateFn]();
           } else {
             // pen.render();
           }

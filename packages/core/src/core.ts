@@ -25,6 +25,8 @@ import { MQTT } from './mqtt';
 import { Direction } from './models';
 import { isMobile } from './utils';
 
+declare const window: any;
+
 const resizeCursors = ['nw-resize', 'ne-resize', 'se-resize', 'sw-resize'];
 enum MoveInType {
   None,
@@ -144,7 +146,7 @@ export class Topology {
 
     this.cache();
 
-    (window as any).topology = this;
+    window.topology = this;
     this.dispatch('loaded');
   }
 
@@ -2740,7 +2742,7 @@ export class Topology {
     let elem = this.tipElem;
     if (data.markdown) {
       elem = this.tipMarkdown;
-      const marked = (window as any).marked;
+      const marked = window.marked;
       if (marked) {
         this.tipMarkdown.innerHTML = marked(data.markdown);
       } else {
@@ -3087,6 +3089,6 @@ export class Topology {
     }
     this.closeSocket();
     this.closeMqtt();
-    (window as any).topology = null;
+    window.topology = null;
   }
 }

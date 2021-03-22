@@ -161,7 +161,9 @@ export class Node extends Pen {
     if (json.animateFrames && json.animateFrames.length) {
       for (const item of json.animateFrames) {
         item.children = null;
-        item.initState = new Node(item.initState);
+        if (item.initState) {
+          item.initState = new Node(item.initState);
+        }
         item.state = new Node(item.state);
       }
       this.animateFrames = json.animateFrames;
