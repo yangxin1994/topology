@@ -697,6 +697,9 @@ export class Topology {
 
   // open - redraw by the data
   open(data?: any) {
+    if (data.mqttOptions) {
+      data.mqttOptions.clientId = s8();
+    }
     this.canvas.clearBkImg();
     this.data = createData(data, this.id);
     Store.set(this.generateStoreKey('LT:scale'), this.data.scale);
@@ -3027,6 +3030,10 @@ export class Topology {
 
       this.pureDataChildren(pen);
     });
+
+    if (data.mqttOptions) {
+      delete data.mqttOptions.clientId;
+    }
 
     return data;
   }
