@@ -120,6 +120,9 @@ export class Topology {
 
   socket: Socket;
   mqtt: MQTT;
+
+  private socketFn: Function;
+
   _emitter: Emitter;
 
   private scheduledAnimationFrame = false;
@@ -702,6 +705,8 @@ export class Topology {
     }
     this.canvas.clearBkImg();
     this.data = createData(data, this.id);
+    this.subscribeSocket();
+
     Store.set(this.generateStoreKey('LT:scale'), this.data.scale);
     this.dispatch('scale', this.data.scale);
     Store.set('LT:bkColor', this.data.bkColor);
@@ -723,6 +728,33 @@ export class Topology {
 
     this.dispatch('opened');
   }
+
+  subscribeSocket = () => {
+    if (!this.data.socketFn) {
+      return false;
+    }
+
+    if (!this.data.socketEvent) {
+      this.data.socketEvent = true;
+    }
+    try {
+      const socketFn = new Function('e', this.data.socketFn);
+      if (this.socketFn) {
+        this.off('websocket', this.socketFn as any);
+        this.off('mqtt', this.socketFn as any);
+      }
+      this.on('websocket', socketFn as any);
+      this.on('mqtt', socketFn as any);
+      this.socketFn = socketFn;
+    } catch (e) {
+      console.error('Create the function for socket:', e);
+      return false;
+    }
+
+
+
+    return true;
+  };
 
   openSocket(url?: string) {
     this.closeSocket();
@@ -3128,6 +3160,11 @@ export class Topology {
     }
     this.closeSocket();
     this.closeMqtt();
+    if (this.socketFn) {
+      this.off('websocket', this.socketFn as any);
+      this.off('mqtt', this.socketFn as any);
+    }
+
     window.topology = null;
   }
 }

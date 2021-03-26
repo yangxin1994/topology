@@ -31,6 +31,7 @@ export interface TopologyData {
   manualCps?: boolean;
   tooltip?: boolean | number;
   socketEvent?: boolean | number;
+  socketFn?: string;
 }
 
 export function createData(json?: any, tid?: string) {
