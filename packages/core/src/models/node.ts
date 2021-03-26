@@ -235,7 +235,6 @@ export class Node extends Pen {
       if (
         key !== 'TID' &&
         key !== 'events' &&
-        key !== 'actions' &&
         key !== 'wheres' &&
         key.indexOf('animate') < 0 &&
         key.indexOf('Animate') < 0

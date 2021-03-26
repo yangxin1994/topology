@@ -2626,11 +2626,14 @@ export class Topology {
     }
 
     const result = find(idOrTag, list);
+
     if (array) {
       return result;
     }
 
-    if (result.length === 1) {
+    if (result.length === 0) {
+      return null;
+    } else if (result.length === 1) {
       return result[0];
     }
 
@@ -2979,6 +2982,10 @@ export class Topology {
           item[attr] = val;
         }
         item.doWheres();
+
+        if (item.type === PenType.Node) {
+          (item as Node).animateReady = Node.cloneState(item, false);
+        }
       }
     });
 

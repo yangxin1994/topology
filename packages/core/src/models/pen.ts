@@ -433,17 +433,20 @@ export abstract class Pen {
     }
 
     this.wheres.forEach((where) => {
-      if (where.fn) {
+      if (where.fn.trim()) {
         const fn = new Function('pen', where.fn);
         if (fn(this)) {
           where.actions && where.actions.forEach((action: any) => {
             this.doAction(action);
           });
         }
-      } else if (new Function(`return ${this[where.key]} ${where.comparison} ${where.value}`)) {
-        where.actions && where.actions.forEach((action: any) => {
-          this.doAction(action);
-        });
+      } else {
+        const fn = new Function('attr', `return attr ${where.comparison} ${where.value}`);
+        if (fn(this[where.key])) {
+          where.actions && where.actions.forEach((action: any) => {
+            this.doAction(action);
+          });
+        }
       }
     });
   }
