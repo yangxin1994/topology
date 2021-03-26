@@ -219,7 +219,6 @@ export class Node extends Pen {
     }
 
     delete n.events;
-    delete n.actions;
     delete n.wheres;
 
     return n;
