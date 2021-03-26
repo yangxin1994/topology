@@ -218,6 +218,10 @@ export class Node extends Pen {
       delete n.iconColor;
     }
 
+    delete n.events;
+    delete n.actions;
+    delete n.wheres;
+
     return n;
   }
 
@@ -231,10 +235,17 @@ export class Node extends Pen {
     for (const key in this) {
       if (
         key !== 'TID' &&
+        key !== 'events' &&
+        key !== 'actions' &&
+        key !== 'wheres' &&
         key.indexOf('animate') < 0 &&
         key.indexOf('Animate') < 0
       ) {
         this[key] = (state as any)[key];
+
+        if (key === 'rect') {
+          this.rect = new Rect(this.rect.x, this.rect.y, this.rect.width, this.rect.height);
+        }
       }
     }
 
@@ -742,7 +753,6 @@ export class Node extends Pen {
     }
 
     let rectChanged = false;
-
     for (let i = 0; i < this.animateFrames.length; ++i) {
       const item = this.animateFrames[i];
       if (timeline >= item.start && timeline < item.end) {

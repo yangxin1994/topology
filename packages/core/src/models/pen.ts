@@ -12,13 +12,28 @@ export enum PenType {
 }
 
 export interface Action {
-  where?: any;
   do?: string;
   url?: string;
   _blank?: string;
   tag?: string;
   fn?: string;
   params?: any;
+}
+
+export interface Event {
+  type: EventType;
+  action: EventAction;
+  value: string;
+  params: string;
+  name?: string;
+}
+
+export interface Where {
+  key?: string;
+  comparison?: string;
+  value?: any;
+  fn?: string;
+  actions?: Action[];
 }
 
 const eventFns: string[] = ['link', 'doStartAnimate', 'doFn', 'doWindowFn', '', 'doPauseAnimate', 'doStopAnimate', 'doEmit'];
@@ -126,9 +141,9 @@ export abstract class Pen {
   tipId: string;
   title: string;
 
-  events: { type: EventType; action: EventAction; value: string; params: string; name?: string; }[];
+  events: Event[];
   actions: Action[];
-  disposableActions: Action[];
+  wheres: Where[];
 
   parentId: string;
   rectInParent: {
@@ -214,9 +229,6 @@ export abstract class Pen {
     }
     if (this.actions) {
       this.actions = JSON.parse(JSON.stringify(this.actions));
-    }
-    if (this.disposableActions) {
-      this.disposableActions = JSON.parse(JSON.stringify(this.disposableActions));
     }
 
     if (typeof this.data === 'object') {
@@ -416,55 +428,58 @@ export abstract class Pen {
     }
   }
 
-  doAction() {
-    const actions = this.disposableActions || this.actions || this.events;
-    actions && actions.forEach((action) => {
-      if (action.type === 0 || action.type === 1) {
-        return;
-      }
-      const where = action.where;
-      if (where && where.fn) {
-        const fn = new Function('pen', where.fn);
-        if (!fn(this)) {
-          return;
-        }
-      } else if (where && !new Function(`return ${this[where.key]} ${where.comparison} ${where.value}`)) {
-        return;
-      }
+  doWheres() {
+    if (!this.wheres) {
+      return;
+    }
 
-      switch (action.do || action.action) {
-        case 0:
-        case 'Link':
-          this.link(action.url, action._blank);
-          break;
-        case 1:
-        case 'StartAnimate':
-          this.doStartAnimate(action.tag);
-          break;
-        case 5:
-        case 'PauseAnimate':
-          this.doPauseAnimate(action.tag);
-          break;
-        case 6:
-        case 'StopAnimate':
-          this.doStopAnimate(action.tag);
-          break;
-        case 2:
-        case 'Function':
-          this.doFn(action.fn, action.params);
-          break;
-        case 3:
-        case 'WindowFn':
-          this.doWindowFn(action.fn, action.params);
-          break;
-        case 7:
-        case 'Emit':
-          this.doEmit(action.fn, action.params);
-          break;
+    this.wheres.forEach((where) => {
+      if (where.fn) {
+        const fn = new Function('pen', where.fn);
+        if (fn(this)) {
+          where.actions && where.actions.forEach((action: any) => {
+            this.doAction(action);
+          });
+        }
+      } else if (new Function(`return ${this[where.key]} ${where.comparison} ${where.value}`)) {
+        where.actions && where.actions.forEach((action: any) => {
+          this.doAction(action);
+        });
       }
     });
+  }
 
-    this.disposableActions = null;
+  doAction(action: any) {
+    switch (action.do || action.action) {
+      case 0:
+      case 'Link':
+        this.link(action.url || action.value, action._blank || action.params);
+        break;
+      case 1:
+      case 'StartAnimate':
+        this.doStartAnimate(action.tag || action.value);
+        break;
+      case 5:
+      case 'PauseAnimate':
+        this.doPauseAnimate(action.tag || action.value);
+        break;
+      case 6:
+      case 'StopAnimate':
+        this.doStopAnimate(action.tag || action.value);
+        break;
+      case 2:
+      case 'Function':
+        this.doFn(action.fn || action.value, action.params);
+        break;
+      case 3:
+      case 'WindowFn':
+        this.doWindowFn(action.fn || action.value, action.params);
+        break;
+      case 7:
+      case 'Emit':
+        this.doEmit(action.fn || action.value, action.params);
+        break;
+    }
   }
 
   show() {

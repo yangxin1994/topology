@@ -22,7 +22,7 @@ import { getRect } from './utils/rect';
 import { formatPadding } from './utils/padding';
 import { Socket } from './socket';
 import { MQTT } from './mqtt';
-import { Direction } from './models';
+import { Direction, EventType as SocketEventType } from './models';
 import { isMobile } from './utils';
 
 declare const window: any;
@@ -748,7 +748,7 @@ export class Topology {
       this.mqtt = new MQTT(url || this.data.mqttUrl, options || this.data.mqttOptions, this.data.mqttTopics,
         (topic: string, message: any) => {
           if (this.data.socketEvent !== 1) {
-            this.doSocket(message.toString());
+            this.doSocket(message.toString(), SocketEventType.Mqtt);
           }
           this.data.socketEvent && this.dispatch('mqtt', { topic, message });
         }
@@ -762,14 +762,40 @@ export class Topology {
     }
   }
 
-  doSocket(message: any) {
+  doSocket(message: any, type = SocketEventType.WebSocket) {
     try {
       message = JSON.parse(message);
       if (!Array.isArray(message)) {
         message = [message];
       }
       message.forEach((item: any) => {
-        this.setValue(item.id || item.tag, item);
+        let actions = [];
+
+        if (item.actions) {
+          actions = item.actions;
+          delete item.actions;
+        }
+
+        const pens = find(item.id || item.tag, this.data.pens);
+        pens.forEach((pen) => {
+          if (pen.id === item.id || (pen.tags && pen.tags.indexOf(item.tag) > -1)) {
+            pen.fromData(pen, item);
+            pen.doWheres();
+
+            if (pen.events) {
+              pen.events.forEach((event) => {
+                if (event.type === type) {
+                  actions.push(event);
+                }
+              });
+            }
+            actions && actions.forEach((action: any) => {
+              pen.doAction(action);
+            });
+          }
+        });
+
+        this.willRender();
       });
     } catch (error) {
       console.warn(error);
@@ -1032,11 +1058,13 @@ export class Topology {
           break;
 
         case MoveInType.LineFrom:
-          const fromId = this.hoverLayer.line.from.id;
+          let fromId = this.hoverLayer.line.from.id;
           if (e.ctrlKey || e.shiftKey || e.altKey) {
             this.hoverLayer.lineFrom(new Point(e.x, e.y));
           } else {
-            this.hoverLayer.lineFrom(this.getLineDock(new Point(e.x, e.y), AnchorMode.Out));
+            const from = this.getLineDock(new Point(e.x, e.y), AnchorMode.Out);
+            fromId = from.id;
+            this.hoverLayer.lineFrom(from);
           }
           this.hoverLayer.line.from.id = fromId;
           if (this.hoverLayer.line.parentId) {
@@ -2918,10 +2946,14 @@ export class Topology {
         } else {
           item[attr] = val;
         }
-        item.doAction();
+        item.doWheres();
       }
     });
 
+    this.willRender();
+  }
+
+  willRender() {
     if (this.actionTimer) {
       clearTimeout(this.actionTimer);
     }
