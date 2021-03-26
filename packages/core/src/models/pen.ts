@@ -281,7 +281,7 @@ export abstract class Pen {
 
     if (this.fillImage) {
       if (this.fillImage === this.lastFillImage && this.fillImg) {
-        ctx.fillStyle = ctx.createPattern(this.fillImg, "repeat");;
+        ctx.fillStyle = ctx.createPattern(this.fillImg, "repeat");
       } else {
         this.loadFillImg();
       }
