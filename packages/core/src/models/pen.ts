@@ -142,7 +142,6 @@ export abstract class Pen {
   title: string;
 
   events: Event[];
-  actions: Action[];
   wheres: Where[];
 
   parentId: string;
@@ -227,8 +226,8 @@ export abstract class Pen {
     if (this.events) {
       this.events = JSON.parse(JSON.stringify(this.events));
     }
-    if (this.actions) {
-      this.actions = JSON.parse(JSON.stringify(this.actions));
+    if (this.wheres) {
+      this.wheres = JSON.parse(JSON.stringify(this.wheres));
     }
 
     if (typeof this.data === 'object') {
