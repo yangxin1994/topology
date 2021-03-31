@@ -110,9 +110,10 @@ export class Line extends Pen {
   }
 
   calcControlPoints(force?: boolean) {
-    if (this.manualCps && !force) {
+    if (this.name !== 'line' && this.manualCps && !force) {
       return;
     }
+
     this.textRect = null;
     if (this.from && this.to && drawLineFns[this.name]) {
       drawLineFns[this.name].controlPointsFn(this);
