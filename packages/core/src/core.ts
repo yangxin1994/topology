@@ -224,7 +224,7 @@ export class Topology {
       }
       this.dispatch('animateEnd', pen);
     });
-    this.subcribeEmit = Store.subscribe('LT:emit', (e: {
+    this.subcribeEmit = Store.subscribe(this.generateStoreKey('LT:emit'), (e: {
       event: string,
       params: string;
     }) => {
