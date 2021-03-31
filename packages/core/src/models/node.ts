@@ -113,9 +113,8 @@ export class Node extends Pen {
 
     this.fromData(defaultData, json);
     this.type = PenType.Node;
-    if (this.gif) {
-      this.elementLoaded = false;
-    }
+    delete this.elementLoaded;
+    delete this.elementRendered;
 
     // 兼容老数据
     if (json.children && json.children[0] && json.children[0].parentRect) {
