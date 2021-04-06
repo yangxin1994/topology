@@ -94,6 +94,24 @@ export class Node extends Pen {
   // 外部dom是否已经渲染。当需要重绘时，设置为false（用于第三方库辅助变量）
   elementRendered: boolean;
 
+  private static frameDelElements = [
+    // 添加动画帧情况下，希望恢复原状态的属性
+    'text',
+    'fontColor',
+    'fontFamily',
+    'fontSize',
+    'lineHeight',
+    'fontStyle',
+    'fontWeight',
+    'textAlign',
+    'textBaseline',
+    'textBackground',
+    'iconFamily',
+    'icon',
+    'iconSize',
+    'iconColor',
+  ];
+
   constructor(json: any) {
     super();
 
@@ -170,8 +188,8 @@ export class Node extends Pen {
     this.animateType = json.animateType
       ? json.animateType
       : json.animateDuration
-        ? 'custom'
-        : '';
+      ? 'custom'
+      : '';
     this.init();
 
     if (json.children) {
@@ -200,21 +218,9 @@ export class Node extends Pen {
     delete n.animateFrames;
 
     if (addFrame) {
-      delete n.text;
-      delete n.fontColor;
-      delete n.fontFamily;
-      delete n.fontSize;
-      delete n.lineHeight;
-      delete n.fontStyle;
-      delete n.fontWeight;
-      delete n.textAlign;
-      delete n.textBaseline;
-      delete n.textBackground;
-
-      delete n.iconFamily;
-      delete n.icon;
-      delete n.iconSize;
-      delete n.iconColor;
+      this.frameDelElements.forEach((item) => {
+        delete n[item];
+      });
     }
 
     delete n.events;
@@ -238,10 +244,18 @@ export class Node extends Pen {
         key.indexOf('animate') < 0 &&
         key.indexOf('Animate') < 0
       ) {
+        if (Node.frameDelElements.includes(key)) {
+          continue;
+        }
         this[key] = (state as any)[key];
 
         if (key === 'rect') {
-          this.rect = new Rect(this.rect.x, this.rect.y, this.rect.width, this.rect.height);
+          this.rect = new Rect(
+            this.rect.x,
+            this.rect.y,
+            this.rect.width,
+            this.rect.height
+          );
         }
       }
     }
@@ -254,7 +268,12 @@ export class Node extends Pen {
     this.rect.height = this.rect.height < 0 ? 0 : this.rect.height;
 
     if (!this.rect.calcCenter) {
-      this.rect = new Rect(this.rect.x, this.rect.y, this.rect.width, this.rect.height);
+      this.rect = new Rect(
+        this.rect.x,
+        this.rect.y,
+        this.rect.width,
+        this.rect.height
+      );
     }
   }
 
@@ -655,7 +674,7 @@ export class Node extends Pen {
     this.rectInParent = {
       x:
         ((this.rect.x - parent.rect.x - parent.paddingLeftNum) * 100) /
-        parentW +
+          parentW +
         '%',
       y:
         ((this.rect.y - parent.rect.y - parent.paddingTopNum) * 100) / parentH +
@@ -891,7 +910,7 @@ export class Node extends Pen {
                   (item.initState.data[key] || 0) +
                   ((item.state.data[key] || 0) -
                     (item.initState.data[key] || 0)) *
-                  rate;
+                    rate;
               } else if (
                 item.state.data[key] !== undefined &&
                 item.state.data[key] !== null
@@ -918,7 +937,7 @@ export class Node extends Pen {
     }
   };
 
-  scale(scale: number, center?: { x: number; y: number; }) {
+  scale(scale: number, center?: { x: number; y: number }) {
     if (!center) {
       center = this.rect.center;
     }
@@ -1145,7 +1164,7 @@ export class Node extends Pen {
     };
   }
 
-  hitInSelf(point: { x: number; y: number; }, padding = 0) {
+  hitInSelf(point: { x: number; y: number }, padding = 0) {
     if (this.rotate % 360 === 0) {
       return this.rect.hit(point, padding);
     }
@@ -1157,7 +1176,7 @@ export class Node extends Pen {
     return pointInRect(point, pts);
   }
 
-  hit(pt: { x: number; y: number; }, padding = 0) {
+  hit(pt: { x: number; y: number }, padding = 0) {
     let node: any;
     if (this.hitInSelf(pt, padding)) {
       node = this;
