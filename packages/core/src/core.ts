@@ -226,9 +226,10 @@ export class Topology {
     });
     this.subcribeEmit = Store.subscribe(this.generateStoreKey('LT:emit'), (e: {
       event: string,
+      pen: Pen,
       params: string;
     }) => {
-      this.emit(e.event, e.params);
+      this.emit(e.event, e);
     });
   }
 

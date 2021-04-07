@@ -585,6 +585,7 @@ export abstract class Pen {
     Store.set(this.generateStoreKey('LT:emit'), {
       event,
       params,
+      pen: this,
     });
   }
 
