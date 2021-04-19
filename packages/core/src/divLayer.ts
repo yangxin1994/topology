@@ -48,7 +48,6 @@ export class DivLayer extends Layer {
     parentElem.appendChild(this.canvas);
     parentElem.appendChild(this.player);
     this.createPlayer();
-
     this.subcribeDiv = Store.subscribe(this.generateStoreKey('LT:addDiv'), this.addDiv);
     this.subcribePlay = Store.subscribe(this.generateStoreKey('LT:play'), (e: { pen: Node; pause?: boolean; }) => {
       this.playOne(e.pen, e.pause);

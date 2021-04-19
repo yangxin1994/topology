@@ -198,6 +198,7 @@ export class Node extends Pen {
       this.children = [];
       json.children.forEach((item: Pen) => {
         let child: Pen;
+        item.TID = this.TID;
         switch (item.type) {
           case PenType.Line:
             child = new Line(item);
