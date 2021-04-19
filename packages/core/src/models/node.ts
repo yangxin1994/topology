@@ -112,7 +112,7 @@ export class Node extends Pen {
     'iconColor',
   ];
 
-  constructor(json: any) {
+  constructor(json: any, clone?: boolean) {
     super();
 
     const defaultData: any = {
@@ -171,7 +171,9 @@ export class Node extends Pen {
     if (json.manualAnchors) {
       this.manualAnchors = [];
       json.manualAnchors.forEach((pt: any) => {
-        this.manualAnchors.push(new Point(pt.x, pt.y));
+        const point = new Point(pt.x, pt.y);
+        point.id = json.id;
+        this.manualAnchors.push(point);
       });
     }
 
@@ -188,9 +190,9 @@ export class Node extends Pen {
     this.animateType = json.animateType
       ? json.animateType
       : json.animateDuration
-      ? 'custom'
-      : '';
-    this.init();
+        ? 'custom'
+        : '';
+    this.init(clone);
 
     if (json.children) {
       this.children = [];
@@ -214,7 +216,7 @@ export class Node extends Pen {
   }
 
   static cloneState(json: any, addFrame = true) {
-    const n = new Node(json);
+    const n = new Node(json, true);
     delete n.animateFrames;
 
     if (addFrame) {
@@ -277,7 +279,7 @@ export class Node extends Pen {
     }
   }
 
-  init() {
+  init(clone?: boolean) {
     this.checkData();
 
     this.calcAbsPadding();
@@ -300,6 +302,10 @@ export class Node extends Pen {
     this.elementRendered = false;
 
     this.addToDiv();
+
+    if (!clone) {
+      this.initAnimate();
+    }
   }
 
   addToDiv() {
@@ -674,7 +680,7 @@ export class Node extends Pen {
     this.rectInParent = {
       x:
         ((this.rect.x - parent.rect.x - parent.paddingLeftNum) * 100) /
-          parentW +
+        parentW +
         '%',
       y:
         ((this.rect.y - parent.rect.y - parent.paddingTopNum) * 100) / parentH +
@@ -721,12 +727,15 @@ export class Node extends Pen {
   }
 
   stopAnimate() {
-    this.restore();
-    this.initAnimate();
+    this.animateStart = 0;
     Store.set(this.generateStoreKey('LT:AnimatePlay'), {
       pen: this,
       stop: true,
     });
+
+    this.restore();
+    this.initAnimate();
+
     Store.set(this.generateStoreKey('LT:render'), {
       pen: this,
       stop: true,
@@ -734,8 +743,11 @@ export class Node extends Pen {
   }
 
   animate = (now: number) => {
-    let timeline = now - this.animateStart;
+    if (this.animateStart < 1) {
+      return;
+    }
 
+    let timeline = now - this.animateStart;
     if (this.animateFrame > 0) {
       this.animateFrames.forEach((item, index) => {
         if (this.animateFrame < index + 1) {
@@ -756,11 +768,7 @@ export class Node extends Pen {
       ) {
         this.animateStart = 0;
         this.animateCycleIndex = 0;
-        const item = this.animateFrames[this.animateFrames.length - 1];
-        if (item) {
-          this.restore(item.state);
-        }
-
+        this.restore();
         Store.set(this.generateStoreKey('animateEnd'), this);
         return;
       }
@@ -910,7 +918,7 @@ export class Node extends Pen {
                   (item.initState.data[key] || 0) +
                   ((item.state.data[key] || 0) -
                     (item.initState.data[key] || 0)) *
-                    rate;
+                  rate;
               } else if (
                 item.state.data[key] !== undefined &&
                 item.state.data[key] !== null
@@ -937,7 +945,7 @@ export class Node extends Pen {
     }
   };
 
-  scale(scale: number, center?: { x: number; y: number }) {
+  scale(scale: number, center?: { x: number; y: number; }) {
     if (!center) {
       center = this.rect.center;
     }
@@ -1164,7 +1172,7 @@ export class Node extends Pen {
     };
   }
 
-  hitInSelf(point: { x: number; y: number }, padding = 0) {
+  hitInSelf(point: { x: number; y: number; }, padding = 0) {
     if (this.rotate % 360 === 0) {
       return this.rect.hit(point, padding);
     }
@@ -1176,7 +1184,7 @@ export class Node extends Pen {
     return pointInRect(point, pts);
   }
 
-  hit(pt: { x: number; y: number }, padding = 0) {
+  hit(pt: { x: number; y: number; }, padding = 0) {
     let node: any;
     if (this.hitInSelf(pt, padding)) {
       node = this;

@@ -1338,7 +1338,9 @@ export class Topology {
               this.moveIn.hoverNode.manualAnchors = [];
             }
 
-            this.moveIn.hoverNode.manualAnchors.push(new Point(e.x, e.y));
+            const point = new Point(e.x, e.y);
+            point.id = this.moveIn.hoverNode.id;
+            this.moveIn.hoverNode.manualAnchors.push(point);
             this.moveIn.hoverNode.calcAnchors();
             this.needCache = true;
           }
