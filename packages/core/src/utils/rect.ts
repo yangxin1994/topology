@@ -23,7 +23,7 @@ export function getRect(pens: Pen[]) {
           points.push(child.from);
           points.push(child.to);
           if (Array.isArray(child.controlPoints)) {
-            points.push(...child.controlPoints)
+            points.push(...child.controlPoints);
           }
           if (child.name === 'curve') {
             for (let i = 0.01; i < 1; i += 0.02) {
@@ -35,7 +35,7 @@ export function getRect(pens: Pen[]) {
         points.push(item.from);
         points.push(item.to);
         if (Array.isArray(item.controlPoints)) {
-          points.push(...item.controlPoints)
+          points.push(...item.controlPoints);
         }
         if (item.name === 'curve') {
           for (let i = 0.01; i < 1; i += 0.02) {

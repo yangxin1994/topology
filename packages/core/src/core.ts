@@ -3062,6 +3062,7 @@ export class Topology {
       delete pen.dockWatchers;
       delete pen.elementLoaded;
       delete pen.elementRendered;
+      delete pen.animateReady;
 
       if (pen.animateFrames && pen.animateFrames.length) {
         for (const item of pen.animateFrames) {
@@ -3135,6 +3136,7 @@ export class Topology {
       delete pen.dockWatchers;
       delete pen.elementLoaded;
       delete pen.elementRendered;
+      delete pen.animateReady;
 
       this.pureDataChildren(pen);
     });

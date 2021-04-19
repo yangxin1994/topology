@@ -208,7 +208,7 @@ export class Node extends Pen {
             child = new Node(item);
             child.parentId = this.id;
             child.calcRectByParent(this);
-            (child as Node).init();
+            (child as Node).init(clone);
             break;
         }
         this.children.push(child);
@@ -219,6 +219,9 @@ export class Node extends Pen {
   static cloneState(json: any, addFrame = true) {
     const n = new Node(json, true);
     delete n.animateFrames;
+    delete n.animateReady;
+    delete n.events;
+    delete n.wheres;
 
     if (addFrame) {
       this.frameDelElements.forEach((item) => {
@@ -226,15 +229,12 @@ export class Node extends Pen {
       });
     }
 
-    delete n.events;
-    delete n.wheres;
-
     return n;
   }
 
   restore(state?: Node) {
     if (!state) {
-      state = this.animateReady;
+      state = Node.cloneState(this.animateReady);
     }
     if (!state) {
       return;
