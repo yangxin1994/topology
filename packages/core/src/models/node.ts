@@ -700,6 +700,10 @@ export class Node extends Pen {
   }
 
   initAnimate() {
+    if (!this.animateFrames) {
+      return;
+    }
+
     let passed = 0;
     for (let i = 0; i < this.animateFrames.length; ++i) {
       this.animateFrames[i].start = passed;
