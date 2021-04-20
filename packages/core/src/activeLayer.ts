@@ -617,6 +617,8 @@ export class ActiveLayer extends Layer {
           (tmp.fromArrowSize * scale - 1.5 * tmp.lineWidth) / scale;
         tmp.setTID(TID);
         tmp.strokeStyle = rgba(0.2, this.options.activeColor);
+        tmp.borderWidth = 4;
+        tmp.borderColor = rgba(0.1, this.options.activeColor);
         tmp.fromArrowColor = this.options.activeColor;
         tmp.toArrowColor = this.options.activeColor;
         tmp.render(ctx);
