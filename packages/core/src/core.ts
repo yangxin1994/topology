@@ -285,7 +285,7 @@ export class Topology {
         this.onmousedown({
           x: pos.x,
           y: pos.y,
-          ctrlKey: event.ctrlKey,
+          ctrlKey: event.ctrlKey || event.metaKey,
           shiftKey: event.shiftKey,
           altKey: event.altKey,
           button: 0,
@@ -342,7 +342,7 @@ export class Topology {
         this.onMouseMove({
           x: pos.x,
           y: pos.y,
-          ctrlKey: event.ctrlKey,
+          ctrlKey: event.ctrlKey || event.metaKey,
           shiftKey: event.shiftKey,
           altKey: event.altKey,
           buttons: 1,
@@ -369,7 +369,7 @@ export class Topology {
         const e = {
           x: event.pageX - window.scrollX - (this.canvasPos.left || this.canvasPos.x),
           y: event.pageY - window.scrollY - (this.canvasPos.top || this.canvasPos.y),
-          ctrlKey: event.ctrlKey,
+          ctrlKey: event.ctrlKey || event.metaKey,
           shiftKey: event.shiftKey,
           altKey: event.altKey,
           button: event.button,
@@ -382,7 +382,7 @@ export class Topology {
         this.onMouseMove({
           x: event.pageX - window.scrollX - (this.canvasPos.left || this.canvasPos.x),
           y: event.pageY - window.scrollY - (this.canvasPos.top || this.canvasPos.y),
-          ctrlKey: event.ctrlKey,
+          ctrlKey: event.ctrlKey || event.metaKey,
           shiftKey: event.shiftKey,
           altKey: event.altKey,
           buttons: event.buttons,
@@ -392,7 +392,7 @@ export class Topology {
         const e = {
           x: event.pageX - window.scrollX - (this.canvasPos.left || this.canvasPos.x),
           y: event.pageY - window.scrollY - (this.canvasPos.top || this.canvasPos.y),
-          ctrlKey: event.ctrlKey,
+          ctrlKey: event.ctrlKey || event.metaKey,
           shiftKey: event.shiftKey,
           altKey: event.altKey,
           button: event.button,
@@ -431,7 +431,7 @@ export class Topology {
       }
       switch (this.options.scaleKey) {
         case KeyType.Ctrl:
-          if (!event.ctrlKey) {
+          if (!event.ctrlKey && !event.metaKey) {
             return;
           }
           break;
@@ -496,7 +496,7 @@ export class Topology {
     this.onmouseup({
       x: pos.x,
       y: pos.y,
-      ctrlKey: event.ctrlKey,
+      ctrlKey: event.ctrlKey || event.metaKey,
       shiftKey: event.shiftKey,
       altKey: event.altKey,
       button: 0,
