@@ -387,7 +387,7 @@ export class Node extends Pen {
     }
 
     // Draw image.
-    if (this.image || this.img) {
+    if (this.image || (this.img && this.elementId === '')) {
       this.drawImg(ctx);
     } else if (this.icon) {
       ctx.save();
@@ -1083,14 +1083,14 @@ export class Node extends Pen {
     }
   }
 
-  translate(x: number, y: number) {
+  translate(x: number, y: number, noAnimate?: boolean) {
     this.rect.x += x;
     this.rect.y += y;
     this.rect.ex = this.rect.x + this.rect.width;
     this.rect.ey = this.rect.y + this.rect.height;
     this.rect.calcCenter();
 
-    if (this.animateFrames && this.animateFrames.length) {
+    if (!noAnimate && this.animateFrames && this.animateFrames.length) {
       for (const frame of this.animateFrames) {
         const { initState, state } = frame;
         if (initState && initState.translate) {
@@ -1116,16 +1116,12 @@ export class Node extends Pen {
       });
     }
 
-    this.init();
+    this.init(noAnimate);
 
     if (this.children) {
       for (const item of this.children) {
-        item.translate(x, y);
+        item.translate(x, y, noAnimate);
       }
-    }
-
-    if (this.animateReady && this.animateReady.translate) {
-      this.animateReady.translate(x, y);
     }
   }
 

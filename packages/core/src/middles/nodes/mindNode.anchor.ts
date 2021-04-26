@@ -1,6 +1,6 @@
 import { Point } from '../../models/point';
 import { Node } from '../../models/node';
-import { Direction } from '@topology/core';
+import { Direction } from '../../models/direction';
 
 export function mindNodeAnchors(node: Node) {
   let r = borderRadius(node);

@@ -6,6 +6,8 @@ import { images, PenType } from './models/pen';
 import { Layer } from './layer';
 import { find } from './utils';
 
+let videos: { [key: string]: { player: HTMLElement; current: HTMLElement; media: HTMLMediaElement; }; } = {};
+
 export class DivLayer extends Layer {
   canvas = document.createElement('div');
   player = document.createElement('div');
@@ -16,7 +18,6 @@ export class DivLayer extends Layer {
   progress: HTMLElement;
   loop: HTMLElement;
   media: HTMLMediaElement;
-  videos: { [key: string]: { player: HTMLElement; current: HTMLElement; media: HTMLMediaElement; }; } = {};
   audios: { [key: string]: { player: HTMLElement; current: HTMLElement; media: HTMLMediaElement; }; } = {};
   iframes: { [key: string]: HTMLIFrameElement; } = {};
   elements: { [key: string]: HTMLElement; } = {};
@@ -62,8 +63,8 @@ export class DivLayer extends Layer {
 
       if (node.audio && this.audios[node.id]) {
         this.media = this.audios[node.id].media;
-      } else if (node.video && this.videos[node.id]) {
-        this.media = this.videos[node.id].media;
+      } else if (node.video && videos[node.id]) {
+        this.media = videos[node.id].media;
       } else {
         return;
       }
@@ -105,10 +106,12 @@ export class DivLayer extends Layer {
       this.setElemPosition(node, (this.audios[node.id] && this.audios[node.id].player) || this.addMedia(node, 'audio'));
     }
     if (node.video) {
-      if (this.videos[node.id] && this.videos[node.id].media.src !== node.video) {
-        this.videos[node.id].media.src = node.video;
+      if (videos[node.id] && videos[node.id].media.src !== node.video) {
+        videos[node.id].media.src = node.video;
       }
-      this.setElemPosition(node, (this.videos[node.id] && this.videos[node.id].player) || this.addMedia(node, 'video'));
+      setTimeout(() => {
+        this.setElemPosition(node, (videos[node.id] && videos[node.id].player) || this.addMedia(node, 'video'));
+      });
     }
 
     if (node.iframe) {
@@ -160,7 +163,7 @@ export class DivLayer extends Layer {
     }
   };
 
-  createPlayer() {
+  createPlayer = () => {
     this.player.style.position = 'fixed';
     this.player.style.outline = 'none';
     this.player.style.top = '-99999px';
@@ -246,9 +249,9 @@ export class DivLayer extends Layer {
     fullScreen.onclick = () => {
       this.media.requestFullscreen();
     };
-  }
+  };
 
-  getMediaCurrent() {
+  getMediaCurrent = () => {
     if (!this.media) {
       return;
     }
@@ -256,13 +259,14 @@ export class DivLayer extends Layer {
       this.formatSeconds(this.media.currentTime) + ' / ' + this.formatSeconds(this.media.duration);
     this.progressCurrent.style.width =
       (this.media.currentTime / this.media.duration) * this.progress.clientWidth + 'px';
-  }
+  };
 
-  addMedia(node: Node, type: string) {
+  addMedia = (node: Node, type: string) => {
     const player = document.createElement('div');
     const current = document.createElement('div');
     const media = document.createElement(type) as HTMLMediaElement;
 
+    player.id = node.id;
     current.style.position = 'absolute';
     current.style.outline = 'none';
     current.style.left = '0';
@@ -311,19 +315,28 @@ export class DivLayer extends Layer {
     media.onloadedmetadata = () => {
       this.getMediaCurrent();
     };
+
     media.src = node[type];
 
     player.appendChild(media);
     player.appendChild(current);
-    this[type + 's'][node.id] = {
-      player,
-      current,
-      media,
-    };
+    if (type === 'video') {
+      videos[node.id] = {
+        player,
+        current,
+        media,
+      };
+    } else {
+      this.audios[node.id] = {
+        player,
+        current,
+        media,
+      };
+    }
     this.canvas.appendChild(player);
 
     return player;
-  }
+  };
 
   play(idOrTag: any, pause?: boolean) {
     if (!idOrTag) {
@@ -343,11 +356,11 @@ export class DivLayer extends Layer {
       } else if (this.audios[item.id].media.paused) {
         this.audios[item.id].media.play();
       }
-    } else if (item.video && this.videos[item.id].media) {
+    } else if (item.video && videos[item.id].media) {
       if (pause) {
-        this.videos[item.id].media.pause();
-      } else if (this.videos[item.id].media.paused) {
-        this.videos[item.id].media.play();
+        videos[item.id].media.pause();
+      } else if (videos[item.id].media.paused) {
+        videos[item.id].media.play();
       }
     }
   }
@@ -368,7 +381,7 @@ export class DivLayer extends Layer {
     return node.img;
   }
 
-  setElemPosition(node: Node, elem: HTMLElement) {
+  setElemPosition = (node: Node, elem: HTMLElement) => {
     if (!elem) {
       return;
     }
@@ -381,9 +394,9 @@ export class DivLayer extends Layer {
     if (node.rotate || node.offsetRotate) {
       elem.style.transform = `rotate(${node.rotate + node.offsetRotate}deg)`;
     }
-    if (node.video && this.videos[node.id] && this.videos[node.id].media) {
-      this.videos[node.id].media.style.width = '100%';
-      this.videos[node.id].media.style.height = '100%';
+    if (node.video && videos[node.id] && videos[node.id].media) {
+      videos[node.id].media.style.width = '100%';
+      videos[node.id].media.style.height = '100%';
     }
     if (this.data.locked > Lock.None || node.locked > Lock.None) {
       elem.style.userSelect = 'initial';
@@ -392,7 +405,7 @@ export class DivLayer extends Layer {
       elem.style.userSelect = 'none';
       elem.style.pointerEvents = 'none';
     }
-  }
+  };
 
   removeDiv = (item: Node) => {
     if (this.curNode && item.id === this.curNode.id) {
@@ -405,8 +418,8 @@ export class DivLayer extends Layer {
       this.audios[item.id] = null;
     }
     if (item.video) {
-      this.canvas.removeChild(this.videos[item.id].player);
-      this.videos[item.id] = null;
+      this.canvas.removeChild(videos[item.id].player);
+      videos[item.id] = null;
     }
     if (item.iframe) {
       this.canvas.removeChild(this.iframes[item.id]);
@@ -435,7 +448,7 @@ export class DivLayer extends Layer {
   clear(shallow?: boolean) {
     this.canvas.innerHTML = '';
     this.audios = {};
-    this.videos = {};
+    videos = {};
     this.iframes = {};
     this.elements = {};
     this.gifs = {};

@@ -2213,9 +2213,12 @@ export class Topology {
       } else {
         pen = new Node(item, true);
         (pen as Node).animateFrames = [];
-        (pen as Node).elementId = null;
+        (pen as Node).img = (item as Node).img;
+        (pen as Node).elementId = '';
+        (pen as Node).elementLoaded = true;
+        (pen as Node).elementRendered = true;
       }
-      pen.translate(-rect.x, -rect.y);
+      pen.translate(-rect.x, -rect.y, true);
       pen.render(ctx);
     }
 
