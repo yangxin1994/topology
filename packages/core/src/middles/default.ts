@@ -32,8 +32,18 @@ import {
   calcPolylineControlPoints,
   dockPolylineControlPoint,
 } from './lines/polyline';
-import { curve, curveControlPoints, pointInCurve, calcCurveControlPoints } from './lines/curve';
-import { mind, calcMindControlPoints, mindControlPoints, pointInMind } from './lines/mind';
+import {
+  curve,
+  curveControlPoints,
+  pointInCurve,
+  calcCurveControlPoints,
+} from './lines/curve';
+import {
+  mind,
+  calcMindControlPoints,
+  mindControlPoints,
+  pointInMind,
+} from './lines/mind';
 import { triangleSolid, triangle as arrowTriangle } from './arrows/triangle';
 import { diamondSolid, diamond as arrowDiamond } from './arrows/diamond';
 import { circleSolid, circle as arrowCircle } from './arrows/circle';
@@ -65,6 +75,9 @@ import { peopleIconRect, peopleTextRect } from './nodes/people.rect';
 import { rectangleIconRect, rectangleTextRect } from './nodes/rectangle.rect';
 import { graffiti } from './nodes/graffiti';
 import { graffitiAnchors } from './nodes/graffiti.anchor';
+import { mindNodeAnchors } from './nodes/mindNode.anchor';
+import { mindLine } from './nodes/mindLine';
+import { mindLineAnchors } from './nodes/mindLine.anchor';
 
 // Functions of drawing a node.
 export const drawNodeFns: any = {};
@@ -180,7 +193,7 @@ function init() {
   textRectFns.line = lineTextRect;
 
   // Image
-  drawNodeFns.image = (ctx: CanvasRenderingContext2D, node: Rect) => { };
+  drawNodeFns.image = (ctx: CanvasRenderingContext2D, node: Rect) => {};
   iconRectFns.image = imageIconRect;
   textRectFns.image = imageTextRect;
   anchorsFns.image = imageAnchors;
@@ -191,10 +204,20 @@ function init() {
   iconRectFns.cube = cubeIconRect;
   textRectFns.cube = cubeTextRect;
 
-  // Cube
+  // People
   drawNodeFns.people = people;
   iconRectFns.people = peopleIconRect;
   textRectFns.people = peopleTextRect;
+
+  // MindNode
+  drawNodeFns.mindNode = rectangle;
+  anchorsFns.mindNode = mindNodeAnchors;
+  iconRectFns.mindNode = rectangleIconRect;
+  textRectFns.mindNode = rectangleTextRect;
+
+  // MindLine
+  drawNodeFns.mindLine = mindLine;
+  anchorsFns.mindLine = mindLineAnchors;
   // ********end********
 
   // ********Default lines.*******
@@ -302,7 +325,7 @@ export function registerLine(
     pointIn: pointInFn,
     getLength,
     getCenter,
-    getPointByPos
+    getPointByPos,
   };
   return true;
 }
@@ -313,7 +336,12 @@ export function registerLine(
 // force - Overwirte the node if exists.
 export function registerArrow(
   name: string,
-  drawFn: (ctx: CanvasRenderingContext2D, from: Point, to: Point, size: number) => void,
+  drawFn: (
+    ctx: CanvasRenderingContext2D,
+    from: Point,
+    to: Point,
+    size: number
+  ) => void,
   protect?: boolean
 ) {
   // Exist
