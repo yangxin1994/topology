@@ -46,7 +46,6 @@ export class AnimateLayer extends Layer {
           }
         } else {
           if (params.pen) {
-
             if (this.pens.has(params.pen.id)) {
               this.pens.get(params.pen.id).animateStart = Date.now();
             } else {

@@ -236,6 +236,7 @@ export abstract class Pen {
 
     delete this['img'];
     delete this['animateStart'];
+    delete this['animateReady'];
   }
 
   render(ctx: CanvasRenderingContext2D) {

@@ -12,6 +12,33 @@ import { s8 } from '../utils/uuid';
 import { pointInRect } from '../utils/canvas';
 import { Direction } from './direction';
 
+// 动画帧不涉及的属性
+const animateOutsides = [
+  'TID',
+  'events',
+  'wheres',
+  'animateDuration',
+  'animateAlone',
+  'animateFrames',
+  'animateReady',
+  'animateFrame',
+  'text',
+  'fontColor',
+  'fontFamily',
+  'fontSize',
+  'lineHeight',
+  'fontStyle',
+  'fontWeight',
+  'textAlign',
+  'textBaseline',
+  'textBackground',
+  'iconFamily',
+  'icon',
+  'iconSize',
+  'iconColor',
+  'data'
+];
+
 export class Node extends Pen {
   is3D: boolean;
   z: number;
@@ -94,25 +121,7 @@ export class Node extends Pen {
   // 外部dom是否已经渲染。当需要重绘时，设置为false（用于第三方库辅助变量）
   elementRendered: boolean;
 
-  private static frameDelElements = [
-    // 添加动画帧情况下，希望恢复原状态的属性
-    'text',
-    'fontColor',
-    'fontFamily',
-    'fontSize',
-    'lineHeight',
-    'fontStyle',
-    'fontWeight',
-    'textAlign',
-    'textBaseline',
-    'textBackground',
-    'iconFamily',
-    'icon',
-    'iconSize',
-    'iconColor',
-  ];
-
-  constructor(json: any, clone?: boolean) {
+  constructor(json: any, cloneState?: boolean) {
     super();
 
     const defaultData: any = {
@@ -177,13 +186,16 @@ export class Node extends Pen {
       });
     }
 
-    if (json.animateFrames && json.animateFrames.length) {
+    if (cloneState) {
+      this.animateFrames = undefined;
+    }
+    if (!cloneState && json.animateFrames && json.animateFrames.length) {
       for (const item of json.animateFrames) {
         item.children = null;
         if (item.initState) {
-          item.initState = new Node(item.initState);
+          item.initState = Node.cloneState(item.initState);
         }
-        item.state = new Node(item.state);
+        item.state = Node.cloneState(item.state);
       }
       this.animateFrames = json.animateFrames;
     }
@@ -192,7 +204,7 @@ export class Node extends Pen {
       : json.animateDuration
         ? 'custom'
         : '';
-    this.init(clone);
+    this.init(cloneState);
 
     if (json.children) {
       this.children = [];
@@ -208,7 +220,7 @@ export class Node extends Pen {
             child = new Node(item);
             child.parentId = this.id;
             child.calcRectByParent(this);
-            (child as Node).init(clone);
+            (child as Node).init(cloneState);
             break;
         }
         this.children.push(child);
@@ -216,18 +228,11 @@ export class Node extends Pen {
     }
   }
 
-  static cloneState(json: any, addFrame = true) {
+  static cloneState(json: any) {
     const n = new Node(json, true);
-    delete n.animateFrames;
-    delete n.animateReady;
-    delete n.events;
-    delete n.wheres;
-
-    if (addFrame) {
-      this.frameDelElements.forEach((item) => {
-        delete n[item];
-      });
-    }
+    animateOutsides.forEach((item) => {
+      delete n[item];
+    });
 
     return n;
   }
@@ -240,30 +245,22 @@ export class Node extends Pen {
       return;
     }
     for (const key in this) {
-      if (
-        key !== 'TID' &&
-        key !== 'events' &&
-        key !== 'wheres' &&
-        key.indexOf('animate') < 0 &&
-        key.indexOf('Animate') < 0
-      ) {
-        if (Node.frameDelElements.includes(key)) {
-          continue;
-        }
-        this[key] = (state as any)[key];
+      if (animateOutsides.includes(key)) {
+        continue;
+      }
+      this[key] = (state as any)[key];
 
-        if (key === 'rect') {
-          this.rect = new Rect(
-            this.rect.x,
-            this.rect.y,
-            this.rect.width,
-            this.rect.height
-          );
-        }
+      if (key === 'rect') {
+        this.rect = new Rect(
+          this.rect.x,
+          this.rect.y,
+          this.rect.width,
+          this.rect.height
+        );
       }
     }
 
-    this.init();
+    this.init(true);
   }
 
   checkData() {
@@ -280,7 +277,7 @@ export class Node extends Pen {
     }
   }
 
-  init(clone?: boolean) {
+  init(cloneState?: boolean) {
     this.checkData();
 
     this.calcAbsPadding();
@@ -304,7 +301,7 @@ export class Node extends Pen {
 
     this.addToDiv();
 
-    if (!clone) {
+    if (!cloneState) {
       this.initAnimate();
     }
   }
@@ -711,13 +708,12 @@ export class Node extends Pen {
       passed += this.animateFrames[i].duration;
       this.animateFrames[i].end = passed;
       this.animateFrames[i].initState = Node.cloneState(
-        i ? this.animateFrames[i - 1].state : this,
-        false
+        i ? this.animateFrames[i - 1].state : this
       );
     }
     this.animateDuration = passed;
 
-    this.animateReady = Node.cloneState(this, false);
+    this.animateReady = Node.cloneState(this);
     this.animatePos = 0;
     this.animateFrame = 0;
   }
@@ -767,13 +763,10 @@ export class Node extends Pen {
     if (timeline > this.animateDuration) {
       this.animatePos = 0;
       this.animateFrame = 0;
-      if (
-        ++this.animateCycleIndex >= this.animateCycle &&
-        this.animateCycle > 0
-      ) {
+      this.restore();
+      if (this.animateCycle > 0 && ++this.animateCycleIndex >= this.animateCycle) {
         this.animateStart = 0;
         this.animateCycleIndex = 0;
-        this.restore();
         Store.set(this.generateStoreKey('animateEnd'), this);
         return;
       }
@@ -943,7 +936,7 @@ export class Node extends Pen {
     }
 
     if (rectChanged) {
-      this.init();
+      this.init(true);
       if (!this.animateAlone) {
         Store.set(this.generateStoreKey('LT:rectChanged'), this);
       }

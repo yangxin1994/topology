@@ -2987,7 +2987,7 @@ export class Topology {
         item.doWheres();
 
         if (item.type === PenType.Node) {
-          (item as Node).animateReady = Node.cloneState(item, false);
+          (item as Node).animateReady = Node.cloneState(item);
         }
       }
     });

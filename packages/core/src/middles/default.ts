@@ -248,7 +248,7 @@ init();
 // anchorsFn - How to get the anchors.
 // iconRectFn - How to get the icon rect.
 // textRectFn - How to get the text rect.
-// force - Overwirte the node if exists.
+// protect - No overwirte the node if exists.
 export function registerNode(
   name: string,
   drawFn: (ctx: CanvasRenderingContext2D, node: Node) => void,
