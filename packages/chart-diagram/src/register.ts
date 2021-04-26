@@ -1,4 +1,5 @@
 import { registerNode, loadJS } from '@topology/core';
+import { imageIconRect } from '@topology/core/middles/nodes/image.rect';
 import { echarts, echartsObjs } from './echarts';
 
 export function register(_echarts?: any) {
@@ -10,5 +11,5 @@ export function register(_echarts?: any) {
       true
     );
   }
-  registerNode('echarts', echarts, null, null, null);
+  registerNode('echarts', echarts, null, imageIconRect, null);
 }

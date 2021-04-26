@@ -140,8 +140,10 @@ export class Node extends Pen {
 
     this.fromData(defaultData, json);
     this.type = PenType.Node;
-    delete this.elementLoaded;
-    delete this.elementRendered;
+    if (!cloneState) {
+      delete this.elementLoaded;
+      delete this.elementRendered;
+    }
 
     // 兼容老数据
     if (json.children && json.children[0] && json.children[0].parentRect) {
@@ -205,6 +207,10 @@ export class Node extends Pen {
         ? 'custom'
         : '';
     this.init(cloneState);
+
+    if (json.init && json.img && !json.image) {
+      this.img = json.img;
+    }
 
     if (json.children) {
       this.children = [];
@@ -299,9 +305,8 @@ export class Node extends Pen {
     this.calcAnchors();
     this.elementRendered = false;
 
-    this.addToDiv();
-
     if (!cloneState) {
+      this.addToDiv();
       this.initAnimate();
     }
   }
@@ -310,6 +315,10 @@ export class Node extends Pen {
     if (this.audio || this.video || this.iframe || this.elementId || this.gif) {
       Store.set(this.generateStoreKey('LT:addDiv'), this);
     }
+  }
+
+  removeFromDiv() {
+    Store.set(this.generateStoreKey('LT:removeDiv'), this);
   }
 
   hasGif() {
@@ -378,7 +387,7 @@ export class Node extends Pen {
     }
 
     // Draw image.
-    if (this.image) {
+    if (this.image || this.img) {
       this.drawImg(ctx);
     } else if (this.icon) {
       ctx.save();
@@ -444,13 +453,12 @@ export class Node extends Pen {
       }
     }
 
-    const gif = this.image.indexOf('.gif') > 0;
+    const gif = this.image && this.image.indexOf('.gif') > 0;
     if (!gif) {
       if (this.img) {
         ctx.save();
         ctx.shadowColor = '';
         ctx.shadowBlur = 0;
-
         const rect = this.getIconRect();
         let x = rect.x;
         let y = rect.y;
@@ -462,7 +470,7 @@ export class Node extends Pen {
         if (this.imageHeight) {
           h = this.imageHeight;
         }
-        if (this.imageRatio) {
+        if (this.imgNaturalWidth && this.imgNaturalHeight && this.imageRatio) {
           if (this.imageWidth) {
             h = (this.imgNaturalHeight / this.imgNaturalWidth) * w;
           } else {
@@ -508,6 +516,7 @@ export class Node extends Pen {
           ctx.rotate((this.iconRotate * Math.PI) / 180);
           ctx.translate(-rect.center.x, -rect.center.y);
         }
+
         ctx.drawImage(this.img, x, y, w, h);
         ctx.restore();
         return;
@@ -524,6 +533,10 @@ export class Node extends Pen {
         this.elementLoaded = true;
         Store.set(this.generateStoreKey('LT:addDiv'), this);
       }
+      return;
+    }
+
+    if (!this.image) {
       return;
     }
 

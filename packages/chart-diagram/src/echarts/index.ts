@@ -22,7 +22,7 @@ export function echarts(ctx: CanvasRenderingContext2D, node: Node) {
     return;
   }
 
-  if (!node.elementId) {
+  if (node.elementId === undefined || node.elementId === null) {
     node.elementId = s8();
   }
 
@@ -49,6 +49,14 @@ export function echarts(ctx: CanvasRenderingContext2D, node: Node) {
       echartsObjs[node.id].chart.setOption(node.data.echarts.option);
       echartsObjs[node.id].chart.resize();
       node.elementRendered = true;
+
+      setTimeout(() => {
+        const img = new Image();
+        img.src = echartsObjs[node.id].chart.getDataURL({
+          pixelRatio: 2
+        });
+        node.img = img;
+      }, 100);
     });
   }
 }

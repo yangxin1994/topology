@@ -2114,8 +2114,7 @@ export class Topology {
     if (this.caches.index < this.caches.list.length - 1) {
       this.caches.list.splice(this.caches.index + 1, this.caches.list.length - this.caches.index - 1);
     }
-    const data = createData(this.data);
-    this.caches.list.push(data);
+    this.caches.list.push(this.pureData());
     if (this.caches.list.length > this.options.cacheLen) {
       this.caches.list.shift();
     }
@@ -2178,7 +2177,7 @@ export class Topology {
     this.dispatch('redo', this.data);
   }
 
-  toImage(padding: Padding = 0, type = 'image/png', quality = 1, callback: any = null): string {
+  toImage(padding: Padding = 0, callback: any = null): string {
     const rect = this.getRect();
     const p = formatPadding(padding || 0);
     rect.x -= p[3];
@@ -2196,10 +2195,6 @@ export class Topology {
     const ctx = canvas.getContext('2d');
     // ctx.scale(dpi, dpi);
 
-    if (type && type !== 'image/png') {
-      ctx.fillStyle = 'white';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
     if (this.data.bkColor || this.options.bkColor) {
       ctx.fillStyle = this.data.bkColor || this.options.bkColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -2213,10 +2208,10 @@ export class Topology {
       if (item.type) {
         pen = new Line(item);
       } else {
-        pen = new Node(item);
+        pen = new Node(item, true);
         (pen as Node).animateFrames = [];
+        (pen as Node).elementId = null;
       }
-
       pen.translate(-rect.x, -rect.y);
       pen.render(ctx);
     }
@@ -2224,13 +2219,13 @@ export class Topology {
     if (callback) {
       canvas.toBlob(callback);
     }
-    return canvas.toDataURL(type, quality);
+    return canvas.toDataURL('image/png', 1);
   }
 
-  saveAsImage(name?: string, padding: Padding = 0, type: string = 'image/png', quality = 1) {
+  saveAsImage(name?: string, padding: Padding = 0) {
     const a = document.createElement('a');
     a.setAttribute('download', name || 'le5le.topology.png');
-    a.setAttribute('href', this.toImage(padding, type, quality));
+    a.setAttribute('href', this.toImage(padding));
     const evt = document.createEvent('MouseEvents');
     evt.initEvent('click', true, true);
     a.dispatchEvent(evt);

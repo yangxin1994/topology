@@ -49,6 +49,7 @@ export class DivLayer extends Layer {
     parentElem.appendChild(this.player);
     this.createPlayer();
     this.subcribeDiv = Store.subscribe(this.generateStoreKey('LT:addDiv'), this.addDiv);
+    this.subcribeDiv = Store.subscribe(this.generateStoreKey('LT:removeDiv'), this.removeDiv);
     this.subcribePlay = Store.subscribe(this.generateStoreKey('LT:play'), (e: { pen: Node; pause?: boolean; }) => {
       this.playOne(e.pen, e.pause);
     });
@@ -393,7 +394,7 @@ export class DivLayer extends Layer {
     }
   }
 
-  removeDiv(item: Node) {
+  removeDiv = (item: Node) => {
     if (this.curNode && item.id === this.curNode.id) {
       this.curNode = null;
       this.media = null;
@@ -414,6 +415,7 @@ export class DivLayer extends Layer {
     if (item.elementId) {
       this.canvas.removeChild(this.elements[item.id]);
       this.elements[item.id] = null;
+      item.elementId = '';
     }
     if (item.gif) {
       this.canvas.removeChild(this.gifs[item.id]);
@@ -428,7 +430,7 @@ export class DivLayer extends Layer {
         this.removeDiv(child as Node);
       }
     }
-  }
+  };
 
   clear(shallow?: boolean) {
     this.canvas.innerHTML = '';
