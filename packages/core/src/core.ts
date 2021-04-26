@@ -2831,8 +2831,10 @@ export class Topology {
     const elemRect = elem.getBoundingClientRect();
     let x = (parentRect.left || parentRect.x) + data.rect.x;
     let y = pos.y + (parentRect.top || parentRect.y);
-    if (data instanceof Node) {
-      y = (parentRect.top || parentRect.y) + (data as Node).rect.ey;
+    if (data.type) {
+      x = (parentRect.left || parentRect.x) + pos.x;
+    } else {
+      y = (parentRect.top || parentRect.y) + data.rect.ey;
     }
 
     x -= this.parentElem.scrollLeft;
