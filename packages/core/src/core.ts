@@ -116,6 +116,9 @@ export class Topology {
   private tip = '';
   private raf: number;
   tipMarkdown: HTMLElement;
+  tipMarkdownContent: HTMLElement;
+  tipMarkdownArrowUp: HTMLElement;
+  tipMarkdownArrowDown: HTMLElement;
   tipElem: HTMLElement;
 
   socket: Socket;
@@ -2773,18 +2776,47 @@ export class Topology {
 
   private createMarkdownTip() {
     this.tipMarkdown = document.createElement('div');
+    this.tipMarkdown.className = 'topology-markdown';
     this.tipMarkdown.style.position = 'fixed';
     this.tipMarkdown.style.zIndex = '-1';
     this.tipMarkdown.style.left = '-9999px';
-    this.tipMarkdown.style.width = '260px';
-    this.tipMarkdown.style.outline = 'none';
-    this.tipMarkdown.style.border = '1px solid #333';
-    this.tipMarkdown.style.backgroundColor = 'rgba(0,0,0,.7)';
-    this.tipMarkdown.style.color = '#fff';
-    this.tipMarkdown.style.padding = '10px 15px';
-    this.tipMarkdown.style.overflowY = 'auto';
-    this.tipMarkdown.style.minHeight = '30px';
-    this.tipMarkdown.style.maxHeight = '260px';
+    this.tipMarkdown.style.padding = '8px 0';
+
+    this.tipMarkdownContent = document.createElement('div');
+    this.tipMarkdownContent.style.maxWidth = '320px';
+    this.tipMarkdownContent.style.outline = 'none';
+    this.tipMarkdownContent.style.borderRadius = '4px';
+    this.tipMarkdownContent.style.backgroundColor = 'rgba(0,0,0,.6)';
+    this.tipMarkdownContent.style.color = '#fff';
+    this.tipMarkdownContent.style.padding = '8px 16px';
+    this.tipMarkdownContent.style.lineHeight = '1.8';
+    this.tipMarkdownContent.style.overflowY = 'auto';
+    this.tipMarkdownContent.style.minHeight = '30px';
+    this.tipMarkdownContent.style.maxHeight = '400px';
+    this.tipMarkdown.appendChild(this.tipMarkdownContent);
+
+    this.tipMarkdownArrowUp = document.createElement('div');
+    this.tipMarkdownArrowUp.className = 'arrow';
+    this.tipMarkdownArrowUp.style.position = 'absolute';
+    this.tipMarkdownArrowUp.style.border = '6px solid transparent';
+    this.tipMarkdownArrowUp.style.backgroundColor = 'transparent';
+    this.tipMarkdownArrowUp.style.left = '50%';
+    this.tipMarkdownArrowUp.style.transform = 'translateX(-50%)';
+    this.tipMarkdownArrowUp.style.top = '-4px';
+    // this.tipMarkdownArrowUp.style.borderBottomColor = 'rgba(0,0,0,.6)';
+    this.tipMarkdown.appendChild(this.tipMarkdownArrowUp);
+
+    this.tipMarkdownArrowDown = document.createElement('div');
+    this.tipMarkdownArrowDown.className = 'arrow';
+    this.tipMarkdownArrowDown.style.position = 'absolute';
+    this.tipMarkdownArrowDown.style.border = '6px solid transparent';
+    this.tipMarkdownArrowDown.style.left = '50%';
+    this.tipMarkdownArrowDown.style.transform = 'translateX(-50%)';
+    this.tipMarkdownArrowDown.style.backgroundColor = 'transparent';
+    this.tipMarkdownArrowDown.style.bottom = '-4px';
+    // this.tipMarkdownArrowDown.style.borderTopColor = 'rgba(0,0,0,.6)';
+    this.tipMarkdown.appendChild(this.tipMarkdownArrowDown);
+
     document.body.appendChild(this.tipMarkdown);
   }
 
@@ -2808,11 +2840,11 @@ export class Topology {
       elem = this.tipMarkdown;
       const marked = window.marked;
       if (marked) {
-        this.tipMarkdown.innerHTML = marked(data.markdown);
+        this.tipMarkdownContent.innerHTML = marked(data.markdown);
       } else {
-        this.tipMarkdown.innerHTML = data.markdown;
+        this.tipMarkdownContent.innerHTML = data.markdown;
       }
-      const a = this.tipMarkdown.getElementsByTagName('A');
+      const a = this.tipMarkdownContent.getElementsByTagName('A');
       for (let i = 0; i < a.length; ++i) {
         a[i].setAttribute('target', '_blank');
       }
@@ -2824,26 +2856,23 @@ export class Topology {
 
     const parentRect = this.parentElem.getBoundingClientRect();
     const elemRect = elem.getBoundingClientRect();
-    let x = (parentRect.left || parentRect.x) + data.rect.x;
-    let y = pos.y + (parentRect.top || parentRect.y);
-    if (data.type) {
-      x = (parentRect.left || parentRect.x) + pos.x;
+    let x = (parentRect.left || parentRect.x) + pos.x;
+    let y = (parentRect.top || parentRect.y) + pos.y;
+    if (!data.type) {
+      x = (parentRect.left || parentRect.x) + data.rect.x - (elemRect.width - data.rect.width) / 2;
+      y = (parentRect.top || parentRect.y) + data.rect.ey - elemRect.height - data.rect.height;
+    }
+
+    if (y > 0) {
+      this.tipMarkdownArrowUp.style.borderBottomColor = 'transparent';
+      this.tipMarkdownArrowDown.style.borderTopColor = 'rgba(0,0,0,.6)';
     } else {
       y = (parentRect.top || parentRect.y) + data.rect.ey;
+      this.tipMarkdownArrowUp.style.borderBottomColor = 'rgba(0,0,0,.6)';
+      this.tipMarkdownArrowDown.style.borderTopColor = 'transparent';
     }
 
-    x -= this.parentElem.scrollLeft;
-    y -= this.parentElem.scrollTop;
 
-    if (x < 0) {
-      x = 0;
-    }
-    if (x + elemRect.width > document.body.clientWidth) {
-      x = document.body.clientWidth - elemRect.width;
-    }
-    if (y + elemRect.height > document.body.clientHeight) {
-      y = document.body.clientHeight - elemRect.height;
-    }
 
     elem.style.display = 'block';
     elem.style.position = 'fixed';
