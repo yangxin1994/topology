@@ -399,6 +399,9 @@ export class Node extends Pen {
   }
 
   drawBkLinearGradient(ctx: CanvasRenderingContext2D) {
+    if (!this.gradientFromColor || !this.gradientToColor) {
+      return;
+    }
     const from = new Point(this.rect.x, this.rect.center.y);
     const to = new Point(this.rect.ex, this.rect.center.y);
     if (this.gradientAngle % 90 === 0 && this.gradientAngle % 180) {
@@ -426,6 +429,10 @@ export class Node extends Pen {
   }
 
   drawBkRadialGradient(ctx: CanvasRenderingContext2D) {
+    if (!this.gradientFromColor || !this.gradientToColor) {
+      return;
+    }
+
     let r = this.rect.width;
     if (r < this.rect.height) {
       r = this.rect.height;

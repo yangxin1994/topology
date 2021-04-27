@@ -703,8 +703,8 @@ export class Topology {
   }
 
   // open - redraw by the data
-  open(data?: any) {
-    if (data && data.mqttOptions) {
+  open(data?: TopologyData) {
+    if (data && data.mqttOptions && !data.mqttOptions.customClientId) {
       data.mqttOptions.clientId = s8();
     }
     this.canvas.clearBkImg();
@@ -2188,22 +2188,20 @@ export class Topology {
     rect.width += p[3] + p[1];
     rect.height += p[0] + p[2];
 
-    // const dpi = this.offscreen.getDpiRatio();
-    // const dpiRect = rect.clone();
-    // dpiRect.scale(dpi);
+    const dpi = this.offscreen.getDpiRatio();
+    rect.scale(dpi);
 
     const canvas = document.createElement('canvas');
-    canvas.width = rect.width;
-    canvas.height = rect.height;
+    canvas.width = rect.width * dpi;
+    canvas.height = rect.height * dpi;
     const ctx = canvas.getContext('2d');
-    // ctx.scale(dpi, dpi);
 
     if (this.data.bkColor || this.options.bkColor) {
       ctx.fillStyle = this.data.bkColor || this.options.bkColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
     if (this.data.bkImage) {
-      ctx.drawImage(this.canvas.bkImg, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(this.canvas.bkImg, 0, 0);
     }
 
     for (const item of this.data.pens) {
@@ -2219,8 +2217,10 @@ export class Topology {
         (pen as Node).elementRendered = true;
       }
       pen.translate(-rect.x, -rect.y, true);
+      pen.scale(dpi);
       pen.render(ctx);
     }
+    ctx.scale(1 / dpi, 1 / dpi);
 
     if (callback) {
       canvas.toBlob(callback);
@@ -2859,8 +2859,8 @@ export class Topology {
 
     const parentRect = this.parentElem.getBoundingClientRect();
     const elemRect = elem.getBoundingClientRect();
-    let x = (parentRect.left || parentRect.x) + pos.x;
-    let y = (parentRect.top || parentRect.y) + pos.y;
+    let x = (parentRect.left || parentRect.x) + pos.x - (elemRect.width - data.rect.width) / 2;
+    let y = (parentRect.top || parentRect.y) + pos.y - elemRect.height - data.rect.height;
     if (!data.type) {
       x = (parentRect.left || parentRect.x) + data.rect.x - (elemRect.width - data.rect.width) / 2;
       y = (parentRect.top || parentRect.y) + data.rect.ey - elemRect.height - data.rect.height;
@@ -2870,7 +2870,12 @@ export class Topology {
       this.tipMarkdownArrowUp.style.borderBottomColor = 'transparent';
       this.tipMarkdownArrowDown.style.borderTopColor = 'rgba(0,0,0,.6)';
     } else {
-      y = (parentRect.top || parentRect.y) + data.rect.ey;
+      if (data.type) {
+        y = (parentRect.top || parentRect.y) + pos.y;
+      } else {
+        y = (parentRect.top || parentRect.y) + data.rect.ey;
+      }
+
       this.tipMarkdownArrowUp.style.borderBottomColor = 'rgba(0,0,0,.6)';
       this.tipMarkdownArrowDown.style.borderTopColor = 'transparent';
     }
@@ -3134,10 +3139,6 @@ export class Topology {
 
       this.pureDataChildren(pen);
     });
-
-    if (data.mqttOptions) {
-      delete data.mqttOptions.clientId;
-    }
 
     return data;
   }

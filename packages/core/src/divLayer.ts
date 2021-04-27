@@ -103,7 +103,9 @@ export class DivLayer extends Layer {
       if (this.audios[node.id] && this.audios[node.id].media.src !== node.audio) {
         this.audios[node.id].media.src = node.audio;
       }
-      this.setElemPosition(node, (this.audios[node.id] && this.audios[node.id].player) || this.addMedia(node, 'audio'));
+      setTimeout(() => {
+        this.setElemPosition(node, (this.audios[node.id] && this.audios[node.id].player) || this.addMedia(node, 'audio'));
+      });
     }
     if (node.video) {
       if (videos[node.id] && videos[node.id].media.src !== node.video) {

@@ -26,6 +26,7 @@ export interface TopologyData {
     clientId?: string;
     username?: string;
     password?: string;
+    customClientId?: boolean;
   };
   mqttTopics?: string;
   manualCps?: boolean;
