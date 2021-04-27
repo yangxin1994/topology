@@ -2200,9 +2200,6 @@ export class Topology {
       ctx.fillStyle = this.data.bkColor || this.options.bkColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
-    if (this.data.bkImage) {
-      ctx.drawImage(this.canvas.bkImg, 0, 0);
-    }
 
     for (const item of this.data.pens) {
       let pen: Pen;
@@ -2216,12 +2213,14 @@ export class Topology {
         (pen as Node).elementLoaded = true;
         (pen as Node).elementRendered = true;
       }
-      pen.translate(-rect.x, -rect.y, true);
       pen.scale(dpi, rect.center);
+      pen.translate(-rect.x, -rect.y, true);
       pen.render(ctx);
     }
     ctx.scale(1 / dpi, 1 / dpi);
-
+    if (this.data.bkImage) {
+      ctx.drawImage(this.canvas.bkImg, 0, 0);
+    }
     if (callback) {
       canvas.toBlob(callback);
     }
