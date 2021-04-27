@@ -127,6 +127,7 @@ export abstract class Pen {
   animatePlay: boolean;
 
   animatePos: number;
+  animateReverse: boolean;
 
   locked: Lock;
   // 作为子节点，是否可以直接点击选中

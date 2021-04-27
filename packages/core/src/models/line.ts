@@ -335,6 +335,44 @@ export class Line extends Pen {
     return null;
   }
 
+  getPointByReversePos(pos: number): Point {
+    if (pos <= 0) {
+      return this.to;
+    }
+    switch (this.name) {
+      case 'line':
+        return this.getLinePtByPos(this.to, this.from, pos);
+      case 'polyline':
+        if (!this.controlPoints || !this.controlPoints.length) {
+          return this.getLinePtByPos(this.to, this.from, pos);
+        } else {
+          const points: Point[] = [];
+          this.controlPoints.forEach(item => {
+            points.unshift(item);
+          });
+          points.unshift(this.to);
+          let curPt = this.to;
+          for (const pt of points) {
+            const l = lineLen(curPt, pt);
+            if (pos > l) {
+              pos -= l;
+              curPt = pt;
+            } else {
+              return this.getLinePtByPos(curPt, pt, pos);
+            }
+          }
+          return this.from;
+        }
+      case 'curve':
+        return getBezierPoint(pos / this.getLen(), this.to, this.controlPoints[1], this.controlPoints[0], this.from);
+      default:
+        if (drawLineFns[this.name].getPointByReversePos) {
+          return drawLineFns[this.name].getPointByReversePos(pos, this);
+        }
+    }
+    return null;
+  }
+
   getLinePtByPos(from: Point, to: Point, pos: number) {
     const length = lineLen(from, to);
     if (pos <= 0) {
@@ -390,6 +428,7 @@ export class Line extends Pen {
   }
 
   initAnimate() {
+    this.animateDot = null;
     this.animatePos = 0;
   }
 
@@ -403,17 +442,28 @@ export class Line extends Pen {
   stopAnimate() {
     this.pauseAnimate();
     this.initAnimate();
+    setTimeout(() => {
+      Store.set(this.generateStoreKey('LT:render'), {
+        pen: this,
+        stop: true,
+      });
+    }, 50);
   }
 
   animate(now: number) {
-    if (this.animateFromSize) {
-      this.lineDashOffset = -this.animateFromSize;
+    if (this.animateReverse) {
+      this.lineDashOffset = this.animateToSize;
+    } else if (this.animateFromSize) {
+      this.lineDashOffset = this.animateFromSize;
     }
     this.animatePos += this.animateSpan;
-    this.animateDot = null;
     switch (this.animateType) {
       case 'beads':
-        this.lineDashOffset = -this.animatePos;
+        if (this.animateReverse) {
+          this.lineDashOffset = this.animatePos;
+        } else {
+          this.lineDashOffset = -this.animatePos;
+        }
         let len = this.lineWidth;
         if (len < 5) {
           len = 5;
@@ -427,17 +477,28 @@ export class Line extends Pen {
       case 'dot':
       case 'comet':
         this.lineDash = null;
-        this.animateDot = this.getPointByPos(this.animatePos + this.animateFromSize);
+        let pos: any;
+        if (this.animateReverse) {
+          pos = this.getPointByReversePos(this.animatePos + this.animateToSize);
+        } else {
+          pos = this.getPointByPos(this.animatePos + this.animateFromSize);
+        }
+        this.animateDot = pos;
         break;
       default:
-        this.lineDash = [this.animatePos, this.length - this.animatePos + 1];
+        if (this.animateReverse) {
+          this.lineDash = [0, this.length - this.animatePos + 1, this.animatePos];
+        } else {
+          this.lineDash = [this.animatePos, this.length - this.animatePos + 1];
+        }
         break;
     }
 
     if (this.animatePos > this.length + this.animateSpan - this.animateFromSize - this.animateToSize) {
       if (++this.animateCycleIndex >= this.animateCycle && this.animateCycle > 0) {
         this.animateStart = 0;
-        this.animatePos = 0;
+        this.initAnimate();
+
         Store.set(this.generateStoreKey('animateEnd'), this);
         return;
       }
@@ -448,12 +509,21 @@ export class Line extends Pen {
 
   getBubbles() {
     const bubbles: any[] = [];
+
     for (let i = 0; i < 30 && this.animatePos - i > 0; ++i) {
-      bubbles.push({
-        pos: this.getPointByPos(this.animatePos - i * 2 + this.animateFromSize),
-        a: 1 - i * 0.03,
-        r: this.lineWidth - i * 0.01,
-      });
+      if (this.animateReverse || 1) {
+        bubbles.push({
+          pos: this.getPointByReversePos(this.animatePos - i * 2 + this.animateToSize),
+          a: 1 - i * 0.03,
+          r: this.lineWidth - i * 0.01,
+        });
+      } else {
+        bubbles.push({
+          pos: this.getPointByPos(this.animatePos - i * 2 + this.animateFromSize),
+          a: 1 - i * 0.03,
+          r: this.lineWidth - i * 0.01,
+        });
+      }
     }
 
     return bubbles;
