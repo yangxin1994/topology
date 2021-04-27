@@ -451,11 +451,6 @@ export class Line extends Pen {
   }
 
   animate(now: number) {
-    if (this.animateReverse) {
-      this.lineDashOffset = this.animateToSize;
-    } else if (this.animateFromSize) {
-      this.lineDashOffset = this.animateFromSize;
-    }
     this.animatePos += this.animateSpan;
     switch (this.animateType) {
       case 'beads':
