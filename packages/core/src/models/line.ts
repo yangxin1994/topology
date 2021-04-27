@@ -428,6 +428,7 @@ export class Line extends Pen {
   }
 
   initAnimate() {
+    this.animateStart = 0;
     this.animateDot = null;
     this.animatePos = 0;
   }
