@@ -2217,7 +2217,7 @@ export class Topology {
         (pen as Node).elementRendered = true;
       }
       pen.translate(-rect.x, -rect.y, true);
-      pen.scale(dpi);
+      pen.scale(dpi, rect.center);
       pen.render(ctx);
     }
     ctx.scale(1 / dpi, 1 / dpi);
