@@ -17,11 +17,6 @@ const animateOutsides = [
   'TID',
   'events',
   'wheres',
-  'animateDuration',
-  'animateAlone',
-  'animateFrames',
-  'animateReady',
-  'animateFrame',
   'text',
   'fontColor',
   'fontFamily',
@@ -251,18 +246,24 @@ export class Node extends Pen {
       return;
     }
     for (const key in this) {
-      if (animateOutsides.includes(key)) {
-        continue;
-      }
-      this[key] = (state as any)[key];
+      if (
+        (state as any)[key] !== undefined &&
+        key.indexOf('animate') < 0 &&
+        key.indexOf('Animate') < 0
+      ) {
+        if (animateOutsides.includes(key)) {
+          continue;
+        }
+        this[key] = (state as any)[key];
 
-      if (key === 'rect') {
-        this.rect = new Rect(
-          this.rect.x,
-          this.rect.y,
-          this.rect.width,
-          this.rect.height
-        );
+        if (key === 'rect') {
+          this.rect = new Rect(
+            this.rect.x,
+            this.rect.y,
+            this.rect.width,
+            this.rect.height
+          );
+        }
       }
     }
 
