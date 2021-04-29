@@ -457,7 +457,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
       options = {};
     }
     const name = this.data.name + (options.ext || '.png');
-    this.canvas.saveAsImage(name, options.type, options.quality);
+    this.canvas.saveAsImage(name);
   }
 
   async onShare() {
