@@ -2666,6 +2666,9 @@ export class Topology {
     for (const item of this.data.pens) {
       item.translate(offsetX, offsetY);
     }
+    if (this.data.bkImageRect) {
+      this.data.bkImageRect.translate(offsetX, offsetY);
+    }
 
     Store.set(this.generateStoreKey('LT:updateLines'), this.data.pens);
 
@@ -2695,6 +2698,9 @@ export class Topology {
 
     for (const item of this.data.pens) {
       item.scale(scale, center);
+    }
+    if (this.data.bkImageRect) {
+      this.data.bkImageRect.scale(scale, center);
     }
     Store.set(this.generateStoreKey('LT:updateLines'), this.data.pens);
 

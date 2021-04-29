@@ -3,6 +3,7 @@ import { Options } from './options';
 import { Canvas } from './canvas';
 import { TopologyData } from './models/data';
 import { rgba } from './utils/math';
+import { Rect } from './models';
 
 export class RenderLayer extends Canvas {
   offscreen: any;
@@ -25,6 +26,7 @@ export class RenderLayer extends Canvas {
     this.bkImg.crossOrigin = 'anonymous';
     this.bkImg.src = this.data.bkImage;
     this.bkImg.onload = () => {
+      this.data.bkImageRect = new Rect(0, 0, this.bkImg.naturalWidth, this.bkImg.naturalHeight);
       if (cb) {
         cb();
       }
@@ -53,7 +55,7 @@ export class RenderLayer extends Canvas {
     }
 
     if (this.bkImg) {
-      ctx.drawImage(this.bkImg, 0, 0);
+      ctx.drawImage(this.bkImg, this.data.bkImageRect.x, this.data.bkImageRect.y, this.data.bkImageRect.width, this.data.bkImageRect.height);
     }
 
     if (this.data.grid || this.options.grid) {

@@ -85,7 +85,7 @@ export class Rect {
     this.calcCenter();
   }
 
-  scale(scale: number, center?: Point, scaleY?: number) {
+  scale(scale: number, center?: { x: number, y: number; }, scaleY?: number) {
     if (!center) {
       center = this.center;
     }
