@@ -114,22 +114,12 @@ export function pointInLine(point: Point, from: Point, to: Point, padding = 1): 
   let x = Math.sin(angle) * padding;
   const y = Math.cos(angle) * padding;
 
-  let points: Point[];
-  if (Math.abs(to.x - from.x) < 2) {
-    points = [
-      new Point(from.x - x, from.y - y),
-      new Point(to.x - x, to.y - y),
-      new Point(to.x + x, to.y + y),
-      new Point(from.x + x, from.y + y)
-    ];
-  } else {
-    points = [
-      new Point(from.x + x, from.y - y),
-      new Point(to.x - x, to.y - y),
-      new Point(to.x - x, to.y + y),
-      new Point(from.x + x, from.y + y),
-    ];
-  }
+  let points = [
+    new Point(from.x - x, from.y - y),
+    new Point(to.x - x, to.y - y),
+    new Point(to.x + x, to.y + y),
+    new Point(from.x + x, from.y + y)
+  ];
 
   return pointInRect(point, points);
 }

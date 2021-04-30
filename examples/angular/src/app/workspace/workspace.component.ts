@@ -452,7 +452,7 @@ export class WorkspaceComponent implements OnInit, OnDestroy {
     });
   }
 
-  onSavePng(options?: { type?: string; quality?: any; ext?: string; }) {
+  onSavePng(options?: { ext?: string; }) {
     if (!options) {
       options = {};
     }
