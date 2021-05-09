@@ -78,7 +78,7 @@ export function createData(json?: any, tid?: string) {
     });
 
     if (json.bkImageRect) {
-      this.data.bkImageRect = new Rect(json.bkImageRect.x, json.bkImageRect.y, json.bkImageRect.width, json.bkImageRect.height);
+      data.bkImageRect = new Rect(json.bkImageRect.x, json.bkImageRect.y, json.bkImageRect.width, json.bkImageRect.height);
     }
   }
 

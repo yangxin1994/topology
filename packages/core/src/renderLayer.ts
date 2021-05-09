@@ -26,7 +26,9 @@ export class RenderLayer extends Canvas {
     this.bkImg.crossOrigin = 'anonymous';
     this.bkImg.src = this.data.bkImage;
     this.bkImg.onload = () => {
-      this.data.bkImageRect = new Rect(0, 0, this.bkImg.naturalWidth, this.bkImg.naturalHeight);
+      if (!this.data.bkImageRect) {
+        this.data.bkImageRect = new Rect(0, 0, this.bkImg.naturalWidth, this.bkImg.naturalHeight);
+      }
       if (cb) {
         cb();
       }
