@@ -978,6 +978,7 @@ export class Node extends Pen {
     this.rect.height *= scale;
     this.rect.ex = this.rect.x + this.rect.width;
     this.rect.ey = this.rect.y + this.rect.height;
+    this.lineWidth *= scale;
     if (this.imageWidth) {
       this.imageWidth *= scale;
     }
