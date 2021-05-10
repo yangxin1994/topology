@@ -56,7 +56,7 @@ export class RenderLayer extends Canvas {
       ctx.fillRect(0, 0, this.width, this.height);
     }
 
-    if (this.bkImg) {
+    if (this.bkImg && this.data.bkImageRect) {
       ctx.drawImage(this.bkImg, this.data.bkImageRect.x, this.data.bkImageRect.y, this.data.bkImageRect.width, this.data.bkImageRect.height);
     }
 
