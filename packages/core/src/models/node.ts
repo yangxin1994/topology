@@ -789,6 +789,9 @@ export class Node extends Pen {
         this.animateStart = 0;
         this.animateCycleIndex = 0;
         Store.set(this.generateStoreKey('animateEnd'), this);
+        if (!this.animateAlone) {
+          Store.set(this.generateStoreKey('LT:rectChanged'), this);
+        }
         return;
       }
       this.animateStart = now;

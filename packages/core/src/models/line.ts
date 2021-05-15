@@ -76,13 +76,12 @@ export class Line extends Pen {
     }
 
     // 暂时兼容老数据
-    if (json.name === 'mind' && json.controlPoints && json.controlPoints.length < 3) {
+    if (json.name === 'mind' && (!json.controlPoints || json.controlPoints.length > 2)) {
       json.controlPoints = null;
-      this.calcControlPoints();
+      this.calcControlPoints(true);
     }
     // end
-
-    if (json.controlPoints) {
+    else if (json.controlPoints) {
       this.controlPoints = [];
       for (const item of json.controlPoints) {
         this.controlPoints.push(new Point(item.x, item.y, item.direction, item.anchorIndex, item.id));
@@ -116,6 +115,7 @@ export class Line extends Pen {
 
     this.textRect = null;
     if (this.from && this.to && drawLineFns[this.name]) {
+
       drawLineFns[this.name].controlPointsFn(this);
     }
   }
@@ -206,7 +206,7 @@ export class Line extends Pen {
           this.from,
           this.controlPoints[0],
           this.controlPoints[1],
-          this.controlPoints[2]
+          this.to
         );
       } else if (this.name !== 'line' && this.controlPoints.length) {
         f = this.controlPoints[this.controlPoints.length - 1];
@@ -244,8 +244,8 @@ export class Line extends Pen {
         }
         len += lineLen(curPt, this.to);
         return len | 0;
-
       case 'curve':
+      case 'mind':
         return curveLen(this.from, this.controlPoints[0], this.controlPoints[1], this.to);
       default:
         if (drawLineFns[this.name].getLength) {
@@ -507,7 +507,7 @@ export class Line extends Pen {
     const bubbles: any[] = [];
 
     for (let i = 0; i < 30 && this.animatePos - i > 0; ++i) {
-      if (this.animateReverse || 1) {
+      if (this.animateReverse) {
         bubbles.push({
           pos: this.getPointByReversePos(this.animatePos - i * 2 + this.animateToSize),
           a: 1 - i * 0.03,

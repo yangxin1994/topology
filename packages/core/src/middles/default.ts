@@ -39,10 +39,7 @@ import {
   calcCurveControlPoints,
 } from './lines/curve';
 import {
-  mind,
   calcMindControlPoints,
-  mindControlPoints,
-  pointInMind,
 } from './lines/mind';
 import { triangleSolid, triangle as arrowTriangle } from './arrows/triangle';
 import { diamondSolid, diamond as arrowDiamond } from './arrows/diamond';
@@ -193,7 +190,7 @@ function init() {
   textRectFns.line = lineTextRect;
 
   // Image
-  drawNodeFns.image = (ctx: CanvasRenderingContext2D, node: Rect) => {};
+  drawNodeFns.image = (ctx: CanvasRenderingContext2D, node: Rect) => { };
   iconRectFns.image = imageIconRect;
   textRectFns.image = imageTextRect;
   anchorsFns.image = imageAnchors;
@@ -241,10 +238,10 @@ function init() {
     pointIn: pointInCurve,
   };
   drawLineFns.mind = {
-    drawFn: mind,
-    drawControlPointsFn: mindControlPoints,
+    drawFn: curve,
+    drawControlPointsFn: curveControlPoints,
     controlPointsFn: calcMindControlPoints,
-    pointIn: pointInMind,
+    pointIn: pointInCurve,
   };
   // ********end********
 
