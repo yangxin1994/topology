@@ -1513,28 +1513,28 @@ export class Topology {
         break;
       case 'ArrowLeft':
         moveX = -5;
-        if (key.ctrlKey) {
+        if (key.ctrlKey || key.metaKey) {
           moveX = -1;
         }
         done = true;
         break;
       case 'ArrowUp':
         moveY = -5;
-        if (key.ctrlKey) {
+        if (key.ctrlKey || key.metaKey) {
           moveY = -1;
         }
         done = true;
         break;
       case 'ArrowRight':
         moveX = 5;
-        if (key.ctrlKey) {
+        if (key.ctrlKey || key.metaKey) {
           moveX = 1;
         }
         done = true;
         break;
       case 'ArrowDown':
         moveY = 5;
-        if (key.ctrlKey) {
+        if (key.ctrlKey || key.metaKey) {
           moveY = 1;
         }
         done = true;
@@ -2192,8 +2192,8 @@ export class Topology {
     rect.scale(dpi);
 
     const canvas = document.createElement('canvas');
-    canvas.width = rect.width * dpi;
-    canvas.height = rect.height * dpi;
+    canvas.width = rect.width;
+    canvas.height = rect.height;
     const ctx = canvas.getContext('2d');
 
     if (this.data.bkColor || this.options.bkColor) {

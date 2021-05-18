@@ -93,6 +93,7 @@ export class Node extends Pen {
     initState?: Node;
     linear: boolean;
     state: Node;
+    offsetRect: Rect;
   }[] = [];
   animateAlone: boolean;
   animateReady: Node;
@@ -139,6 +140,7 @@ export class Node extends Pen {
       delete this.elementLoaded;
       delete this.elementRendered;
     }
+    delete this.animateReady;
 
     // 兼容老数据
     if (json.children && json.children[0] && json.children[0].parentRect) {
@@ -239,7 +241,7 @@ export class Node extends Pen {
   }
 
   restore(state?: Node) {
-    if (!state) {
+    if (!state && this.animateReady) {
       state = Node.cloneState(this.animateReady);
     }
     if (!state) {
@@ -308,7 +310,6 @@ export class Node extends Pen {
 
     if (!cloneState) {
       this.addToDiv();
-      this.initAnimate();
     }
   }
 
@@ -731,6 +732,11 @@ export class Node extends Pen {
       this.animateFrames[i].initState = Node.cloneState(
         i ? this.animateFrames[i - 1].state : this
       );
+      this.animateFrames[i].offsetRect = new Rect(
+        this.animateFrames[i].state.rect.x - this.animateFrames[i].initState.rect.x,
+        this.animateFrames[i].state.rect.y - this.animateFrames[i].initState.rect.y,
+        this.animateFrames[i].state.rect.width - this.animateFrames[i].initState.rect.width,
+        this.animateFrames[i].state.rect.height - this.animateFrames[i].initState.rect.height);
     }
     this.animateDuration = passed;
 
@@ -764,7 +770,8 @@ export class Node extends Pen {
     });
   }
 
-  animate = (now: number) => {
+  animate(now: number) {
+
     if (this.animateStart < 1) {
       return;
     }
@@ -835,27 +842,19 @@ export class Node extends Pen {
 
         if (item.linear) {
           if (item.state.rect.x !== item.initState.rect.x) {
-            this.rect.x =
-              item.initState.rect.x +
-              (item.state.rect.x - item.initState.rect.x) * rate;
+            this.rect.x = item.initState.rect.x + item.offsetRect.x * rate;
             rectChanged = true;
           }
           if (item.state.rect.y !== item.initState.rect.y) {
-            this.rect.y =
-              item.initState.rect.y +
-              (item.state.rect.y - item.initState.rect.y) * rate;
+            this.rect.y = item.initState.rect.y + item.offsetRect.y * rate;
             rectChanged = true;
           }
           if (item.state.rect.width !== item.initState.rect.width) {
-            this.rect.width =
-              item.initState.rect.width +
-              (item.state.rect.width - item.initState.rect.width) * rate;
+            this.rect.width = item.initState.rect.width + item.offsetRect.width * rate;
             rectChanged = true;
           }
           if (item.state.rect.height !== item.initState.rect.height) {
-            this.rect.height =
-              item.initState.rect.height +
-              (item.state.rect.height - item.initState.rect.height) * rate;
+            this.rect.height = item.initState.rect.height + item.offsetRect.height * rate;
             rectChanged = true;
           }
           this.rect.ex = this.rect.x + this.rect.width;
@@ -1095,14 +1094,18 @@ export class Node extends Pen {
     }
   }
 
-  translate(x: number, y: number, noAnimate?: boolean) {
+  translate(x: number, y: number) {
     this.rect.x += x;
     this.rect.y += y;
     this.rect.ex = this.rect.x + this.rect.width;
     this.rect.ey = this.rect.y + this.rect.height;
     this.rect.calcCenter();
 
-    if (!noAnimate && this.animateFrames && this.animateFrames.length) {
+    if (this.animateReady) {
+      this.animateReady.translate(x, y);
+    }
+
+    if (this.animateFrames && this.animateFrames.length) {
       for (const frame of this.animateFrames) {
         const { initState, state } = frame;
         if (initState && initState.translate) {
@@ -1128,11 +1131,11 @@ export class Node extends Pen {
       });
     }
 
-    this.init(noAnimate);
+    this.init();
 
     if (this.children) {
       for (const item of this.children) {
-        item.translate(x, y, noAnimate);
+        item.translate(x, y);
       }
     }
   }
