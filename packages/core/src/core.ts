@@ -547,6 +547,7 @@ export class Topology {
     }
     let firstNode;
     jsonList.forEach((json) => {
+      json.id = null;
       if (json.name === 'graffiti') {
         json.rect = new Rect(0, 0, 0, 0);
         this.addNode(json);

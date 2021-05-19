@@ -964,7 +964,7 @@ export class Node extends Pen {
         Store.set(this.generateStoreKey('LT:rectChanged'), this);
       }
     }
-  };
+  }
 
   scale(scale: number, center?: { x: number; y: number; }) {
     if (!center) {
