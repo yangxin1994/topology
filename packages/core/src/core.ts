@@ -282,6 +282,7 @@ export class Topology {
 
         this.getMoveIn(pos);
         this.hoverLayer.node = this.moveIn.hoverNode;
+        this.hoverLayer.line = this.moveIn.hoverLine;
 
         this.lastTranlated.x = pos.x;
         this.lastTranlated.y = pos.y;
@@ -547,7 +548,7 @@ export class Topology {
     }
     let firstNode;
     jsonList.forEach((json) => {
-      json.id = null;
+      json.id = s8();
       if (json.name === 'graffiti') {
         json.rect = new Rect(0, 0, 0, 0);
         this.addNode(json);
@@ -990,6 +991,7 @@ export class Topology {
             this.hideTip();
           }
           if (this.moveIn.hoverLine) {
+            this.hoverLayer.line = this.moveIn.hoverLine;
             this.moveIn.hoverLine.moveIn();
             this.dispatch('moveInLine', this.moveIn.hoverLine);
 
@@ -1031,7 +1033,6 @@ export class Topology {
         }
         this.translate(x, y, false);
       }
-
       this.hideTip();
       switch (this.moveIn.type) {
         case MoveInType.None:
@@ -1046,7 +1047,6 @@ export class Topology {
           if (this.activeLayer.locked()) {
             break;
           }
-
           const x = e.x - this.mouseDown.x;
           const y = e.y - this.mouseDown.y;
           if (x || y) {
@@ -1720,15 +1720,11 @@ export class Topology {
     const child = this.inChildNode(pt, node.children);
     if (child) {
       if (this.moveIn.type < MoveInType.HoverAnchors) {
-        if (child.type === PenType.Line) {
-          this.moveIn.activeNode = node;
-          this.moveIn.type = MoveInType.Nodes;
-        } else if (child.stand) {
+        this.moveIn.type = MoveInType.Nodes;
+        if (child.stand) {
           this.moveIn.activeNode = child;
-          this.moveIn.type = MoveInType.Nodes;
         } else {
           this.moveIn.activeNode = node;
-          this.moveIn.type = MoveInType.Nodes;
         }
       }
       return child;
