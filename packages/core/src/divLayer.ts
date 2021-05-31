@@ -146,7 +146,7 @@ export class DivLayer extends Layer {
       if (node.image.indexOf('.gif') < 0) {
         node.gif = false;
         this.canvas.removeChild(this.gifs[node.id]);
-        this.gifs[node.id] = null;
+        this.gifs[node.id] = undefined;
       } else if (node.img) {
         if (this.gifs[node.id] && this.gifs[node.id].src !== node.image) {
           this.gifs[node.id].src = node.image;
@@ -411,30 +411,30 @@ export class DivLayer extends Layer {
 
   removeDiv = (item: Node) => {
     if (this.curNode && item.id === this.curNode.id) {
-      this.curNode = null;
-      this.media = null;
+      this.curNode = undefined;
+      this.media = undefined;
       this.player.style.top = '-99999px';
     }
     if (item.audio) {
       this.canvas.removeChild(this.audios[item.id].player);
-      this.audios[item.id] = null;
+      this.audios[item.id] = undefined;
     }
     if (item.video) {
       this.canvas.removeChild(videos[item.id].player);
-      videos[item.id] = null;
+      videos[item.id] = undefined;
     }
     if (item.iframe) {
       this.canvas.removeChild(this.iframes[item.id]);
-      this.iframes[item.id] = null;
+      this.iframes[item.id] = undefined;
     }
     if (item.elementId) {
       this.canvas.removeChild(this.elements[item.id]);
-      this.elements[item.id] = null;
+      this.elements[item.id] = undefined;
       item.elementId = '';
     }
     if (item.gif) {
       this.canvas.removeChild(this.gifs[item.id]);
-      this.gifs[item.id] = null;
+      this.gifs[item.id] = undefined;
     }
 
     if (item.children) {

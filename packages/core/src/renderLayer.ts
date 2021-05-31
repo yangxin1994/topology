@@ -36,7 +36,7 @@ export class RenderLayer extends Canvas {
   }
 
   clearBkImg() {
-    this.bkImg = null;
+    this.bkImg = undefined;
   }
 
   render = () => {

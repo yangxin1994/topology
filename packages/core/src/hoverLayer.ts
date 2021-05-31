@@ -39,7 +39,7 @@ export class HoverLayer extends Layer {
     if (this.line.from.id || this.line.to.id) {
       this.line.calcControlPoints();
     }
-    Store.set(this.generateStoreKey('pts-') + this.line.id, null);
+    Store.set(this.generateStoreKey('pts-') + this.line.id, undefined);
     Store.set(this.generateStoreKey('LT:updateLines'), [this.line]);
   }
 
@@ -52,7 +52,7 @@ export class HoverLayer extends Layer {
     if (this.line.from.id || this.line.to.id) {
       this.line.calcControlPoints();
     }
-    Store.set(this.generateStoreKey('pts-') + this.line.id, null);
+    Store.set(this.generateStoreKey('pts-') + this.line.id, undefined);
     Store.set(this.generateStoreKey('LT:updateLines'), [this.line]);
   }
 
@@ -249,7 +249,7 @@ export class HoverLayer extends Layer {
   }
 
   clear() {
-    this.node = null;
-    this.line = null;
+    this.node = undefined;
+    this.line = undefined;
   }
 }

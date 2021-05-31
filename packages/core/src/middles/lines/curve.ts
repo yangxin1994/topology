@@ -59,7 +59,7 @@ export function calcCurveControlPoints(l: Line) {
     }
   }
   l.controlPoints = [getControlPt(l.from, l.to), getControlPt(l.to, l.from)];
-  Store.set(generateStoreKey(l, 'pts-') + l.id, null);
+  Store.set(generateStoreKey(l, 'pts-') + l.id, undefined);
 }
 
 export function pointInCurve(point: Point, l: Line) {

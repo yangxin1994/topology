@@ -75,6 +75,7 @@ import { graffitiAnchors } from './nodes/graffiti.anchor';
 import { mindNodeAnchors } from './nodes/mindNode.anchor';
 import { mindLine } from './nodes/mindLine';
 import { mindLineAnchors } from './nodes/mindLine.anchor';
+import { lines } from './nodes/lines';
 
 // Functions of drawing a node.
 export const drawNodeFns: any = {};
@@ -102,6 +103,9 @@ function init() {
   // graffiti
   drawNodeFns.graffiti = graffiti;
   anchorsFns.graffiti = graffitiAnchors;
+
+  // lines
+  drawNodeFns.lines = lines;
 
   // Square
   drawNodeFns.square = rectangle;

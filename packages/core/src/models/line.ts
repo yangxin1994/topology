@@ -77,7 +77,7 @@ export class Line extends Pen {
 
     // 暂时兼容老数据
     if (json.name === 'mind' && (!json.controlPoints || json.controlPoints.length > 2)) {
-      json.controlPoints = null;
+      json.controlPoints = undefined;
       this.calcControlPoints(true);
     }
     // end
@@ -99,13 +99,13 @@ export class Line extends Pen {
   setFrom(from: Point, fromArrow: string = '') {
     this.from = from;
     this.fromArrow = fromArrow;
-    this.textRect = null;
+    this.textRect = undefined;
   }
 
   setTo(to: Point, toArrow: string = 'triangleSolid') {
     this.to = to;
     this.toArrow = toArrow;
-    this.textRect = null;
+    this.textRect = undefined;
   }
 
   calcControlPoints(force?: boolean) {
@@ -113,7 +113,7 @@ export class Line extends Pen {
       return;
     }
 
-    this.textRect = null;
+    this.textRect = undefined;
     if (this.from && this.to && drawLineFns[this.name]) {
 
       drawLineFns[this.name].controlPointsFn(this);
@@ -429,7 +429,7 @@ export class Line extends Pen {
 
   initAnimate() {
     this.animateStart = 0;
-    this.animateDot = null;
+    this.animateDot = undefined;
     this.animatePos = 0;
   }
 
@@ -472,7 +472,7 @@ export class Line extends Pen {
         break;
       case 'dot':
       case 'comet':
-        this.lineDash = null;
+        this.lineDash = undefined;
         let pos: any;
         if (this.animateReverse) {
           pos = this.getPointByReversePos(this.animatePos + this.animateToSize);
@@ -537,7 +537,7 @@ export class Line extends Pen {
       this.to.x += x;
       this.to.y += y;
       if (this.text) {
-        this.textRect = null;
+        this.textRect = undefined;
       }
 
       for (const pt of this.controlPoints) {
@@ -552,7 +552,7 @@ export class Line extends Pen {
       }
     }
 
-    Store.set(this.generateStoreKey('pts-') + this.id, null);
+    Store.set(this.generateStoreKey('pts-') + this.id, undefined);
   }
 
   scale(scale: number, center: { x: number; y: number; }) {
@@ -565,7 +565,7 @@ export class Line extends Pen {
       this.borderWidth *= scale;
       this.fontSize *= scale;
       if (this.text) {
-        this.textRect = null;
+        this.textRect = undefined;
       }
       this.textOffsetX *= scale;
       this.textOffsetY *= scale;
@@ -582,7 +582,7 @@ export class Line extends Pen {
       }
     }
 
-    Store.set(this.generateStoreKey('pts-') + this.id, null);
+    Store.set(this.generateStoreKey('pts-') + this.id, undefined);
   }
 
   hit(pt: Point, padding = 0): any {

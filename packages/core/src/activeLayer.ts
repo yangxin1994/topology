@@ -26,8 +26,8 @@ export class ActiveLayer extends Layer {
   // 备份初始位置，方便移动事件处理
   initialSizeCPs: Point[] = [];
   nodeRects: Rect[] = [];
-  childrenRects: { [key: string]: Rect } = {};
-  childrenRotate: { [key: string]: number } = {};
+  childrenRects: { [key: string]: Rect; } = {};
+  childrenRotate: { [key: string]: number; } = {};
 
   // nodes移动时，停靠点的参考位置
   dockWatchers: Point[] = [];
@@ -166,7 +166,7 @@ export class ActiveLayer extends Layer {
     this.pens = [];
     this.sizeCPs = [];
     this.rotateCPs = [];
-    Store.set(this.generateStoreKey('LT:activeNode'), null);
+    Store.set(this.generateStoreKey('LT:activeNode'), undefined);
   }
 
   // 即将缩放选中的nodes，备份nodes最初大小，方便缩放比例计算
@@ -221,7 +221,7 @@ export class ActiveLayer extends Layer {
   // pt2 - the point of mouse move.
   resize(
     type: number,
-    pt1: { x: number; y: number },
+    pt1: { x: number; y: number; },
     pt2: {
       x: number;
       y: number;
@@ -443,8 +443,8 @@ export class ActiveLayer extends Layer {
         if (cnt && !this.data.manualCps) {
           line.calcControlPoints();
         }
-        line.textRect = null;
-        Store.set(this.generateStoreKey('pts-') + line.id, null);
+        line.textRect = undefined;
+        Store.set(this.generateStoreKey('pts-') + line.id, undefined);
         lines.push(line);
       }
     }
@@ -591,8 +591,8 @@ export class ActiveLayer extends Layer {
       if (this.data.locked && item instanceof Node) {
         const tmp = new Node(item);
         tmp.setTID(TID);
-        tmp.data = null;
-        tmp.fillStyle = null;
+        tmp.data = undefined;
+        tmp.fillStyle = undefined;
         tmp.bkType = 0;
         tmp.icon = '';
         tmp.image = '';

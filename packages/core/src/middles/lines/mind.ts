@@ -33,6 +33,6 @@ export function calcMindControlPoints(l: Line) {
       break;
   }
 
-  Store.set(generateStoreKey(l, 'pts-') + l.id, null);
+  Store.set(generateStoreKey(l, 'pts-') + l.id, undefined);
 }
 

@@ -31,7 +31,6 @@ const animateOutsides = [
   'icon',
   'iconSize',
   'iconColor',
-  'data'
 ];
 
 export class Node extends Pen {
@@ -190,7 +189,7 @@ export class Node extends Pen {
     }
     if (!cloneState && json.animateFrames && json.animateFrames.length) {
       for (const item of json.animateFrames) {
-        item.children = null;
+        item.children = undefined;
         if (item.initState) {
           item.initState = Node.cloneState(item.initState);
         }
@@ -456,7 +455,7 @@ export class Node extends Pen {
 
   drawImg(ctx: CanvasRenderingContext2D) {
     if (this.lastImage !== this.image) {
-      this.img = null;
+      this.img = undefined;
       if (this.lastImage && this.lastImage.indexOf('.gif') > 0) {
         Store.set(this.generateStoreKey('LT:addDiv'), this);
       }
@@ -771,7 +770,6 @@ export class Node extends Pen {
   }
 
   animate(now: number) {
-
     if (this.animateStart < 1) {
       return;
     }
@@ -809,10 +807,9 @@ export class Node extends Pen {
     for (let i = 0; i < this.animateFrames.length; ++i) {
       const item = this.animateFrames[i];
       if (timeline >= item.start && timeline < item.end) {
-        this.dash = item.state.dash;
-        this.strokeStyle = item.state.strokeStyle;
-        this.fillStyle = item.state.fillStyle;
-
+        item.state.dash && (this.dash = item.state.dash);
+        item.state.strokeStyle && (this.strokeStyle = item.state.strokeStyle);
+        item.state.fillStyle && (this.fillStyle = item.state.fillStyle);
         item.state.text && (this.text = item.state.text);
         item.state.fontColor && (this.fontColor = item.state.fontColor);
         item.state.fontFamily && (this.fontFamily = item.state.fontFamily);
@@ -942,7 +939,7 @@ export class Node extends Pen {
                   rate;
               } else if (
                 item.state.data[key] !== undefined &&
-                item.state.data[key] !== null
+                item.state.data[key] !== undefined
               ) {
                 this.data[key] = item.state.data[key];
               }
@@ -987,7 +984,7 @@ export class Node extends Pen {
     if (this.imageHeight) {
       this.imageHeight *= scale;
     }
-    this.lastImage = null;
+    this.lastImage = undefined;
     this.fontSize *= scale;
     this.iconSize *= scale;
     if (typeof this.paddingLeft === 'number') {

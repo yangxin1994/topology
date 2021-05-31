@@ -6,12 +6,12 @@ export function register(_echarts?: any) {
   if (!echartsObjs.echarts && !(echarts as any)) {
     loadJS(
       'https://cdn.bootcdn.net/ajax/libs/echarts/4.8.0/echarts.min.js',
-      null,
+      undefined,
       true
     );
   }
-  registerNode('echarts', echarts, null, (node: Node) => {
+  registerNode('echarts', echarts, undefined, (node: Node) => {
     node.iconRect = new Rect(node.rect.x, node.rect.y, node.rect.width, node.rect.height);
     node.fullIconRect = node.rect;
-  }, null);
+  }, undefined);
 }
