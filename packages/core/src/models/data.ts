@@ -16,6 +16,7 @@ export interface TopologyData {
   locked: Lock;
   bkImage?: string;
   bkImageRect?: Rect;
+  bkImageStatic?: boolean;
   bkColor?: string;
   grid?: boolean;
   gridColor?: string;

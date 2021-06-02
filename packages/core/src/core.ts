@@ -1196,7 +1196,7 @@ export class Topology {
           this.dispatch('multi', this.activeLayer.pens);
         } else {
           this.activeLayer.pens = [this.moveIn.hoverLine];
-          this.dispatch('line', this.moveIn.hoverLine);
+          this.dispatch('line' + (e.button === 2 ? 'RightClick' : ''), this.moveIn.hoverLine);
         }
         this.hoverLayer.line = this.moveIn.hoverLine;
         this.hoverLayer.initLine = new Line(this.moveIn.hoverLine);
@@ -1269,26 +1269,26 @@ export class Topology {
         if (e.ctrlKey || e.shiftKey) {
           if (this.moveIn.hoverNode && this.activeLayer.hasInAll(this.moveIn.hoverNode)) {
             this.activeLayer.setPens([this.moveIn.hoverNode]);
-            this.dispatch('node', this.moveIn.hoverNode);
+            this.dispatch('node' + (e.button === 2 ? 'RightClick' : ''), this.moveIn.hoverNode);
           } else if (!this.activeLayer.has(this.moveIn.activeNode)) {
             this.activeLayer.add(this.moveIn.activeNode);
             if (this.activeLayer.pens.length > 1) {
               this.dispatch('multi', this.activeLayer.pens);
             } else {
-              this.dispatch('node', this.moveIn.activeNode);
+              this.dispatch('node' + (e.button === 2 ? 'RightClick' : ''), this.moveIn.activeNode);
             }
           }
         } else if (e.altKey) {
           if (this.moveIn.hoverNode) {
             this.activeLayer.setPens([this.moveIn.hoverNode]);
-            this.dispatch('node', this.moveIn.hoverNode);
+            this.dispatch('node' + (e.button === 2 ? 'RightClick' : ''), this.moveIn.hoverNode);
           } else if (this.moveIn.hoverLine) {
             this.activeLayer.setPens([this.moveIn.hoverLine]);
             this.dispatch('line', this.moveIn.hoverLine);
           }
         } else if (this.activeLayer.pens.length < 2) {
           this.activeLayer.setPens([this.moveIn.activeNode]);
-          this.dispatch('node', this.moveIn.activeNode);
+          this.dispatch('node' + (e.button === 2 ? 'RightClick' : ''), this.moveIn.activeNode);
         }
 
         if (this.data.locked || this.moveIn.activeNode.locked) {
@@ -1333,9 +1333,9 @@ export class Topology {
       if (this.activeLayer.pens && this.activeLayer.pens.length > 1) {
         this.dispatch('multi', this.activeLayer.pens);
       } else if (this.activeLayer.pens && this.activeLayer.pens[0] && this.activeLayer.pens[0].type === PenType.Line) {
-        this.dispatch('line', this.activeLayer.pens[0]);
+        this.dispatch('line' + (e.button === 2 ? 'RightClick' : ''), this.activeLayer.pens[0]);
       } else if (this.activeLayer.pens && this.activeLayer.pens[0] && this.activeLayer.pens[0].type === PenType.Node) {
-        this.dispatch('node', this.activeLayer.pens[0]);
+        this.dispatch('node' + (e.button === 2 ? 'RightClick' : ''), this.activeLayer.pens[0]);
       }
     } else {
       switch (this.moveIn.type) {
@@ -2722,7 +2722,7 @@ export class Topology {
     for (const item of this.data.pens) {
       item.translate(offsetX, offsetY);
     }
-    if (this.data.bkImageRect) {
+    if (this.data.bkImageRect && !this.data.bkImageStatic) {
       this.data.bkImageRect.translate(offsetX, offsetY);
     }
 
