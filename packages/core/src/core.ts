@@ -24,6 +24,7 @@ import { Socket } from './socket';
 import { MQTT } from './mqtt';
 import { Direction, EventType as SocketEventType } from './models';
 import { isMobile } from './utils';
+import pkg from './../package.json';
 
 declare const window: any;
 
@@ -53,6 +54,7 @@ interface ICaches {
 const dockOffset = 10;
 
 export class Topology {
+  VERSION: string = pkg.version;
   id = s8();
   data: TopologyData = createData(undefined, this.id);
   clipboard: TopologyData;
