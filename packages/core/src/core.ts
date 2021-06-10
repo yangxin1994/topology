@@ -2158,7 +2158,7 @@ export class Topology {
   }
 
   cache() {
-    if (this.options.cacheLen == 0) return
+    if (this.options.cacheLen == 0) return;
     if (this.caches.index < this.caches.list.length - 1) {
       this.caches.list.splice(this.caches.index + 1, this.caches.list.length - this.caches.index - 1);
     }
@@ -2171,7 +2171,7 @@ export class Topology {
   }
 
   cacheReplace(pens: Pen[]) {
-    if (this.options.cacheLen == 0) return
+    if (this.options.cacheLen == 0) return;
     if (pens && pens.length) {
       const needPenMap = {};
       for (let i = 0, len = pens.length; i < len; i++) {
@@ -2197,7 +2197,7 @@ export class Topology {
   }
 
   undo(noRedo = false, force?: boolean) {
-    if (this.options.cacheLen == 0) return
+    if (this.options.cacheLen == 0) return;
     if ((!force && this.data.locked) || this.caches.index < 1) {
       return;
     }
@@ -2216,7 +2216,9 @@ export class Topology {
   }
 
   redo(force?: boolean) {
-    if (this.options.cacheLen == 0) return
+    if (this.options.cacheLen == 0) {
+      return;
+    }
     if ((!force && this.data.locked) || this.caches.index > this.caches.list.length - 2) {
       return;
     }
@@ -2761,7 +2763,7 @@ export class Topology {
     for (const item of this.data.pens) {
       item.scale(scale, center);
     }
-    if (this.data.bkImageRect) {
+    if (this.data.bkImageRect && !this.data.bkImageStatic) {
       this.data.bkImageRect.scale(scale, center);
     }
     Store.set(this.generateStoreKey('LT:updateLines'), this.data.pens);
