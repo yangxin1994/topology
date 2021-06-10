@@ -382,11 +382,6 @@ export class Node extends Pen {
     // Draw shape.
     drawNodeFns[this.name](ctx, this);
 
-    // Draw text.
-    if (this.name !== 'text' && this.text) {
-      text(ctx, this);
-    }
-
     // Draw image.
     if (this.image || (this.img && this.elementId === '')) {
       this.drawImg(ctx);
@@ -396,6 +391,11 @@ export class Node extends Pen {
       ctx.shadowBlur = 0;
       iconfont(ctx, this);
       ctx.restore();
+    }
+
+    // Draw text.
+    if (this.name !== 'text' && this.text) {
+      text(ctx, this);
     }
   }
 
