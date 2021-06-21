@@ -73,6 +73,12 @@ $ yarn build
 - [顽强的小强](https://github.com/FxLsoft)
 - [sunnyguohua](https://github.com/sunnyguohua)
 
+
+# 核心维护者
+
+- [Alsmile](https://github.com/Alsmile)
+- [hudeyi](https://github.com/deyihu)
+
 # 如何贡献
 
 - PR
@@ -84,11 +90,6 @@ $ yarn build
 
 微信：alsmile123  
 邮箱：alsmile123@qq.com
-
-# 核心维护者
-
-- [Alsmile](https://github.com/Alsmile)
-- [hudeyi](https://github.com/deyihu)
 
 # 谁在使用
 
