@@ -75,6 +75,12 @@ $ yarn build
 - [FxLsoft](https://github.com/FxLsoft)
 - [sunnyguohua](https://github.com/sunnyguohua)
 
+# Core Maintainers
+
+- [Alsmile](https://github.com/Alsmile)
+- [hudeyi](https://github.com/deyihu)
+
+
 # Contributing
 
 - PR
@@ -86,11 +92,6 @@ $ yarn build
 
 Wechat: alsmile123  
 Email: alsmile123@qq.com
-
-# Core Maintainers
-
-- [Alsmile](https://github.com/Alsmile)
-- [hudeyi](https://github.com/deyihu)
 
 # Who is using
 
