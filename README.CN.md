@@ -67,7 +67,6 @@ $ yarn build
 
 # 贡献者
 
-- [hudeyi](https://github.com/deyihu)
 - [Nickbing Lao](https://github.com/giscafer)
 - [ivanZzzz](https://github.com/ivan135)
 - [johnnyhhj](https://github.com/johnnyhhj)
@@ -89,6 +88,7 @@ $ yarn build
 # 核心维护者
 
 - [Alsmile](https://github.com/Alsmile)
+- [hudeyi](https://github.com/deyihu)
 
 # 谁在使用
 
