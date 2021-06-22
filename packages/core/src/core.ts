@@ -657,9 +657,6 @@ export class Topology {
   }
 
   addLine(line: any, focus = false) {
-    if (this.data.locked) {
-      return null;
-    }
     if (line.type === PenType.Node) {
       line.isNode = true;
     }
