@@ -436,7 +436,7 @@ export abstract class Pen {
     }
 
     this.wheres.forEach((where) => {
-      if (where.fn.trim()) {
+      if (where.fn && where.fn.trim()) {
         const fn = new Function('pen', where.fn);
         if (fn(this)) {
           where.actions && where.actions.forEach((action: any) => {
