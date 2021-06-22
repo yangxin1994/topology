@@ -2396,6 +2396,7 @@ export class Topology {
     });
     for (const pen of this.activeLayer.pens) {
       this.clipboard.pens.push(pen.clone());
+      pen.parentId = null;
     }
     this.dispatch('copy', this.clipboard);
   }
@@ -2829,8 +2830,7 @@ export class Topology {
   }
 
   hasView() {
-    const rect = this.getRect();
-    return !(rect.width === 99999 || rect.height === 99999);
+    return !!this.data.pens.length;
   }
 
   getViewCenter(viewPadding?: Padding) {
