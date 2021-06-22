@@ -2444,13 +2444,7 @@ export class Topology {
     this.cache();
     this.copy();
 
-    if (this.clipboard.pens.length > 1) {
-      this.dispatch('paste', {
-        pens: this.clipboard.pens,
-      });
-    } else if (this.activeLayer.pens.length > 0) {
-      this.dispatch('paste', this.activeLayer.pens[0]);
-    }
+    this.dispatch('paste', this.clipboard.pens);
   }
 
   newId(node: any, idMaps: any) {
