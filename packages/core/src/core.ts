@@ -2693,6 +2693,14 @@ export class Topology {
         pen.rect.ex += 20;
         pen.rect.y += 20;
         pen.rect.ey += 20;
+        // 存在自定义瞄点
+        if ((pen as Node).manualAnchors) {
+          // 将 位置偏移 20
+          (pen as Node).manualAnchors.forEach((pt: Point) => {
+            pt.x += 20;
+            pt.y += 20;
+          });
+        }
         (pen as Node).init();
       }
       if (pen instanceof Line) {
