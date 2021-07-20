@@ -477,7 +477,7 @@ export class Node extends Pen {
         if (this.imageHeight) {
           h = this.imageHeight;
         }
-        console.log(4333,w,h,this.imageWidth,this.imageHeight)
+        // console.log(4333,w,h,this.imageWidth,this.imageHeight)
         if (this.imgNaturalWidth && this.imgNaturalHeight && this.imageRatio) {
           if (this.imageWidth) {
             h = (this.imgNaturalHeight / this.imgNaturalWidth) * w;
@@ -525,9 +525,7 @@ export class Node extends Pen {
           ctx.translate(-rect.center.x, -rect.center.y);
         }
 
-        // console.log('draw',this.img.width,this.img.height,w,h)
         if(this.rgba && this.rgba.length > 0){
-          // console.log('window.cacheCanvas')
           // 获取内存中的canvas对象
           const _cacheCanvas = window.cacheCanvas.get('canvas').canvas
           const cvs = _cacheCanvas.getContext("2d")
@@ -545,7 +543,6 @@ export class Node extends Pen {
           cvs.putImageData(imageData, 0, 0,0,0,this.imgNaturalWidth,this.imgNaturalHeight);
           // 将内存中的canvas对象绘制到topology的canvas画布中
           ctx.drawImage(_cacheCanvas, 0,0,this.imgNaturalWidth,this.imgNaturalHeight, x, y, w, h);
-          console.log('x, y, w, h',x, y, w, h)
         }else{
           ctx.drawImage(this.img, x, y, w, h);
 
