@@ -5,7 +5,8 @@ export function simpleClassIconRect(node: Node) {
 }
 
 export function simpleClassTextRect(node: Node) {
-  node.textRect = new Rect(node.rect.x, node.rect.y, node.rect.width, 40);
+  const topHeight = 0.2 * node.rect.height;
+  node.textRect = new Rect(node.rect.x, node.rect.y, node.rect.width, topHeight);
   node.fullTextRect = node.textRect;
 }
 
@@ -14,6 +15,7 @@ export function interfaceClassIconRect(node: Node) {
 }
 
 export function interfaceClassTextRect(node: Node) {
-  node.textRect = new Rect(node.rect.x, node.rect.y, node.rect.width, 40);
+  const topHeight = 0.2 * node.rect.height;
+  node.textRect = new Rect(node.rect.x, node.rect.y, node.rect.width, topHeight);
   node.fullTextRect = node.textRect;
 }
