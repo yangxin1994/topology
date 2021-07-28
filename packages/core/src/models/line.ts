@@ -154,6 +154,12 @@ export class Line extends Pen {
       ctx.restore();
     }
 
+    switch(this.storkeType){
+      case 1:
+        this.strokeLinearGradient(ctx);
+        break;
+    }
+
     if ((!this.isAnimate || this.animateType !== 'comet') && drawLineFns[this.name]) {
       if (this.lineJoin) {
         ctx.lineJoin = this.lineJoin;
@@ -254,6 +260,20 @@ export class Line extends Pen {
     }
 
     return 0;
+  }
+
+  strokeLinearGradient(ctx: CanvasRenderingContext2D) {
+    if (!this.lineGradientFromColor || !this.lineGradientToColor) {
+      return;
+    }
+    const from = this.from;
+    const to = this.to;
+
+    // contributor: https://github.com/sunnyguohua/topology
+    const grd = ctx.createLinearGradient(from.x, from.y, to.x, to.y);
+    grd.addColorStop(0, this.lineGradientFromColor);
+    grd.addColorStop(1, this.lineGradientToColor);
+    ctx.strokeStyle = grd;
   }
 
   calcTextRect() {
