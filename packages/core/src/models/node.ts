@@ -377,6 +377,13 @@ export class Node extends Pen {
         break;
     }
 
+    switch(this.storkeType){
+      case 1:
+        this.strokeLinearGradient(ctx);
+        break;
+    }
+
+
     // Draw shape.
     drawNodeFns[this.name](ctx, this);
 
@@ -395,6 +402,20 @@ export class Node extends Pen {
     if (this.name !== 'text' && this.text) {
       text(ctx, this);
     }
+  }
+
+  strokeLinearGradient(ctx: CanvasRenderingContext2D) {
+    if (!this.lineGradientFromColor || !this.lineGradientToColor) {
+      return;
+    }
+    const from = new Point(this.rect.x, this.rect.center.y);
+    const to = new Point(this.rect.ex, this.rect.center.y);
+
+    // contributor: https://github.com/sunnyguohua/topology
+    const grd = ctx.createLinearGradient(from.x, from.y, to.x, to.y);
+    grd.addColorStop(0, this.lineGradientFromColor);
+    grd.addColorStop(1, this.lineGradientToColor);
+    ctx.strokeStyle = grd;
   }
 
   drawBkLinearGradient(ctx: CanvasRenderingContext2D) {

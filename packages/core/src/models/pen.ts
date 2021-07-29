@@ -159,6 +159,13 @@ export abstract class Pen {
     rect?: Rect;
   };
 
+  // 0 - 纯色；1 - 线性渐变
+  storkeType: number;
+
+  // 线条渐变
+  lineGradientFromColor: string;
+  lineGradientToColor: string;
+
   paddingTopNum: number;
   paddingBottomNum: number;
   paddingLeftNum: number;
@@ -608,4 +615,6 @@ export abstract class Pen {
   abstract animate(now: number): void;
   abstract pauseAnimate(): void;
   abstract stopAnimate(): void;
+
+  abstract strokeLinearGradient(ctx: CanvasRenderingContext2D):void;
 }
