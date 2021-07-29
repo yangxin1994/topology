@@ -154,7 +154,7 @@ export class Line extends Pen {
       ctx.restore();
     }
 
-    switch(this.storkeType){
+    switch(this.strokeType){
       case 1:
         this.strokeLinearGradient(ctx);
         break;
