@@ -160,7 +160,7 @@ export abstract class Pen {
   };
 
   // 0 - 纯色；1 - 线性渐变
-  storkeType: number;
+  strokeType: number;
 
   // 线条渐变
   lineGradientFromColor: string;

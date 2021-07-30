@@ -2701,6 +2701,14 @@ export class Topology {
             pt.y += 20;
           });
         }
+        // 存在 points
+        if ((pen as Node).points) {
+          // 将 位置偏移 20
+          (pen as Node).points.forEach((pt: Point) => {
+            pt.x += 20;
+            pt.y += 20;
+          });
+        }
         (pen as Node).init();
       }
       if (pen instanceof Line) {
