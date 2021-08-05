@@ -913,6 +913,7 @@ export class Topology {
             if (pen.events) {
               pen.events.forEach((event) => {
                 if (event.type === type) {
+                  event.params = item;
                   actions.push(event);
                 }
               });
