@@ -40,8 +40,10 @@ export function textbox(ctx: CanvasRenderingContext2D, node: Node) {
 }
 function changeStyle(id: string, node: Node) {
   const input = document.getElementById(id);
-  input.style.backgroundColor = node.fillStyle;
-  input.style.fontSize = node.fontSize + 'px';
-  input.style.color = node.fontColor;
-  input.style.fontFamily = node.fontFamily;
+  if (input) {
+    input.style.backgroundColor = node.fillStyle;
+    input.style.fontSize = node.fontSize + 'px';
+    input.style.color = node.fontColor;
+    input.style.fontFamily = node.fontFamily;
+  }
 }
