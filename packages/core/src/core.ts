@@ -2354,6 +2354,8 @@ export class Topology {
     } else {
       this.input.style.transform = undefined;
     }
+    // 为 textarea 添加 class
+    this.input.classList.add('set-text-input');
     this.input.focus();
   }
 
