@@ -1153,7 +1153,7 @@ export class Topology {
           );
           break;
         case MoveInType.Nodes:
-          if (this.activeLayer.locked()) {
+          if (this.activeLayer.locked() || this.data.locked) {
             break;
           }
           const x = e.x - this.mouseDown.x;
