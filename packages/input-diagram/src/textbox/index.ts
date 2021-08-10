@@ -26,8 +26,8 @@ export function textbox(ctx: CanvasRenderingContext2D, node: Node) {
   if (!node.elementRendered) {
     // 初始化时，等待父div先渲染完成，避免初始图表控件太大。
     setTimeout(() => {
-      inputObjs[node.id].input.value = node.text;
-      inputObjs[node.id].input.onchange = (e: any) => {
+      inputObjs[node.id].input.value = node.text || '';
+      inputObjs[node.id].input.oninput = (e: any) => {
         node.text = e.target.value;
       };
 
