@@ -33,7 +33,7 @@ export interface Where {
   key?: string;
   comparison?: string;
   value?: any;
-  fn?: string;
+  fn?: string | Function;
   actions?: Action[];
 }
 
@@ -464,7 +464,14 @@ export abstract class Pen {
     }
 
     this.wheres.forEach((where) => {
-      if (where.fn && where.fn.trim()) {
+      if(where.fn instanceof Function){ // 函数类型 fn
+        if (where.fn(this)) {
+          where.actions &&
+            where.actions.forEach((action: any) => {
+              this.doAction(action);
+            });
+        }
+      } else if (where.fn && where.fn.trim()) {  // 字符串类型 fn
         const fn = new Function('pen', where.fn);
         if (fn(this)) {
           where.actions &&
@@ -472,7 +479,7 @@ export abstract class Pen {
               this.doAction(action);
             });
         }
-      } else {
+      } else {  // fn 为空
         const fn = new Function(
           'attr',
           `return attr ${where.comparison} ${where.value}`
