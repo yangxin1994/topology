@@ -347,20 +347,20 @@ export class Node extends Pen {
     this.paddingBottomNum = abs(this.rect.height, this.paddingBottom);
   }
 
-  setChildrenIds() {
-    if (!this.children) {
-      return;
-    }
+  // setChildrenIds() {
+  //   if (!this.children) {
+  //     return;
+  //   }
 
-    for (const item of this.children) {
-      item.id = s8();
-      switch (item.type) {
-        case PenType.Node:
-          (item as Node).setChildrenIds();
-          break;
-      }
-    }
-  }
+  //   for (const item of this.children) {
+  //     item.id = s8();
+  //     switch (item.type) {
+  //       case PenType.Node:
+  //         (item as Node).setChildrenIds();
+  //         break;
+  //     }
+  //   }
+  // }
 
   draw(ctx: CanvasRenderingContext2D) {
     if (!drawNodeFns[this.name]) {
@@ -1270,7 +1270,6 @@ export class Node extends Pen {
     if (this.name !== 'div') {
       n.elementId = '';
     }
-    this.setChildrenIds();
     return n;
   }
 }
