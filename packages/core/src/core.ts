@@ -2688,54 +2688,9 @@ export class Topology {
 
     this.activeLayer.pens = [];
 
-    const idMaps: any = {};
     for (const pen of this.clipboard.pens) {
-      if (pen.type === PenType.Node) {
-        this.newId(pen, idMaps);
-        pen.rect.x += 20;
-        pen.rect.ex += 20;
-        pen.rect.y += 20;
-        pen.rect.ey += 20;
-        // 存在自定义瞄点
-        if ((pen as Node).manualAnchors) {
-          // 将 位置偏移 20
-          (pen as Node).manualAnchors.forEach((pt: Point) => {
-            pt.x += 20;
-            pt.y += 20;
-          });
-        }
-        // 存在 points
-        if ((pen as Node).points) {
-          // 将 位置偏移 20
-          (pen as Node).points.forEach((pt: Point) => {
-            pt.x += 20;
-            pt.y += 20;
-          });
-        }
-        (pen as Node).init();
-      }
-      if (pen instanceof Line) {
-        pen.id = s8();
-        pen.from = new Point(
-          pen.from.x + 20,
-          pen.from.y + 20,
-          pen.from.direction,
-          pen.from.anchorIndex,
-          idMaps[pen.from.id]
-        );
-        pen.to = new Point(
-          pen.to.x + 20,
-          pen.to.y + 20,
-          pen.to.direction,
-          pen.to.anchorIndex,
-          idMaps[pen.to.id]
-        );
-        const controlPoints = [];
-        for (const pt of pen.controlPoints) {
-          controlPoints.push(new Point(pt.x + 20, pt.y + 20));
-        }
-        pen.controlPoints = controlPoints;
-      }
+      this.pastePen(pen,{},20);
+
       this.data.pens.push(pen);
 
       this.activeLayer.add(pen);
@@ -2749,16 +2704,79 @@ export class Topology {
     this.dispatch('paste', this.clipboard.pens);
   }
 
-  newId(node: any, idMaps: any) {
-    const old = node.id;
-    node.id = s8();
-    idMaps[old] = node.id;
-    if (node.children) {
-      for (const item of node.children) {
-        this.newId(item, idMaps);
+  /**
+   * 粘贴当前画笔，位置偏移 offset
+   * */
+  pastePen(pen: Pen, idMaps: any = {}, offset:number=0) {
+    if (pen.type === PenType.Node) {
+      const old = pen.id;
+      pen.id = s8();
+      idMaps[old] = pen.id;
+
+      pen.rect.x += offset;
+      pen.rect.ex += offset;
+      pen.rect.y += offset;
+      pen.rect.ey += offset;
+      // 存在自定义瞄点
+      if ((pen as Node).manualAnchors) {
+        // 将 位置偏移 offset
+        (pen as Node).manualAnchors.forEach((pt: Point) => {
+          pt.x += offset;
+          pt.y += offset;
+        });
+      }
+      // 存在 points
+      if ((pen as Node).points) {
+        // 将 位置偏移 offset
+        (pen as Node).points.forEach((pt: Point) => {
+          pt.x += offset;
+          pt.y += offset;
+        });
+      }
+      // 若是 echarts 则清一下 elementId
+      if(pen.name === 'echarts'){
+        (pen as Node).elementId = undefined;
+      }
+      (pen as Node).init();
+    } else if (pen instanceof Line) {
+      pen.id = s8();
+      pen.from = new Point(
+        pen.from.x + offset,
+        pen.from.y + offset,
+        pen.from.direction,
+        pen.from.anchorIndex,
+        idMaps[pen.from.id]
+      );
+      pen.to = new Point(
+        pen.to.x + offset,
+        pen.to.y + offset,
+        pen.to.direction,
+        pen.to.anchorIndex,
+        idMaps[pen.to.id]
+      );
+      const controlPoints = [];
+      for (const pt of pen.controlPoints) {
+        controlPoints.push(new Point(pt.x + offset, pt.y + offset));
+      }
+      pen.controlPoints = controlPoints;
+    }
+    if (pen.children) {
+      for (const item of pen.children) {
+        this.pastePen(item, idMaps,offset);
       }
     }
   }
+
+  // newId(node: any, idMaps: any) {
+  //   const old = node.id;
+  //   node.id = s8();
+  //   idMaps[old] = node.id;
+  //   if (node.children) {
+  //     for (const item of node.children) {
+  //       this.newId(item, idMaps);
+  //     }
+  //   }
+  // }
 
   animate(autoplay = false) {
     this.animateLayer.readyPlay(undefined, autoplay);
