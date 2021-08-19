@@ -2688,8 +2688,9 @@ export class Topology {
 
     this.activeLayer.pens = [];
 
+    const idMaps = {};
     for (const pen of this.clipboard.pens) {
-      this.pastePen(pen,{},20);
+      this.pastePen(pen,idMaps,20);
 
       this.data.pens.push(pen);
 
