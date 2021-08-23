@@ -36,6 +36,7 @@ export interface TopologyData {
   tooltip?: boolean | number;
   socketEvent?: boolean | number;
   socketFn?: string;
+  initJS?: string;   // 初始化时所执行 js
 }
 
 export function createData(json?: any, tid?: string) {
