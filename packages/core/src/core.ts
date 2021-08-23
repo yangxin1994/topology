@@ -818,7 +818,19 @@ export class Topology {
     this.openSocket();
     this.openMqtt();
 
+    this.doInitJS();
     this.dispatch('opened');
+  }
+  
+  /**
+   * 执行初始化函数 initJS
+   * */
+  private doInitJS() {
+    if(this.data.initJS && this.data.initJS.trim()){
+      // 字符串类型存在
+      const fn = new Function(this.data.initJS);
+      fn();
+    }
   }
 
   subscribeSocket = () => {
