@@ -642,6 +642,7 @@ export class ActiveLayer extends Layer {
     }
 
     if (this.pens.length === 1 && this.pens[0].type === PenType.Line) {
+      ctx.restore();  // 对应前面的 save() , 保持状态一致
       return;
     }
 

@@ -12,6 +12,8 @@ export interface TopologyData {
   fromArrow: string;
   toArrow: string;
   lineWidth?: number;
+  x: number;   // 画布的相对位置
+  y: number;
   scale: number;
   locked: Lock;
   bkImage?: string;
@@ -46,7 +48,9 @@ export function createData(json?: any, tid?: string) {
     fromArrow: '',
     toArrow: 'triangleSolid',
     scale: 1,
-    locked: Lock.None
+    locked: Lock.None,
+    x: 0,
+    y: 0,
   };
 
   if (typeof json === 'string') {

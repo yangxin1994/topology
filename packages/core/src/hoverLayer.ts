@@ -210,7 +210,7 @@ export class HoverLayer extends Layer {
     if (this.dockLineX > 0) {
       const size = Store.get(this.generateStoreKey('LT:size'));
       ctx.beginPath();
-      ctx.moveTo(this.dockLineX, 0);
+      ctx.moveTo(this.dockLineX, -this.data.y);
       ctx.lineTo(this.dockLineX, size.height);
       ctx.stroke();
     }
@@ -218,7 +218,7 @@ export class HoverLayer extends Layer {
     if (this.dockLineY > 0) {
       const size = Store.get(this.generateStoreKey('LT:size'));
       ctx.beginPath();
-      ctx.moveTo(0, this.dockLineY);
+      ctx.moveTo(-this.data.x, this.dockLineY);
       ctx.lineTo(size.width, this.dockLineY);
       ctx.stroke();
     }
