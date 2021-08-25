@@ -36,6 +36,7 @@ export interface TopologyData {
   tooltip?: boolean | number;
   socketEvent?: boolean | number;
   socketFn?: string;
+  initJS?: string;   // 初始化时所执行 js
 }
 
 export function createData(json?: any, tid?: string) {
@@ -98,20 +99,4 @@ export function createData(json?: any, tid?: string) {
   tid && Store.set(tid + '-topology-data', data);
 
   return data;
-}
-
-export function deepClone(o?: any) {
-  if (Array.isArray(o)) {
-    const arr = [];
-    o.forEach(item => { arr.push(deepClone(item)); });
-    return arr;
-  } else if (typeof o === 'object') {
-    const _o = {};
-    for (let key in o) {
-      _o[key] = deepClone(o[key]);
-    }
-    return _o;
-  }
-
-  return o;
 }

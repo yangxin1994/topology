@@ -30,12 +30,25 @@ export function simpleClass(ctx: CanvasRenderingContext2D, node: Node) {
     node.rect.y + node.rect.height,
     r
   );
-  ctx.arcTo(node.rect.x, node.rect.y + node.rect.height, node.rect.x, node.rect.y, r);
-  ctx.arcTo(node.rect.x, node.rect.y, node.rect.x + node.rect.width, node.rect.y, r);
+  ctx.arcTo(
+    node.rect.x,
+    node.rect.y + node.rect.height,
+    node.rect.x,
+    node.rect.y,
+    r
+  );
+  ctx.arcTo(
+    node.rect.x,
+    node.rect.y,
+    node.rect.x + node.rect.width,
+    node.rect.y,
+    r
+  );
   ctx.closePath();
 
-  ctx.moveTo(node.rect.x, node.rect.y + 40);
-  ctx.lineTo(node.rect.ex, node.rect.y + 40);
+  const topHeight = 0.2 * node.rect.height;
+  ctx.moveTo(node.rect.x, node.rect.y + topHeight);
+  ctx.lineTo(node.rect.ex, node.rect.y + topHeight);
   (node.fillStyle || node.bkType) && ctx.fill();
   ctx.stroke();
 }
@@ -70,14 +83,27 @@ export function interfaceClass(ctx: CanvasRenderingContext2D, node: Node) {
     node.rect.y + node.rect.height,
     r
   );
-  ctx.arcTo(node.rect.x, node.rect.y + node.rect.height, node.rect.x, node.rect.y, r);
-  ctx.arcTo(node.rect.x, node.rect.y, node.rect.x + node.rect.width, node.rect.y, r);
+  ctx.arcTo(
+    node.rect.x,
+    node.rect.y + node.rect.height,
+    node.rect.x,
+    node.rect.y,
+    r
+  );
+  ctx.arcTo(
+    node.rect.x,
+    node.rect.y,
+    node.rect.x + node.rect.width,
+    node.rect.y,
+    r
+  );
   ctx.closePath();
 
-  ctx.moveTo(node.rect.x, node.rect.y + 40);
-  ctx.lineTo(node.rect.ex, node.rect.y + 40);
+  const topHeight = 0.2 * node.rect.height;
+  ctx.moveTo(node.rect.x, node.rect.y + topHeight);
+  ctx.lineTo(node.rect.ex, node.rect.y + topHeight);
 
-  const height = node.rect.y + 20 + node.rect.height / 2;
+  const height = node.rect.y + topHeight + (node.rect.height - topHeight) / 2;
   ctx.moveTo(node.rect.x, height);
   ctx.lineTo(node.rect.ex, height);
 

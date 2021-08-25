@@ -348,20 +348,20 @@ export class Node extends Pen {
     this.paddingBottomNum = abs(this.rect.height, this.paddingBottom);
   }
 
-  setChildrenIds() {
-    if (!this.children) {
-      return;
-    }
+  // setChildrenIds() {
+  //   if (!this.children) {
+  //     return;
+  //   }
 
-    for (const item of this.children) {
-      item.id = s8();
-      switch (item.type) {
-        case PenType.Node:
-          (item as Node).setChildrenIds();
-          break;
-      }
-    }
-  }
+  //   for (const item of this.children) {
+  //     item.id = s8();
+  //     switch (item.type) {
+  //       case PenType.Node:
+  //         (item as Node).setChildrenIds();
+  //         break;
+  //     }
+  //   }
+  // }
 
   draw(ctx: CanvasRenderingContext2D) {
     if (!drawNodeFns[this.name]) {
@@ -377,6 +377,13 @@ export class Node extends Pen {
         this.drawBkRadialGradient(ctx);
         break;
     }
+
+    switch(this.strokeType){
+      case 1:
+        this.strokeLinearGradient(ctx);
+        break;
+    }
+
 
     // Draw shape.
     drawNodeFns[this.name](ctx, this);
@@ -396,6 +403,20 @@ export class Node extends Pen {
     if (this.name !== 'text' && this.text) {
       text(ctx, this);
     }
+  }
+
+  strokeLinearGradient(ctx: CanvasRenderingContext2D) {
+    if (!this.lineGradientFromColor || !this.lineGradientToColor) {
+      return;
+    }
+    const from = new Point(this.rect.x, this.rect.center.y);
+    const to = new Point(this.rect.ex, this.rect.center.y);
+
+    // contributor: https://github.com/sunnyguohua/topology
+    const grd = ctx.createLinearGradient(from.x, from.y, to.x, to.y);
+    grd.addColorStop(0, this.lineGradientFromColor);
+    grd.addColorStop(1, this.lineGradientToColor);
+    ctx.strokeStyle = grd;
   }
 
   drawBkLinearGradient(ctx: CanvasRenderingContext2D) {
@@ -1272,7 +1293,6 @@ export class Node extends Pen {
     if (this.name !== 'div') {
       n.elementId = '';
     }
-    this.setChildrenIds();
     return n;
   }
 }

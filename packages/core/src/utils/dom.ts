@@ -17,6 +17,23 @@ export function createDiv(node: Node) {
   return div;
 }
 
+export function createInput(node: Node) {
+  const input = document.createElement('input');
+  input.style.position = 'absolute';
+  input.style.outline = 'none';
+  input.style.left = '-9999px';
+  input.style.bottom = '-9999px';
+  input.style.width = node.rect.width + 'px';
+  input.style.height = node.rect.height + 'px';
+  input.style.border = '1px solid #cdcdcd';
+  input.classList.add('set-text-input');
+  if (node.elementId) {
+    input.id = node.elementId;
+  }
+
+  return input;
+}
+
 export function loadJS(url: string, callback?: () => void, render?: boolean) {
   const loaderScript = document.createElement('script');
   loaderScript.type = 'text/javascript';
