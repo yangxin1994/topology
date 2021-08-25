@@ -726,8 +726,8 @@ export class Topology {
   };
 
   // open - redraw by the data
-  open(data?: TopologyData) {
-    if (data && data.mqttOptions && !data.mqttOptions.customClientId) {
+  open(data?: TopologyData | string) {
+    if (typeof data !== 'string' && data && data.mqttOptions && !data.mqttOptions.customClientId) {
       data.mqttOptions.clientId = s8();
     }
     this.canvas.clearBkImg();
