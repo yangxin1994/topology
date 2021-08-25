@@ -237,15 +237,15 @@ export class HoverLayer extends Layer {
     if (!pen.parentId) {
       return null;
     }
-
+    let data = null
     for (const item of this.data.pens) {
       if (item.id === pen.parentId) {
         const n = this.getRoot(item);
-        return n ? n : item;
+        data = n ? n : item;
       }
     }
 
-    return null;
+    return data;
   }
 
   clear() {

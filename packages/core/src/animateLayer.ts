@@ -95,11 +95,13 @@ export class AnimateLayer extends Layer {
   }
 
   findLine(pen: Pen) {
+    let data;
     for (const item of this.data.pens) {
       if (item.id === pen.data) {
-        return item;
+        data = item;
       }
     }
+    return data;
   }
 
   readyPlay(tag?: string, auto?: boolean, pens?: Pen[]) {
