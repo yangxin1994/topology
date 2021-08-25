@@ -822,7 +822,7 @@ export class Topology {
     this.doInitJS();
     this.dispatch('opened');
   }
-  
+
   /**
    * 执行初始化函数 initJS
    * */
