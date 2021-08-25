@@ -789,7 +789,7 @@ export class Topology {
     this.rendering = true;
     // 获取 ctx 对象
     const ctx= this.offscreen.canvas.getContext('2d');
-    ctx.clearRect(0,0,this.offscreen.canvas.width,this.offscreen.canvas.height)
+    ctx.clearRect(0,0,this.offscreen.canvas.width,this.offscreen.canvas.height);
     ctx.save();
     ctx.translate(this.data.x,this.data.y);
     this.offscreen.render();
