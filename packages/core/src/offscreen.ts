@@ -4,6 +4,8 @@ import { Canvas } from './canvas';
 import { ActiveLayer } from './activeLayer';
 import { HoverLayer } from './hoverLayer';
 import { AnimateLayer } from './animateLayer';
+import { rectInRect } from './utils/rect';
+import { Rect } from './models';
 
 export class Offscreen extends Canvas {
   public activeLayer: ActiveLayer;
@@ -22,10 +24,13 @@ export class Offscreen extends Canvas {
 
     const ctx = this.canvas.getContext('2d');
     ctx.strokeStyle = this.options.color;
-
+    const canvasRect = new Rect(-this.data.x,-this.data.y,this.width,this.height);
     for (const item of this.data.pens) {
       if (!item.getTID()) {
         item.setTID(this.TID);
+      }
+      if (!rectInRect(item.rect, canvasRect)) {
+        continue;
       }
       item.render(ctx);
     }
