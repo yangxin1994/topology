@@ -70,6 +70,7 @@ export class Topology {
     list: [],
   };
   options: Options;
+  timer:any;
 
   parentElem: HTMLElement;
   canvas: RenderLayer;
@@ -821,7 +822,7 @@ export class Topology {
     this.doInitJS();
     this.dispatch('opened');
   }
-  
+
   /**
    * 执行初始化函数 initJS
    * */
@@ -3068,7 +3069,14 @@ export class Topology {
     this.lastTranlated.x = x;
     this.lastTranlated.y = y;
     this.render();
-    this.cache();
+
+
+    if (this.timer) {
+      clearTimeout(this.timer);
+    }
+    this.timer = setTimeout(() => {
+      this.cache();
+    }, 300);
 
     !noNotice && this.dispatch('translate', { x, y });
   }

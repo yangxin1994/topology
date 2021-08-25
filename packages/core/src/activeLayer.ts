@@ -100,13 +100,13 @@ export class ActiveLayer extends Layer {
   }
 
   locked() {
+    let flag = true;
     for (const item of this.pens) {
       if (!item.locked) {
-        return false;
+        flag = false;
       }
     }
-
-    return true;
+    return flag;
   }
 
   getPoints() {
@@ -543,30 +543,34 @@ export class ActiveLayer extends Layer {
   }
 
   has(pen: Pen) {
+    let flag = false;
     for (const item of this.pens) {
       if (item.id === pen.id) {
-        return true;
+        flag = true;
       }
     }
+    return flag;
   }
 
   hasInAll(pen: Pen, pens?: Pen[]) {
+    let flag = false;
     if (!pens) {
       pens = this.pens;
     }
 
     for (const item of pens) {
       if (item.id === pen.id) {
-        return true;
+        flag= true;
       }
 
       if ((item as any).children) {
         const has = this.hasInAll(pen, (item as any).children);
         if (has) {
-          return true;
+          flag= true;
         }
       }
     }
+    return flag;
   }
 
   render(ctx: CanvasRenderingContext2D) {
