@@ -64,7 +64,6 @@ export class Topology {
   };
   options: Options;
   timer: any;
-  lastRender = 0;
 
   parentElem: HTMLElement;
   canvas: RenderLayer;
@@ -693,15 +692,6 @@ export class Topology {
 
   // Render or redraw
   render(noFocus?: boolean) {
-    const now = performance.now();
-    if (now - this.lastRender < this.options.refresh) {
-      requestAnimationFrame(() => {
-        this.render(noFocus);
-      });
-      return;
-    }
-    this.lastRender = now;
-
     if (noFocus) {
       this.activeLayer.pens = [];
       this.hoverLayer.node = undefined;
