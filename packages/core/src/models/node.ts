@@ -53,6 +53,7 @@ export class Node extends Pen {
   imageHeight: number;
   imageRatio = true;
   imageAlign: string;
+  imageHide:boolean;
   img: HTMLImageElement;
 
   // 0 - 纯色；1 - 线性渐变；2 - 径向渐变
@@ -543,8 +544,12 @@ export class Node extends Pen {
           ctx.rotate((this.iconRotate * Math.PI) / 180);
           ctx.translate(-rect.center.x, -rect.center.y);
         }
+        if(this.imageHide){
+          //  在业务层面去自定义绘制图片
+        }else{
+          ctx.drawImage(this.img, x, y, w, h);
 
-        ctx.drawImage(this.img, x, y, w, h);
+        }
         ctx.restore();
         return;
       } else if (images[this.image]) {

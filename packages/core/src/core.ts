@@ -1015,7 +1015,12 @@ export class Topology {
             this.moveIn.hoverNode.moveIn();
 
             // Send a move event.
-            this.dispatch('moveInNode', this.moveIn.hoverNode);
+            this.dispatch('moveInNode', Object.assign({}, this.moveIn.hoverNode, {
+              evs: {
+                x: e.pageX,
+                y: e.pageY,
+              }
+            }));
 
             this.showTip(this.moveIn.hoverNode, pt);
           }
@@ -1030,7 +1035,12 @@ export class Topology {
           if (this.moveIn.hoverLine) {
             this.hoverLayer.line = this.moveIn.hoverLine;
             this.moveIn.hoverLine.moveIn();
-            this.dispatch('moveInLine', this.moveIn.hoverLine);
+            this.dispatch('moveInLine', Object.assign({},this.moveIn.hoverLine,{
+              evs: {
+                x: e.pageX,
+                y: e.pageY,
+              }
+            }));
 
             this.showTip(this.moveIn.hoverLine, pt);
           }
@@ -1236,7 +1246,15 @@ export class Topology {
           this.dispatch('multi', this.activeLayer.pens);
         } else {
           this.activeLayer.pens = [this.moveIn.hoverLine];
-          this.dispatch('line' + (e.button === 2 ? 'RightClick' : ''), this.moveIn.hoverLine);
+          this.dispatch(
+            'line' + (e.button === 2 ? 'RightClick' : ''),
+            Object.assign({},this.moveIn.hoverLine,{
+              evs: {
+                x: e.pageX,
+                y: e.pageY,
+              }
+            })
+          );
         }
         this.hoverLayer.line = this.moveIn.hoverLine;
         this.hoverLayer.initLine = new Line(this.moveIn.hoverLine);
@@ -1328,7 +1346,15 @@ export class Topology {
           }
         } else if (this.activeLayer.pens.length < 2) {
           this.activeLayer.setPens([this.moveIn.activeNode]);
-          this.dispatch('node' + (e.button === 2 ? 'RightClick' : ''), this.moveIn.activeNode);
+          this.dispatch(
+            'node' + (e.button === 2 ? 'RightClick' : ''),
+            Object.assign({}, this.moveIn.activeNode,{
+              evs: {
+                x: e.pageX,
+                y: e.pageY,
+              }
+            })
+          );
         }
 
         if (this.data.locked || this.moveIn.activeNode.locked) {

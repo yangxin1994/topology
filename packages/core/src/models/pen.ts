@@ -339,6 +339,9 @@ export abstract class Pen {
         case 3:
           ctx.setLineDash([10, 10, 2, 10]);
           break;
+        case 4:
+          ctx.setLineDash([1, 16]);
+          break;
       }
     }
     if (this.lineDashOffset) {
