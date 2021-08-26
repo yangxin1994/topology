@@ -5,6 +5,9 @@ import { Line } from '../models/line';
 import { getBezierPoint } from '../middles/lines/curve';
 import { Rect } from '../models/rect';
 
+/**
+ * 不包含画布偏移量
+ * */
 export function getRect(pens: Pen[]) {
 
   const points: Point[] = [];
