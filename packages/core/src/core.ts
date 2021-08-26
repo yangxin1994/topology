@@ -385,6 +385,8 @@ export class Topology {
           shiftKey: event.shiftKey,
           altKey: event.altKey,
           button: event.button,
+          pageX:event.pageX,
+          pageY:event.pageY
         };
         this.lastTranlated.x = e.x;
         this.lastTranlated.y = e.y;
@@ -398,6 +400,8 @@ export class Topology {
           shiftKey: event.shiftKey,
           altKey: event.altKey,
           buttons: event.buttons,
+          pageX: event.pageX,
+          pageY: event.pageY,
         });
       };
       this.divLayer.canvas.onmouseup = (event: MouseEvent) => {
@@ -919,6 +923,8 @@ export class Topology {
     ctrlKey?: boolean;
     shiftKey?: boolean;
     altKey?: boolean;
+    pageX?: number;
+    pageY?: number;
   }) => {
     if (this.scheduledAnimationFrame || this.data.locked === Lock.NoEvent) {
       return;
@@ -1219,6 +1225,8 @@ export class Topology {
     ctrlKey?: boolean;
     shiftKey?: boolean;
     altKey?: boolean;
+    pageX?:number,
+    pageY?:number
   }) => {
     if (e.button !== 0 && e.button !== 2) return;
 
