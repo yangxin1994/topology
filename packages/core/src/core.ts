@@ -1056,9 +1056,9 @@ export class Topology {
 
       // Move out parent element.
       const moveOutX =
-        this.data.x + e.x + 50 > this.parentElem.clientWidth + this.parentElem.scrollLeft;
+        e.x + 50 > this.parentElem.clientWidth + this.parentElem.scrollLeft;
       const moveOutY =
-        this.data.y + e.y + 50 > this.parentElem.clientHeight + this.parentElem.scrollTop;
+        e.y + 50 > this.parentElem.clientHeight + this.parentElem.scrollTop;
       if (!this.options.disableMoveOutParent && (moveOutX || moveOutY)) {
         this.dispatch('moveOutParent', e);
 
@@ -2146,12 +2146,14 @@ export class Topology {
     this.input.focus();
   }
 
+  // 包含画布偏移量的 Rect，相对与可视区域的内容
   getRect(pens?: Pen[]) {
     if (!pens) {
       pens = this.data.pens;
     }
 
-    return getRect(pens);
+    const rect = getRect(pens);
+    return new Rect(rect.x + this.data.x, rect.y + this.data.y, rect.width , rect.height);
   }
 
   // Get a dock rect for moving nodes.
@@ -2277,7 +2279,7 @@ export class Topology {
   }
 
   toImage(padding: Padding = 0, callback: any = undefined): string {
-    const rect = this.getRect();
+    const rect = getRect(this.data.pens);
     const p = formatPadding(padding || 0);
     rect.x -= p[3];
     rect.y -= p[0];
@@ -2682,7 +2684,7 @@ export class Topology {
       pens = this.activeLayer.pens;
     }
 
-    const rect = this.getRect(pens);
+    const rect = getRect(pens);
     for (const item of pens) {
       const i = this.findIndex(item);
       if (i > -1) {
@@ -2897,13 +2899,11 @@ export class Topology {
       width,
       height,
     });
-    // 2. 图形居中
-    this.centerView(viewPadding);
-    // 3. 获取设置的留白值
+    // 2. 获取设置的留白值
     const padding = formatPadding(viewPadding || this.options.viewPadding);
-    // 4. 获取图形尺寸
+    // 3. 获取图形尺寸
     const rect = this.getRect();
-    // 6. 计算缩放比
+    // 4. 计算缩放比
     const w = (width - padding[1] - padding[3]) / rect.width;
     const h = (height - padding[0] - padding[2]) / rect.height;
     let ratio = w;
@@ -2912,6 +2912,8 @@ export class Topology {
     }
 
     this.scale(ratio);
+    // 5. 图形居中
+    this.centerView(viewPadding);
   }
 
   hasView() {
@@ -3087,7 +3089,7 @@ export class Topology {
       pens = this.data.pens;
     }
 
-    const rect = this.getRect(pens);
+    const rect = getRect(pens);
     let node = new Node({
       name: 'combine',
       rect: new Rect(rect.x, rect.y, rect.width, rect.height),
