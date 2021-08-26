@@ -63,7 +63,7 @@ export class Topology {
     list: [],
   };
   options: Options;
-  timer: any;
+  cacheTimer:any;
 
   parentElem: HTMLElement;
   canvas: RenderLayer;
@@ -726,8 +726,8 @@ export class Topology {
   };
 
   // open - redraw by the data
-  open(data?: TopologyData) {
-    if (data && data.mqttOptions && !data.mqttOptions.customClientId) {
+  open(data?: TopologyData | string) {
+    if (typeof data !== 'string' && data && data.mqttOptions && !data.mqttOptions.customClientId) {
       data.mqttOptions.clientId = s8();
     }
     this.canvas.clearBkImg();
@@ -2821,8 +2821,13 @@ export class Topology {
     this.lastTranlated.y = y;
     this.render();
 
-    if (!noNotice) {
+    if (this.cacheTimer) {
+      clearTimeout(this.cacheTimer);
+    }
+    this.cacheTimer = setTimeout(() => {
       this.cache();
+    }, 300);
+    if (!noNotice) {
       this.dispatch('translate', { x, y });
     }
   }
