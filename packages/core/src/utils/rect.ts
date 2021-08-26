@@ -77,3 +77,21 @@ export function rectInRect(source: Rect, target: Rect) {
     (source.x > target.x && source.x < target.ex && source.ey > target.y && source.ey < target.ey)
   );
 }
+
+/**
+ * 合并大小全部传入的 rects
+ * */
+export function getMoreRect(...rects: Rect[]): Rect{
+  const rect = new Rect(rects[0].x, rects[0].y ,rects[0].width , rects[0].height);
+  for (let i = 1; i < rects.length; i++) {
+    const currentRect = rects[i];
+    if(currentRect){
+      rect.x > currentRect.x && (rect.x = currentRect.x);
+      rect.y > currentRect.y && (rect.y = currentRect.y);
+      rect.ex < currentRect.ex && (rect.ex = currentRect.ex);
+      rect.ey < currentRect.ey && (rect.ey = currentRect.ey);
+    }
+  }
+
+  return new Rect(rect.x, rect.y, rect.ex - rect.x, rect.ey - rect.y);
+}

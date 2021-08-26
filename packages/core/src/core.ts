@@ -18,7 +18,7 @@ import { DivLayer } from './divLayer';
 import { Rect } from './models/rect';
 import { s8 } from './utils/uuid';
 import { del, find, getParent, pointInRect } from './utils/canvas';
-import { getBboxOfPoints, getRect } from './utils/rect';
+import { getBboxOfPoints, getMoreRect, getRect } from './utils/rect';
 import { formatPadding } from './utils/padding';
 import { Socket } from './socket';
 import { MQTT } from './mqtt';
@@ -2305,7 +2305,12 @@ export class Topology {
   }
 
   toImage(padding: Padding = 0, callback: any = undefined): string {
-    const rect = getRect(this.data.pens);
+    let backRect: Rect;
+    if(this.data.bkImageRect){
+      // 背景图片相对于画布的 rect
+      backRect = new Rect(this.data.bkImageRect.x - this.data.x, this.data.bkImageRect.y - this.data.y, this.data.bkImageRect.width, this.data.bkImageRect.height);
+    }
+    const rect = getMoreRect(getRect(this.data.pens), backRect);
     const p = formatPadding(padding || 0);
     rect.x -= p[3];
     rect.y -= p[0];
@@ -2314,6 +2319,7 @@ export class Topology {
 
     const dpi = this.offscreen.getDpiRatio();
     rect.scale(dpi);
+    backRect && backRect.scale(dpi);
 
     const canvas = document.createElement('canvas');
     canvas.width = rect.width;
@@ -2323,6 +2329,9 @@ export class Topology {
     if (this.data.bkColor || this.options.bkColor) {
       ctx.fillStyle = this.data.bkColor || this.options.bkColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    if (this.data.bkImage && backRect) {
+      ctx.drawImage(this.canvas.bkImg, backRect.x - rect.x, backRect.y - rect.y, backRect.width, backRect.height);
     }
 
     for (const item of this.data.pens) {
@@ -2342,9 +2351,6 @@ export class Topology {
       pen.render(ctx);
     }
     ctx.scale(1 / dpi, 1 / dpi);
-    if (this.data.bkImage) {
-      ctx.drawImage(this.canvas.bkImg, 0, 0);
-    }
     if (callback) {
       canvas.toBlob(callback);
     }
