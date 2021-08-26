@@ -5,7 +5,7 @@ import { ActiveLayer } from './activeLayer';
 import { HoverLayer } from './hoverLayer';
 import { AnimateLayer } from './animateLayer';
 import { rectInRect } from './utils/rect';
-import { Rect } from './models';
+import { Rect, Node } from './models';
 
 export class Offscreen extends Canvas {
   public activeLayer: ActiveLayer;
@@ -29,7 +29,8 @@ export class Offscreen extends Canvas {
       if (!item.getTID()) {
         item.setTID(this.TID);
       }
-      if (!rectInRect(item.rect, canvasRect)) {
+      // 连线类型没有 rect，必渲染
+      if (!rectInRect(item.rect, canvasRect) && item instanceof Node) {
         continue;
       }
       item.render(ctx);
