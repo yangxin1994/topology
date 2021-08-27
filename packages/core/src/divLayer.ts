@@ -389,8 +389,8 @@ export class DivLayer extends Layer {
     }
     elem.style.position = 'absolute';
     elem.style.outline = 'none';
-    elem.style.left = node.rect.x + 'px';
-    elem.style.top = node.rect.y + 'px';
+    elem.style.left = node.rect.x + this.data.x + 'px';
+    elem.style.top = node.rect.y + this.data.y + 'px';
     elem.style.width = node.rect.width + 'px';
     elem.style.height = node.rect.height + 'px';
     if (node.rotate || node.offsetRotate) {

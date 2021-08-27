@@ -2864,6 +2864,7 @@ export class Topology {
     this.lastTranlated.x = x;
     this.lastTranlated.y = y;
     this.render();
+    this.divLayer.render();
 
     if (this.cacheTimer) {
       clearTimeout(this.cacheTimer);
