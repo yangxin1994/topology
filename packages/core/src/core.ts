@@ -314,6 +314,8 @@ export class Topology {
             x: touches[0].pageX + (touches[1].pageX - touches[0].pageX) / 2,
             y: touches[0].pageY + (touches[1].pageY - touches[0].pageY) / 2,
           };
+          // 计算鼠标位置根据画布偏移
+          this.calibrateMouse(this.touchCenter);
         }
 
         const timeNow = Date.now();
@@ -470,6 +472,8 @@ export class Topology {
         event.x - window.scrollX - (this.canvasPos.left || this.canvasPos.x),
         event.y - window.scrollY - (this.canvasPos.top || this.canvasPos.y)
       );
+      // 计算鼠标位置根据画布偏移
+      this.calibrateMouse(pos);
       let scale = this.data.scale;
       if (event.deltaY < 0) {
         scale += 0.1;
@@ -2886,13 +2890,14 @@ export class Topology {
       this.data.scale = Math.round(this.data.scale * scale * 100) / 100;
     }
 
-    !center && (center = this.getRect().center);
+    !center && (center = getRect(this.data.pens).center);
 
     for (const item of this.data.pens) {
       item.scale(scale, center);
     }
     if (this.data.bkImageRect && !this.data.bkImageStatic) {
-      this.data.bkImageRect.scale(scale, center);
+      const backCenter = new Point(center.x + this.data.x, center.y + this.data.y);
+      this.data.bkImageRect.scale(scale, backCenter);
     }
     Store.set(this.generateStoreKey('LT:updateLines'), this.data.pens);
 
