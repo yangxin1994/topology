@@ -2327,7 +2327,7 @@ export class Topology {
 
     const dpi = this.offscreen.getDpiRatio();
     rect.scale(dpi);
-    backRect && backRect.scale(dpi);
+    backRect && backRect.scale(dpi, rect.center);
 
     const canvas = document.createElement('canvas');
     canvas.width = rect.width;
