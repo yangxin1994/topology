@@ -210,7 +210,7 @@ export class Topology {
       }, 100);
     });
     this.subcribeAnimateMoved = Store.subscribe(this.generateStoreKey('LT:rectChanged'), (e: any) => {
-      this.activeLayer.updateLines(this.data.pens);
+      this.activeLayer.updateLines([e]);
     });
     this.subcribeMediaEnd = Store.subscribe(this.generateStoreKey('mediaEnd'), (node: Node) => {
       if (node.nextPlay) {
