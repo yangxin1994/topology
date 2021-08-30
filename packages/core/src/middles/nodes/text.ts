@@ -194,6 +194,10 @@ export function text(ctx: CanvasRenderingContext2D, node: Pen) {
   }
 
   const textRect = node.getTextRect();
+  if(!textRect){
+    ctx.restore();
+    return;
+  }
   const lines = getLines(ctx, node);
 
   const lineHeight = node.fontSize * node.lineHeight;
