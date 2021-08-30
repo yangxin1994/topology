@@ -1025,7 +1025,7 @@ export class Topology {
             this.moveIn.hoverNode.moveIn();
 
             // Send a move event.
-            this.dispatch('moveInNode', Object.assign({}, this.moveIn.hoverNode, {
+            this.dispatch('moveInNode', Object.assign(this.moveIn.hoverNode, {
               evs: {
                 x: e.pageX,
                 y: e.pageY,
@@ -1045,7 +1045,7 @@ export class Topology {
           if (this.moveIn.hoverLine) {
             this.hoverLayer.line = this.moveIn.hoverLine;
             this.moveIn.hoverLine.moveIn();
-            this.dispatch('moveInLine', Object.assign({},this.moveIn.hoverLine,{
+            this.dispatch('moveInLine', Object.assign(this.moveIn.hoverLine,{
               evs: {
                 x: e.pageX,
                 y: e.pageY,
@@ -1260,7 +1260,7 @@ export class Topology {
           this.activeLayer.pens = [this.moveIn.hoverLine];
           this.dispatch(
             'line' + (e.button === 2 ? 'RightClick' : ''),
-            Object.assign({},this.moveIn.hoverLine,{
+            Object.assign(this.moveIn.hoverLine,{
               evs: {
                 x: e.pageX,
                 y: e.pageY,
@@ -1360,7 +1360,7 @@ export class Topology {
           this.activeLayer.setPens([this.moveIn.activeNode]);
           this.dispatch(
             'node' + (e.button === 2 ? 'RightClick' : ''),
-            Object.assign({}, this.moveIn.activeNode,{
+            Object.assign(this.moveIn.activeNode,{
               evs: {
                 x: e.pageX,
                 y: e.pageY,

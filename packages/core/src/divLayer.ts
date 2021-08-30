@@ -393,6 +393,7 @@ export class DivLayer extends Layer {
     elem.style.top = node.rect.y + this.data.y + 'px';
     elem.style.width = node.rect.width + 'px';
     elem.style.height = node.rect.height + 'px';
+    elem.style.display = node.visible ? 'inline' : 'none';   // 是否隐藏元素
     if (node.rotate || node.offsetRotate) {
       elem.style.transform = `rotate(${node.rotate + node.offsetRotate}deg)`;
     }
