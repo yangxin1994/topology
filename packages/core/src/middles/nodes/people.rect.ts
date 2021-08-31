@@ -6,6 +6,6 @@ export function peopleIconRect(node: Node) {
 }
 
 export function peopleTextRect(node: Node) {
-  node.textRect = new Rect(0, 0, 0, 0);
+  node.textRect = undefined;
   node.fullTextRect = node.textRect;
 }

@@ -70,11 +70,9 @@ export function getBboxOfPoints(points: Point[]) {
   return { x1, y1, x2, y2 };
 }
 export function rectInRect(source: Rect, target: Rect) {
-  return (
-    (source.x > target.x && source.x < target.ex && source.y > target.y && source.y < target.ey) ||
-    (source.ex > target.x && source.ex < target.ex && source.y > target.y && source.y < target.ey) ||
-    (source.ex > target.x && source.ex < target.ex && source.ey > target.y && source.ey < target.ey) ||
-    (source.x > target.x && source.x < target.ex && source.ey > target.y && source.ey < target.ey)
+  return !(
+    // 括号内表明 在范围外的 四个区域
+    source.x > target.ex || source.ex < target.x || source.ey < target.y || source.y > target.ey
   );
 }
 

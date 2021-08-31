@@ -5,6 +5,6 @@ export function sequenceFocusIconRect(node: Node) {
 }
 
 export function sequenceFocusTextRect(node: Node) {
-  node.textRect = new Rect(0, 0, 0, 0);
+  node.textRect = undefined;
   node.fullTextRect = node.textRect;
 }
