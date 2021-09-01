@@ -2867,10 +2867,13 @@ export class Topology {
     this.render();
     this.divLayer.render();
 
+    this.animateLayer.stop();
     if (this.cacheTimer) {
       clearTimeout(this.cacheTimer);
     }
     this.cacheTimer = setTimeout(() => {
+      this.animateLayer.readyPlay(undefined, true);
+      this.animateLayer.animate();
       this.cache();
     }, 300);
     if (!noNotice) {
