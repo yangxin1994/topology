@@ -251,6 +251,7 @@ export class AnimateLayer extends Layer {
     this.pens.clear();
     if (this.timer) {
       cancelAnimationFrame(this.timer);
+      this.timer = null;
     }
   }
 
