@@ -436,6 +436,7 @@ export class Topology {
       this.mouseDown = undefined;
     };
     this.divLayer.canvas.onwheel = (event) => {
+      if(this.data.locked === Lock.NoEvent) return;
       const timeNow = new Date().getTime();
       if (timeNow - this.touchStart < 20) {
         event.preventDefault();
