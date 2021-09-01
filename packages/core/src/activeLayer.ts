@@ -408,15 +408,14 @@ export class ActiveLayer extends Layer {
       pens = this.pens;
     }
 
-    const nodesLines = flatNodes(pens);
-    const allLines = flatNodes(this.data.pens);
+    const allPens = flatNodes(this.data.pens);
+    const allLines = allPens.lines;
+    let nodes: Node[] = allPens.nodes;
+    if (!this.options.autoAnchor) {  // 非自动瞄点，只要活动层的 nodes
+      nodes = flatNodes(pens).nodes;
+    }
     const lines: Line[] = [];
-    const allNodes = flatNodes(this.data.pens).nodes;
-    for (const line of allLines.lines) {
-      let nodes: Pen[] = nodesLines.nodes;
-      if (this.options.autoAnchor) {
-        nodes = allNodes;
-      }
+    for (const line of allLines) {
       for (const item of nodes) {
         let cnt = 0;
         if (line.from && line.from.id === item.id) {
