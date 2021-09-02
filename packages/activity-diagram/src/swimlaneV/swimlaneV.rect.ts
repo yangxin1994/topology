@@ -11,7 +11,7 @@ export function swimlaneVTextRect(node: Node) {
     node.rect.x,
     node.rect.y,
     node.rect.width,
-    40 * window.topology.data.scale
+    (8 / 100) * node.rect.height
   );
   node.fullTextRect = node.textRect;
 }

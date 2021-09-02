@@ -6,9 +6,9 @@ export function swimlaneHIconRect(node: Node) {
 
 export function swimlaneHTextRect(node: Node) {
   node.textRect = new Rect(
-    node.rect.x + 10 * window.topology.data.scale,
+    node.rect.x + (2 / 100) * node.rect.width,
     node.rect.y,
-    20 * window.topology.data.scale,
+    (4 / 100) * node.rect.width,
     node.rect.height
   );
   node.fullTextRect = node.textRect;

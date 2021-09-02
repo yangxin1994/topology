@@ -49,8 +49,8 @@ export function swimlaneV(ctx: CanvasRenderingContext2D, node: Node) {
   );
   ctx.closePath();
 
-  ctx.moveTo(node.rect.x, node.rect.y + 40 * window.topology.data.scale);
-  ctx.lineTo(node.rect.ex, node.rect.y + 40 * window.topology.data.scale);
+  ctx.moveTo(node.rect.x, node.rect.y + (8 / 100) * node.rect.height);
+  ctx.lineTo(node.rect.ex, node.rect.y + (8 / 100) * node.rect.height);
 
   (node.fillStyle || node.bkType) && ctx.fill();
   ctx.stroke();
