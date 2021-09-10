@@ -23,7 +23,7 @@ import { formatPadding } from './utils/padding';
 import { Socket } from './socket';
 import { MQTT } from './mqtt';
 import { Direction, EventType as SocketEventType } from './models';
-import { isMobile } from './utils';
+import { createCacheTable, getCache, isMobile, pushCache, spliceCache } from './utils';
 import pkg from './../package.json';
 
 declare const window: any;
@@ -48,6 +48,7 @@ enum MoveInType {
 
 interface ICaches {
   index: number;
+  dbIndex: number;   // indexDB 中实际的 index
   list: TopologyData[];
 }
 
@@ -60,6 +61,7 @@ export class Topology {
   clipboard: TopologyData;
   caches: ICaches = {
     index: 0,
+    dbIndex: 0,
     list: [],
   };
   options: Options;
@@ -233,6 +235,7 @@ export class Topology {
     this.subcribeEmit = Store.subscribe(
       this.generateStoreKey('LT:emit'),
       (e: { event: string; pen: Pen; params: string }) => {
+        // TODO: 此处为何不使用 dispatch 
         this.emit(e.event, e);
       }
     );
@@ -748,8 +751,10 @@ export class Topology {
     Store.set('LT:bkColor', this.data.bkColor);
     this.lock(this.data.locked);
 
+    createCacheTable();  // 未建表先建表，建表了清空数据
     this.caches.list = [];
     this.cache();
+    this.caches.dbIndex = 0;
 
     this.divLayer.clear();
     this.animateLayer.stop();
@@ -2248,13 +2253,18 @@ export class Topology {
     if (this.options.cacheLen == 0 || this.data.locked) return;
     if (this.caches.index < this.caches.list.length - 1) {
       this.caches.list.splice(this.caches.index + 1, this.caches.list.length - this.caches.index - 1);
+      // 删除 indexDB 的值
+      spliceCache(this.caches.dbIndex + 1)
     }
-    this.caches.list.push(this.pureData());
+    const data = this.pureData();
+    this.caches.list.push(data);
+    pushCache(data);
     if (this.caches.list.length > this.options.cacheLen) {
       this.caches.list.shift();
     }
 
     this.caches.index = this.caches.list.length - 1;
+    this.caches.dbIndex++;  // 向后移动
   }
 
   cacheReplace(pens: Pen[]) {
@@ -2291,12 +2301,29 @@ export class Topology {
 
     this.divLayer.clear(true);
     this.animateLayer.stop();
+    this.caches.dbIndex--;  // 数据库中的位置前移
     this.data = createData(this.caches.list[--this.caches.index], this.id);
     this.render(true);
     this.divLayer.render();
 
     if (noRedo) {
       this.caches.list.splice(this.caches.index + 1, this.caches.list.length - this.caches.index - 1);
+      // 不允许恢复，同时删除数据库中的值
+      spliceCache(this.caches.dbIndex);
+    }
+    if(this.options.cacheLen === this.caches.list.length){
+      // 说明已经满过，数据库中的值，目前应该是大于内存值的
+      // 当 index 到 list 中间时，开始向左侧添加 indexDB 中的内容
+      if(this.caches.index < this.caches.list.length / 2){
+        getCache(this.caches.dbIndex - Math.ceil(this.caches.list.length / 2)).then(data=>{
+          if(data){
+            // TODO:  异步的，不确认是否正确
+            this.caches.list.pop();
+            this.caches.list.unshift(data);
+            this.caches.index++;
+          }
+        })
+      }
     }
 
     this.dispatch('undo', this.data);
@@ -2310,9 +2337,25 @@ export class Topology {
       return;
     }
     this.divLayer.clear(true);
+    this.caches.dbIndex++;  // 向后移动
     this.data = createData(this.caches.list[++this.caches.index], this.id);
     this.render(true);
     this.divLayer.render();
+
+    if(this.options.cacheLen === this.caches.list.length){
+      // 说明已经满过，数据库中的值，目前应该是大于内存值的
+      // 当 index 到 list 中间时，开始向右侧加
+      if(this.caches.index >= this.caches.list.length / 2){
+        getCache(this.caches.dbIndex + Math.floor(this.caches.list.length / 2)).then(data=>{
+          // TODO:  异步的，不确认是否正确
+          if(data){
+            this.caches.list.shift();
+            this.caches.list.push(data);
+            this.caches.index--;
+          }
+        })
+      }
+    }
 
     this.dispatch('redo', this.data);
   }
