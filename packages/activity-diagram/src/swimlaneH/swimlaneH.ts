@@ -1,5 +1,5 @@
 import { Node } from '@topology/core';
-
+declare const window: any;
 export function swimlaneH(ctx: CanvasRenderingContext2D, node: Node) {
   let wr = node.borderRadius;
   let hr = node.borderRadius;
@@ -31,12 +31,24 @@ export function swimlaneH(ctx: CanvasRenderingContext2D, node: Node) {
     node.rect.y + node.rect.height,
     r
   );
-  ctx.arcTo(node.rect.x, node.rect.y + node.rect.height, node.rect.x, node.rect.y, r);
-  ctx.arcTo(node.rect.x, node.rect.y, node.rect.x + node.rect.width, node.rect.y, r);
+  ctx.arcTo(
+    node.rect.x,
+    node.rect.y + node.rect.height,
+    node.rect.x,
+    node.rect.y,
+    r
+  );
+  ctx.arcTo(
+    node.rect.x,
+    node.rect.y,
+    node.rect.x + node.rect.width,
+    node.rect.y,
+    r
+  );
   ctx.closePath();
 
-  ctx.moveTo(node.rect.x + 40, node.rect.y);
-  ctx.lineTo(node.rect.x + 40, node.rect.ey);
+  ctx.moveTo(node.rect.x + (8 / 100) * node.rect.width, node.rect.y);
+  ctx.lineTo(node.rect.x + (8 / 100) * node.rect.width, node.rect.ey);
 
   (node.fillStyle || node.bkType) && ctx.fill();
   ctx.stroke();
