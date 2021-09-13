@@ -372,6 +372,10 @@ export class Topology {
       };
     } else {
       this.divLayer.canvas.onmousedown = (event: MouseEvent) => {
+        if((event.target as any).nodeName ==='INPUT' && (event.target as any).type ==='range' && this.data.locked){
+          return;
+        }
+        
         if (this.touchedNode) {
           if (this.touchedNode.name === 'graffiti') {
             this.touchedNode.rect = new Rect(0, 0, 0, 0);
@@ -754,7 +758,10 @@ export class Topology {
     createCacheTable();  // 未建表先建表，建表了清空数据
     this.caches.list = [];
     this.cache();
-    this.caches.dbIndex = 0;
+    if (this.options.cacheLen == 0 || this.data.locked)
+      this.caches.dbIndex = -1;
+    else
+      this.caches.dbIndex = 0;
 
     this.divLayer.clear();
     this.animateLayer.stop();
@@ -2254,7 +2261,7 @@ export class Topology {
     if (this.caches.index < this.caches.list.length - 1) {
       this.caches.list.splice(this.caches.index + 1, this.caches.list.length - this.caches.index - 1);
       // 删除 indexDB 的值
-      spliceCache(this.caches.dbIndex + 1)
+      spliceCache(this.caches.dbIndex + 1);
     }
     const data = this.pureData();
     this.caches.list.push(data);
@@ -2322,7 +2329,7 @@ export class Topology {
             this.caches.list.unshift(data);
             this.caches.index++;
           }
-        })
+        });
       }
     }
 
@@ -2353,7 +2360,7 @@ export class Topology {
             this.caches.list.push(data);
             this.caches.index--;
           }
-        })
+        });
       }
     }
 
@@ -2372,6 +2379,7 @@ export class Topology {
     rect.y -= p[0];
     rect.width += p[3] + p[1];
     rect.height += p[0] + p[2];
+    rect.init();
 
     const dpi = this.offscreen.getDpiRatio();
     rect.scale(dpi);
