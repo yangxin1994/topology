@@ -51,7 +51,11 @@ export function spliceCache(index: number) {
   };
 }
 
-export function pushCache(data: TopologyData | any) {
+export function pushCache(
+  data: TopologyData | any,
+  index: number,
+  length: number
+) {
   const request = indexedDB.open('topology-caches'); // 默认版本 1
   request.onsuccess = (event) => {
     const db = request.result;
@@ -59,10 +63,14 @@ export function pushCache(data: TopologyData | any) {
       return;
     }
     const push = db.transaction(['caches'], 'readwrite').objectStore('caches');
+    data.dbIndex = index;
+    push.add(data);
     const result = push.count();
     result.onsuccess = () => {
-      data.dbIndex = result.result;
-      push.add(data);
+      if (result.result > length) {
+        // 把最前面的一个扔出去
+        push.delete(index - length);
+      }
     };
   };
   request.onupgradeneeded = (e: any) => {

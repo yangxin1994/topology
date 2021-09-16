@@ -129,6 +129,11 @@ export class Topology {
   socket: Socket;
   mqtt: MQTT;
 
+  // 内存中的 caches 数量
+  get ramCaches() : number {
+    return 5;
+  }
+
   private socketFn: Function;
 
   _emitter: Emitter;
@@ -755,13 +760,10 @@ export class Topology {
     Store.set('LT:bkColor', this.data.bkColor);
     this.lock(this.data.locked);
 
-    createCacheTable();  // 未建表先建表，建表了清空数据
     this.caches.list = [];
+    createCacheTable();  // 清空数据
+    this.caches.dbIndex = -1;
     this.cache();
-    if (this.options.cacheLen == 0 || this.data.locked)
-      this.caches.dbIndex = -1;
-    else
-      this.caches.dbIndex = 0;
 
     this.divLayer.clear();
     this.animateLayer.stop();
@@ -2265,8 +2267,8 @@ export class Topology {
     }
     const data = this.pureData();
     this.caches.list.push(data);
-    pushCache(data);
-    if (this.caches.list.length > this.options.cacheLen) {
+    pushCache(data, this.caches.dbIndex + 1, this.options.cacheLen);
+    if (this.caches.list.length > this.ramCaches) {
       this.caches.list.shift();
     }
 
@@ -2318,19 +2320,16 @@ export class Topology {
       // 不允许恢复，同时删除数据库中的值
       spliceCache(this.caches.dbIndex);
     }
-    if(this.options.cacheLen === this.caches.list.length){
-      // 说明已经满过，数据库中的值，目前应该是大于内存值的
-      // 当 index 到 list 中间时，开始向左侧添加 indexDB 中的内容
-      if(this.caches.index < this.caches.list.length / 2){
-        getCache(this.caches.dbIndex - Math.ceil(this.caches.list.length / 2)).then(data=>{
-          if(data){
-            // TODO:  异步的，不确认是否正确
-            this.caches.list.pop();
-            this.caches.list.unshift(data);
-            this.caches.index++;
-          }
-        });
-      }
+    // 当 index 到 list 中间时，开始向左侧添加 indexDB 中的内容
+    if(this.caches.index <= this.caches.list.length / 2 - 1){
+      const sub = this.caches.index - 0 + 1;  // 距离左侧前一个的差距
+      getCache(this.caches.dbIndex - sub).then(data=>{
+        if(data){
+          this.caches.list.pop();
+          this.caches.list.unshift(data);
+          this.caches.index++;
+        }
+      });
     }
 
     this.dispatch('undo', this.data);
@@ -2349,19 +2348,16 @@ export class Topology {
     this.render(true);
     this.divLayer.render();
 
-    if(this.options.cacheLen === this.caches.list.length){
-      // 说明已经满过，数据库中的值，目前应该是大于内存值的
-      // 当 index 到 list 中间时，开始向右侧加
-      if(this.caches.index >= this.caches.list.length / 2){
-        getCache(this.caches.dbIndex + Math.floor(this.caches.list.length / 2)).then(data=>{
-          // TODO:  异步的，不确认是否正确
-          if(data){
-            this.caches.list.shift();
-            this.caches.list.push(data);
-            this.caches.index--;
-          }
-        });
-      }
+    // 当 index 到 list 中间时，开始向右侧加
+    if(this.caches.index >= this.caches.list.length / 2){
+      const add = this.caches.list.length - this.caches.index;  // 距离右侧的差距
+      getCache(this.caches.dbIndex + add).then(data=>{
+        if(data){
+          this.caches.list.shift();
+          this.caches.list.push(data);
+          this.caches.index--;
+        }
+      });
     }
 
     this.dispatch('redo', this.data);
