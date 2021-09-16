@@ -218,9 +218,9 @@ export class Node extends Pen {
             child.calcRectByParent(this);
             break;
           default:
+            Node.prototype.calcRectByParent.apply(item, [this]);
             child = new Node(item);
             child.parentId = this.id;
-            child.calcRectByParent(this);
             (child as Node).init(cloneState);
             break;
         }
