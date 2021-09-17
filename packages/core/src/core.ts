@@ -240,7 +240,7 @@ export class Topology {
     this.subcribeEmit = Store.subscribe(
       this.generateStoreKey('LT:emit'),
       (e: { event: string; pen: Pen; params: string }) => {
-        // TODO: 此处为何不使用 dispatch 
+        // TODO: 此处为何不使用 dispatch
         this.emit(e.event, e);
       }
     );
@@ -380,7 +380,7 @@ export class Topology {
         if((event.target as any).nodeName ==='INPUT' && (event.target as any).type ==='range' && this.data.locked){
           return;
         }
-        
+
         if (this.touchedNode) {
           if (this.touchedNode.name === 'graffiti') {
             this.touchedNode.rect = new Rect(0, 0, 0, 0);
@@ -1514,6 +1514,11 @@ export class Topology {
             this.activeLayer.clear();
             this.data.pens.splice(this.findIndex(this.hoverLayer.line), 1);
           }
+         if(this.hoverLayer.line.from.id && this.hoverLayer.line.to.id){
+            this.dispatch('lineOn', Object.assign(this.hoverLayer.line,{
+              lineOnDirection: this.moveIn.type
+            }));
+          }
           break;
         case MoveInType.Graffiti:
           if (!this.moveIn.hoverNode.points || this.moveIn.hoverNode.points.length < 2) {
