@@ -1565,6 +1565,8 @@ export class Topology {
     }
 
     this.hoverLayer.dragRect = undefined;
+    this.activeLayer.lastOffsetX = 0;
+    this.activeLayer.lastOffsetY = 0;
     this.render();
 
     if (this.needCache) {
