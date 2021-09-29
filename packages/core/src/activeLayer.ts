@@ -253,28 +253,47 @@ export class ActiveLayer extends Layer {
       offsetY = (offsetX * h) / w;
     }
 
-    const lines: Line[] = [];
+    // const lines: Line[] = [];
     switch (type) {
       case 0:
-        // offsetX = -offsetX;
-        // offsetY = -offsetY;
         if (this.activeRect.width - offsetX < 5 || this.activeRect.height - offsetY < 5) {
           return;
         }
-        this.activeRect.x += offsetX;
-        this.activeRect.y += offsetY;
-        this.activeRect.width -= offsetX;
-        this.activeRect.height -= offsetY;
+        if (!(pt2 as any).shiftKey) {
+          // offsetX = -offsetX;
+          // offsetY = -offsetY;
+          this.activeRect.x += offsetX;
+          this.activeRect.y += offsetY;
+          this.activeRect.width -= offsetX;
+          this.activeRect.height -= offsetY;
+        }else{
+          offsetX = -offsetX;
+          offsetY = -offsetY;
+          this.activeRect.ex += offsetX;
+          this.activeRect.ey += offsetY;
+          this.activeRect.width += offsetX;
+          this.activeRect.height += offsetY;
+        }
         break;
       case 1:
         // offsetY = -offsetY;
         if (this.activeRect.width + offsetX < 5 || this.activeRect.height - offsetY < 5) {
           return;
         }
-        this.activeRect.ex += offsetX;
-        this.activeRect.y += offsetY;
-        this.activeRect.width += offsetX;
-        this.activeRect.height -= offsetY;
+        if (!(pt2 as any).shiftKey) {
+          this.activeRect.ex += offsetX;
+          this.activeRect.y += offsetY;
+          this.activeRect.width += offsetX;
+          this.activeRect.height -= offsetY;
+        }else{
+          // offsetX = -offsetX;
+          // offsetY = -offsetY;
+          this.activeRect.ex += offsetX;
+          this.activeRect.ey += offsetY;
+          this.activeRect.width += offsetX;
+          this.activeRect.height += offsetY;
+        }
+
         break;
       case 2:
         if (this.activeRect.width + offsetX < 5 || this.activeRect.height + offsetY < 5) {
@@ -290,15 +309,25 @@ export class ActiveLayer extends Layer {
         if (this.activeRect.width - offsetX < 5 || this.activeRect.height + offsetY < 5) {
           return;
         }
-        this.activeRect.x += offsetX;
-        this.activeRect.ey += offsetY;
-        this.activeRect.width -= offsetX;
-        this.activeRect.height += offsetY;
+        if (!(pt2 as any).shiftKey) {
+          this.activeRect.x += offsetX;
+          this.activeRect.ey += offsetY;
+          this.activeRect.width -= offsetX;
+          this.activeRect.height += offsetY;
+        }else{
+          offsetX = -offsetX;
+          offsetY = -offsetY;
+          this.activeRect.ex += offsetX;
+          this.activeRect.ey += offsetY;
+          this.activeRect.width += offsetX;
+          this.activeRect.height += offsetY;
+        }
+
         break;
     }
     const scaleX = this.activeRect.width / w;
     const scaleY = this.activeRect.height / h;
-    let i = 0;
+    // let i = 0;
     for (const item of this.pens) {
       if (item.locked) {
         continue;
@@ -375,7 +404,7 @@ export class ActiveLayer extends Layer {
         }
       }
 
-      ++i;
+      // ++i;
     }
 
     this.updateLines();
