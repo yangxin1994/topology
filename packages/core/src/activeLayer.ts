@@ -11,7 +11,7 @@ import { Lock } from './models/status';
 import { drawLineFns } from './middles';
 import { getBezierPoint } from './middles/lines/curve';
 import { Layer } from './layer';
-import { find, flatNodes, getBboxOfPoints, rgba,deepClone,getActiveRect } from './utils';
+import { find, flatNodes, getBboxOfPoints, rgba,deepClone,getRect } from './utils';
 import { Topology } from './core';
 
 export class ActiveLayer extends Layer {
@@ -768,7 +768,7 @@ export class ActiveLayer extends Layer {
     if (this.pens.length === 1) {
       this.activeRect = deepClone(this.pens[0].rect);
     } else {
-      this.activeRect = getActiveRect(this.pens);
+      this.activeRect = getRect(this.pens);
     }
   }
   getDockWatchers() {
