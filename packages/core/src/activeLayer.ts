@@ -311,7 +311,7 @@ export class ActiveLayer extends Layer {
           item['oldRect'] = item.rect.clone();
           if (
             !this.options.disableSizeX &&
-            pt2.ctrlKey &&
+            !pt2.ctrlKey &&
             !(item as Node).disableSizeX
           ) {
             // item.rect.width = this.nodeRects[i].width + offsetX;
@@ -319,7 +319,7 @@ export class ActiveLayer extends Layer {
           }
           if (
             !this.options.disableSizeY &&
-            pt2.altKey &&
+            !pt2.altKey &&
             !(item as Node).disableSizeY
           ) {
             // item.rect.height = this.nodeRects[i].height + offsetY;
