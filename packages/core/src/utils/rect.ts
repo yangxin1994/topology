@@ -4,7 +4,27 @@ import { Node } from '../models/node';
 import { Line } from '../models/line';
 import { getBezierPoint } from '../middles/lines/curve';
 import { Rect } from '../models/rect';
-
+// export interface Point {
+//   x: number;
+//   y: number;
+//   radius?: number;
+//   color?: string;
+//   background?: string;
+//   id?: string;
+//   penId?: string;
+//   connectTo?: string;
+//   anchorId?: string;
+//   twoWay?: TwoWay;
+//   prev?: Point;
+//   next?: Point;
+//   prevNextType?: PrevNextType;
+//   start?: boolean;
+//   lineLength?: number;
+//   step?: number;
+//   curvePoints?: Point[];
+//   rotate?: number;
+//   hidden?: boolean;
+// }
 /**
  * 不包含画布偏移量
  * */
@@ -52,7 +72,76 @@ export function getRect(pens: Pen[]) {
 
   return new Rect(x1, y1, x2 - x1, y2 - y1);
 }
+export function getActiveRect(pens: Pen[]) {
+  const points: Point[] = [];
+  pens.forEach((pen) => {
+    const rect = pen.rect;
+    if (rect) {
+      const pts = rectToPoints(rect);
+      pts.forEach((pt) => {
+        rotatePoint(pt, pen.rotate, rect.center);
+      });
 
+      points.push(...pts);
+    }
+  });
+  const rect = getRectOfPoints(points);
+  calcCenter(rect);
+  return rect;
+}
+export function rotatePoint(pt: Point, angle: number, center: Point) {
+  if (!angle || angle % 360 === 0) {
+    return;
+  }
+  const a = (angle * Math.PI) / 180;
+  const x = (pt.x - center.x) * Math.cos(a) - (pt.y - center.y) * Math.sin(a) + center.x;
+  const y = (pt.x - center.x) * Math.sin(a) + (pt.y - center.y) * Math.cos(a) + center.y;
+  pt.x = x;
+  pt.y = y;
+
+  pt.prev && rotatePoint(pt.prev, angle, center);
+  pt.next && rotatePoint(pt.next, angle, center);
+}
+export function calcCenter(rect: Rect) {
+  if (!rect.center) {
+    rect.center = {} as Point;
+  }
+  rect.center.x = rect.x + rect.width / 2;
+  rect.center.y = rect.y + rect.height / 2;
+}
+
+export function getRectOfPoints(points: Point[]) {
+  let x = Infinity;
+  let y = Infinity;
+  let ex = -Infinity;
+  let ey = -Infinity;
+
+  points.forEach((item) => {
+    x = Math.min(x, item.x);
+    y = Math.min(y, item.y);
+    ex = Math.max(ex, item.x);
+    ey = Math.max(ey, item.y);
+  });
+  return { x, y, ex, ey, width: ex - x, height: ey - y };
+}
+export function rectToPoints(rect: Rect) {
+  const pts = [
+    { x: rect.x, y: rect.y },
+    { x: rect.ex, y: rect.y },
+    { x: rect.ex, y: rect.ey },
+    { x: rect.x, y: rect.ey },
+  ];
+
+  if (rect.rotate) {
+    if (!rect.center) {
+      calcCenter(rect);
+    }
+    pts.forEach((pt) => {
+      rotatePoint(pt, rect.rotate, rect.center);
+    });
+  }
+  return pts;
+}
 
 export function getBboxOfPoints(points: Point[]) {
   let x1 = Infinity;
@@ -62,7 +151,7 @@ export function getBboxOfPoints(points: Point[]) {
 
   for (const item of points) {
     const { x, y } = item;
-    if(isNaN(x) || isNaN(y)) 
+    if(isNaN(x) || isNaN(y))
       continue;
     x1 = Math.min(x1, x);
     y1 = Math.min(y1, y);

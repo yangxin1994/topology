@@ -11,18 +11,20 @@ import { Lock } from './models/status';
 import { drawLineFns } from './middles';
 import { getBezierPoint } from './middles/lines/curve';
 import { Layer } from './layer';
-import { find, flatNodes, getBboxOfPoints, rgba } from './utils';
+import { find, flatNodes, getBboxOfPoints, rgba,deepClone,getActiveRect } from './utils';
 import { Topology } from './core';
 
 export class ActiveLayer extends Layer {
   rotateCPs: Point[] = [];
   sizeCPs: Point[] = [];
   rect: Rect;
+  activeRect: Rect;
 
   pens: Pen[] = [];
 
   rotate = 0;
-
+  lastOffsetX = 0;
+  lastOffsetY = 0;
   // 备份初始位置，方便移动事件处理
   initialSizeCPs: Point[] = [];
   nodeRects: Rect[] = [];
@@ -227,6 +229,7 @@ export class ActiveLayer extends Layer {
       y: number;
       ctrlKey?: boolean;
       altKey?: boolean;
+      shiftKey?: boolean;
     }
   ) {
     const p1 = new Point(pt1.x, pt1.y);
@@ -236,24 +239,65 @@ export class ActiveLayer extends Layer {
       p2.rotate(-this.pens[0].rotate, this.nodeRects[0].center);
     }
 
-    let offsetX = p2.x - p1.x;
-    let offsetY = p2.y - p1.y;
+    let x = p2.x - p1.x;
+    let y = p2.y - p1.y;
 
-    const lines: Line[] = [];
 
-    switch (type) {
-      case 0:
-        offsetX = -offsetX;
-        offsetY = -offsetY;
-        break;
-      case 1:
-        offsetY = -offsetY;
-        break;
-      case 3:
-        offsetX = -offsetX;
-        break;
+    let offsetX = x - this.lastOffsetX;
+    let offsetY = y - this.lastOffsetY;
+    this.lastOffsetX = x;
+    this.lastOffsetY = y;
+    const w = this.activeRect.width;
+    const h = this.activeRect.height;
+    if ((pt2 as any).shiftKey) {
+      offsetY = (offsetX * h) / w;
     }
 
+    const lines: Line[] = [];
+    switch (type) {
+      case 0:
+        // offsetX = -offsetX;
+        // offsetY = -offsetY;
+        if (this.activeRect.width - offsetX < 5 || this.activeRect.height - offsetY < 5) {
+          return;
+        }
+        this.activeRect.x += offsetX;
+        this.activeRect.y += offsetY;
+        this.activeRect.width -= offsetX;
+        this.activeRect.height -= offsetY;
+        break;
+      case 1:
+        // offsetY = -offsetY;
+        if (this.activeRect.width + offsetX < 5 || this.activeRect.height - offsetY < 5) {
+          return;
+        }
+        this.activeRect.ex += offsetX;
+        this.activeRect.y += offsetY;
+        this.activeRect.width += offsetX;
+        this.activeRect.height -= offsetY;
+        break;
+      case 2:
+        if (this.activeRect.width + offsetX < 5 || this.activeRect.height + offsetY < 5) {
+          return;
+        }
+        this.activeRect.ex += offsetX;
+        this.activeRect.ey += offsetY;
+        this.activeRect.width += offsetX;
+        this.activeRect.height += offsetY;
+        break;
+      case 3:
+        // offsetX = -offsetX;
+        if (this.activeRect.width - offsetX < 5 || this.activeRect.height + offsetY < 5) {
+          return;
+        }
+        this.activeRect.x += offsetX;
+        this.activeRect.ey += offsetY;
+        this.activeRect.width -= offsetX;
+        this.activeRect.height += offsetY;
+        break;
+    }
+    const scaleX = this.activeRect.width / w;
+    const scaleY = this.activeRect.height / h;
     let i = 0;
     for (const item of this.pens) {
       if (item.locked) {
@@ -267,17 +311,32 @@ export class ActiveLayer extends Layer {
           item['oldRect'] = item.rect.clone();
           if (
             !this.options.disableSizeX &&
-            !pt2.altKey &&
+            pt2.ctrlKey &&
             !(item as Node).disableSizeX
           ) {
-            item.rect.width = this.nodeRects[i].width + offsetX;
+            // item.rect.width = this.nodeRects[i].width + offsetX;
+            item.rect.width *= scaleX;
           }
           if (
             !this.options.disableSizeY &&
-            !pt2.ctrlKey &&
+            pt2.altKey &&
             !(item as Node).disableSizeY
           ) {
-            item.rect.height = this.nodeRects[i].height + offsetY;
+            // item.rect.height = this.nodeRects[i].height + offsetY;
+            item.rect.height *= scaleY;
+          }
+          if (
+            (!this.options.disableSizeX &&
+            pt2.shiftKey &&
+            !(item as Node).disableSizeX) ||
+            (!this.options.disableSizeY &&
+            pt2.shiftKey &&
+            !(item as Node).disableSizeY)
+          ) {
+            // item.rect.width = this.nodeRects[i].width + offsetX;
+            // item.rect.height = this.nodeRects[i].height + offsetY;
+            item.rect.width *= scaleX;
+            item.rect.height *= scaleY;
           }
 
           switch (type) {
@@ -705,7 +764,13 @@ export class ActiveLayer extends Layer {
 
     ctx.restore();
   }
-
+  calcActiveRect() {
+    if (this.pens.length === 1) {
+      this.activeRect = deepClone(this.pens[0].rect);
+    } else {
+      this.activeRect = getActiveRect(this.pens);
+    }
+  }
   getDockWatchers() {
     if (this.pens.length === 1) {
       this.dockWatchers = this.nodeRects[0].toPoints();
