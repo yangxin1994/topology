@@ -1130,11 +1130,20 @@ export class Topology {
             this.needCache = true;
           }
           break;
-        case MoveInType.ResizeCP:
-          this.activeLayer.resize(this.moveIn.activeAnchorIndex, this.mouseDown, e);
-          this.dispatch('resizePens', this.activeLayer.pens);
-          this.needCache = true;
+        case MoveInType.ResizeCP: {
+          const x = e.x - this.mouseDown.x;
+          const y = e.y - this.mouseDown.y;
+          if (x || y) {
+            const offset = this.getDockPos(x, y, e.ctrlKey || e.shiftKey || e.altKey);
+            const offsetE = Object.assign({}, e);
+            offset.x && (offsetE.x = offset.x + this.mouseDown.x);
+            offset.y && (offsetE.y = offset.y + this.mouseDown.x);
+            this.activeLayer.resize(this.moveIn.activeAnchorIndex, this.mouseDown, offsetE);
+            this.dispatch('resizePens', this.activeLayer.pens);
+            this.needCache = true;
+          }
           break;
+        }
         case MoveInType.LineTo:
         case MoveInType.HoverAnchors:
         case MoveInType.AutoAnchor:
@@ -1154,9 +1163,8 @@ export class Topology {
           } else {
             const to = this.getLineDock(new Point(pt.x, pt.y), AnchorMode.In);
             toId = to.id;
-            if (to.x !== this.hoverLayer.line.from.x || to.y !== this.hoverLayer.line.from.y) {
-              this.hoverLayer.lineTo(to, arrow);
-            }
+            // 即使是自己连接自己，也为 to 配置 anchorIndex
+            this.hoverLayer.lineTo(to, arrow);
           }
           this.hoverLayer.line.to.id = toId;
           if (this.hoverLayer.line.parentId) {
@@ -1455,6 +1463,7 @@ export class Topology {
           // New active.
           if (this.hoverLayer.line) {
             let willAddLine: boolean;
+            const { from, to } = this.hoverLayer.line;
             if (this.hoverLayer.line.to.id) {
               if (!this.options.disableRepeatLine) {
                 willAddLine = true;
@@ -1467,8 +1476,14 @@ export class Topology {
                 );
                 willAddLine = lines.length <= 1;
               }
+              // 判断是否是当前锚点连接当前锚点
+              if(from.id === to.id && from.anchorIndex === to.anchorIndex){
+                willAddLine = false;
+              }
             } else {
               willAddLine = !this.options.disableEmptyLine && !this.hoverLayer.line.disableEmptyLine;
+              // from 与 to 的距离若小于等于 5 认为是误操作，不会添加连线
+              willAddLine = willAddLine && (from.x - to.x) ** 2 + (from.y - to.y) ** 2 > 25;
             }
 
             if (willAddLine) {
@@ -2243,9 +2258,9 @@ export class Topology {
           continue;
         }
 
-        if (!item.dockWatchers) {
-          item.getDockWatchers();
-        }
+        // if (!item.dockWatchers) {
+        //   item.getDockWatchers();
+        // }
         for (const p of item.dockWatchers) {
           x = Math.abs(p.x - activePt.x - offsetX);
           if (x < disX) {
