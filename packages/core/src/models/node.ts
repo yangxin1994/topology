@@ -81,7 +81,12 @@ export class Node extends Pen {
   rotatedAnchors: Point[] = [];
 
   // nodes移动时，停靠点的参考位置
-  dockWatchers: Point[];
+  // dockWatchers: Point[];
+  
+  get dockWatchers() : Point[] {
+    return [this.rect.center, ...this.rect.toPoints()];
+  }
+  
 
   animateDuration = 0;
   animateFrames: {
@@ -737,10 +742,10 @@ export class Node extends Pen {
     };
   }
 
-  getDockWatchers() {
-    this.dockWatchers = this.rect.toPoints();
-    this.dockWatchers.unshift(this.rect.center);
-  }
+  // getDockWatchers() {
+  //   this.dockWatchers = this.rect.toPoints();
+  //   this.dockWatchers.unshift(this.rect.center);
+  // }
 
   initAnimate() {
     if (!this.animateFrames) {
