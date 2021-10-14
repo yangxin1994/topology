@@ -282,6 +282,9 @@ export class Line extends Pen {
     if (width < 100) {
       width = 100;
     }
+    if (this.text && !this.text.split) {
+      this.text += '';
+    }
     const height =
       this.lineHeight *
       this.fontSize *

@@ -1440,7 +1440,7 @@ export class Topology {
       } else if (this.activeLayer.pens && this.activeLayer.pens[0] && this.activeLayer.pens[0].type === PenType.Node) {
         this.dispatch('node' + (e.button === 2 ? 'RightClick' : ''), this.activeLayer.pens[0]);
       }
-      this.activeLayer.calcActiveRect()
+      this.activeLayer.calcActiveRect();
     } else {
       const pt = this.calibrateMouse({ x: e.x, y: e.y });
       switch (this.moveIn.type) {
