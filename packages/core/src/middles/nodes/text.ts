@@ -54,6 +54,9 @@ export function getWrapLines(ctx: CanvasRenderingContext2D, words: string[], max
 }
 
 export function getLines(ctx: CanvasRenderingContext2D, pen: Pen) {
+  if (pen.text && !pen.text.split) {
+    pen.text += '';
+  }
   let lines = [];
 
   switch (pen.whiteSpace) {
