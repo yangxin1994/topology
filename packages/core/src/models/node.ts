@@ -86,6 +86,10 @@ export class Node extends Pen {
   get dockWatchers() : Point[] {
     return [this.rect.center, ...this.rect.toPoints()];
   }
+  // 不做任何处理，兼容以前版本中节点属性存在该值的
+  set dockWatchers(v : Point[]) {
+  }
+  
   
 
   animateDuration = 0;
