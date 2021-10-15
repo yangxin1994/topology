@@ -1137,7 +1137,7 @@ export class Topology {
             const offset = this.getDockPos(x, y, e.ctrlKey || e.shiftKey || e.altKey);
             const offsetE = Object.assign({}, e);
             offset.x && (offsetE.x = offset.x + this.mouseDown.x);
-            offset.y && (offsetE.y = offset.y + this.mouseDown.x);
+            offset.y && (offsetE.y = offset.y + this.mouseDown.y);
             this.activeLayer.resize(this.moveIn.activeAnchorIndex, this.mouseDown, offsetE);
             this.dispatch('resizePens', this.activeLayer.pens);
             this.needCache = true;
