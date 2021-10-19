@@ -345,6 +345,9 @@ export class ActiveLayer extends Layer {
           ) {
             // item.rect.width = this.nodeRects[i].width + offsetX;
             item.rect.width *= scaleX;
+            if ((item as Node).imageWidth) {
+              (item as Node).imageWidth *= scaleX;
+            }
           }
           if (
             !this.options.disableSizeY &&
@@ -353,6 +356,9 @@ export class ActiveLayer extends Layer {
           ) {
             // item.rect.height = this.nodeRects[i].height + offsetY;
             item.rect.height *= scaleY;
+            if ((item as Node).imageHeight) {
+              (item as Node).imageHeight *= scaleY;
+            }
           }
           if (
             (!this.options.disableSizeX &&
@@ -366,6 +372,12 @@ export class ActiveLayer extends Layer {
             // item.rect.height = this.nodeRects[i].height + offsetY;
             item.rect.width *= scaleX;
             item.rect.height *= scaleY;
+            if ((item as Node).imageWidth) {
+              (item as Node).imageWidth *= scaleX;
+            }
+            if ((item as Node).imageHeight) {
+              (item as Node).imageHeight *= scaleY;
+            }
           }
 
           switch (type) {
