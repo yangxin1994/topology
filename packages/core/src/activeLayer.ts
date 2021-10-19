@@ -807,6 +807,10 @@ export class ActiveLayer extends Layer {
   }
   calcActiveRect() {
     if (this.pens.length === 1) {
+      if(this.pens[0].rect.height === 0){
+        // 处理直线这种高度为0的情况
+        this.pens[0].rect.height = 1;
+      }
       this.activeRect = deepClone(this.pens[0].rect);
     } else {
       this.activeRect = getRect(this.pens);

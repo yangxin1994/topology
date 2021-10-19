@@ -946,7 +946,7 @@ export class Topology {
     pageX?: number;
     pageY?: number;
   }) => {
-    if (this.scheduledAnimationFrame || this.data.locked === Lock.NoEvent) {
+    if (this.scheduledAnimationFrame || this.data?.locked === Lock.NoEvent) {
       return;
     }
 
@@ -2945,7 +2945,7 @@ export class Topology {
     this.cacheTimer = setTimeout(() => {
       this.animateLayer.readyPlay(undefined, true);
       this.animateLayer.animate();
-      this.cache();
+      this.cache?.();
     }, 300);
     if (!noNotice) {
       this.dispatch('translate', { x, y });
