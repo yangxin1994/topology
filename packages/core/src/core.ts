@@ -1576,6 +1576,7 @@ export class Topology {
           }
           this.moveIn.hoverLine.children.push(line);
           this.hoverLayer.line = line;
+          this.dispatch('addLineInLines', {previous, line} );
       }
     }
 
