@@ -4,6 +4,11 @@ import { s8, Node, createInput, rectangle } from '@topology/core';
 export const inputObjs: any = {};
 
 export function textbox(ctx: CanvasRenderingContext2D, node: Node) {
+  // 活动层时，该值尚无，用该值来避免重复的创建
+  if (!node.data) {
+    return;
+  }
+
   if (node.elementId === undefined || node.elementId === null) {
     node.elementId = s8();
   }

@@ -134,6 +134,11 @@ export class Topology {
     return 5;
   }
 
+  // 需要清除 elementId 的图形，复制时用
+  get clearElementIdPensName(): string[]{
+    return ['echarts', 'textbox'];
+  }
+
   private socketFn: Function;
 
   _emitter: Emitter;
@@ -2622,8 +2627,8 @@ export class Topology {
           pt.y += offset;
         });
       }
-      // 若是 echarts 则清一下 elementId
-      if (pen.name === 'echarts') {
+      // 若是 echarts 等 dom 元素 则清一下 elementId
+      if (this.clearElementIdPensName.includes(pen.name)) {
         (pen as Node).elementId = undefined;
       }
       (pen as Node).init();
