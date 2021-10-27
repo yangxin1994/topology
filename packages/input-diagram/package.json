@@ -1,6 +1,6 @@
 {
   "name": "@topology/input-diagram",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A input tool using le5le-topology.",
   "main": "index.js",
   "types": "index.d.ts",

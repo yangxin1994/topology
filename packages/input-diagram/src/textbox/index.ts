@@ -4,6 +4,9 @@ import { s8, Node, createInput, rectangle } from '@topology/core';
 export const inputObjs: any = {};
 
 export function textbox(ctx: CanvasRenderingContext2D, node: Node) {
+  // 节点样式改变时，修改对应值
+  if (inputObjs[node.id] && inputObjs[node.id].input)
+    changeStyle(inputObjs[node.id].input, node);
   // 活动层时，该值尚无，用该值来避免重复的创建
   if (!node.data) {
     return;
@@ -38,13 +41,9 @@ export function textbox(ctx: CanvasRenderingContext2D, node: Node) {
 
       node.elementRendered = true;
     });
-
-    // 节点样式改变时，修改对应值
-    if (inputObjs[node.id].input) changeStyle(node.elementId, node);
   }
 }
-function changeStyle(id: string, node: Node) {
-  const input = document.getElementById(id);
+function changeStyle(input: any, node: Node) {
   if (input) {
     input.style.backgroundColor = node.fillStyle;
     input.style.fontSize = node.fontSize + 'px';
