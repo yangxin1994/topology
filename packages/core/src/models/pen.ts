@@ -176,6 +176,7 @@ export abstract class Pen {
   // 线条渐变
   lineGradientFromColor: string;
   lineGradientToColor: string;
+  lineGradientAngle: number;  // 该属性节点才有意义
 
   paddingTopNum: number;
   paddingBottomNum: number;
