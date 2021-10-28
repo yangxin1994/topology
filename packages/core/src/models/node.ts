@@ -420,6 +420,22 @@ export class Node extends Pen {
     }
     const from = new Point(this.rect.x, this.rect.center.y);
     const to = new Point(this.rect.ex, this.rect.center.y);
+    if (this.lineGradientAngle % 90 === 0 && this.lineGradientAngle % 180) {
+      if (this.lineGradientAngle % 270) {
+        from.x = this.rect.center.x;
+        from.y = this.rect.y;
+        to.x = this.rect.center.x;
+        to.y = this.rect.ey;
+      } else {
+        from.x = this.rect.center.x;
+        from.y = this.rect.ey;
+        to.x = this.rect.center.x;
+        to.y = this.rect.y;
+      }
+    } else if (this.lineGradientAngle) {
+      from.rotate(this.lineGradientAngle, this.rect.center);
+      to.rotate(this.lineGradientAngle, this.rect.center);
+    }
 
     // contributor: https://github.com/sunnyguohua/topology
     const grd = ctx.createLinearGradient(from.x, from.y, to.x, to.y);
