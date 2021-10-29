@@ -2601,11 +2601,12 @@ export class Topology {
   /**
    * 粘贴当前画笔，位置偏移 offset
    * */
-  pastePen(pen: Pen, idMaps: any = {}, offset: number = 0) {
-    if (pen.type === PenType.Node) {
+  pastePen(pen: Pen, idMaps: any = {}, offset: number = 0, parentId?: string) {
+    if (!pen.type) {
       const old = pen.id;
       pen.id = s8();
       idMaps[old] = pen.id;
+      parentId && (pen.parentId = parentId);
 
       pen.rect.x += offset;
       pen.rect.ex += offset;
@@ -2634,6 +2635,7 @@ export class Topology {
       (pen as Node).init();
     } else if (pen instanceof Line) {
       pen.id = s8();
+      parentId && (pen.parentId = parentId);
       pen.from = new Point(
         pen.from.x + offset,
         pen.from.y + offset,
@@ -2650,7 +2652,7 @@ export class Topology {
     }
     if (pen.children) {
       for (const item of pen.children) {
-        this.pastePen(item, idMaps, offset);
+        this.pastePen(item, idMaps, offset, pen.id);
       }
     }
   }
