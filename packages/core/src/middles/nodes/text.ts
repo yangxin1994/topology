@@ -204,7 +204,7 @@ export function text(ctx: CanvasRenderingContext2D, node: Pen) {
   const lines = getLines(ctx, node);
 
   const lineHeight = node.fontSize * node.lineHeight;
-  let maxLineLen = node.textMaxLine > 0 && node.textMaxLine < lines.length ? node.textMaxLine : lines.length;
+  const maxLineLen = node.textMaxLine > 0 && node.textMaxLine < lines.length ? node.textMaxLine : lines.length;
 
   // By default, the text is center aligned.
   let x = textRect.x + textRect.width / 2;
@@ -222,7 +222,7 @@ export function text(ctx: CanvasRenderingContext2D, node: Pen) {
       y = textRect.y + (lineHeight - node.fontSize) / 2;
       break;
     case 'bottom':
-      y = textRect.ey - lineHeight * lines.length + lineHeight;
+      y = textRect.ey - lineHeight * maxLineLen + lineHeight;
       break;
   }
   fillText(
