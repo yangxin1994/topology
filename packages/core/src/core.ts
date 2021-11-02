@@ -3144,32 +3144,16 @@ export class Topology {
 
     const parentRect = this.parentElem.getBoundingClientRect();
     const elemRect = elem.getBoundingClientRect();
-    let x = (parentRect.left || parentRect.x) + pos.x - (elemRect.width - data.rect.width) / 2;
-    let y = (parentRect.top || parentRect.y) + pos.y - elemRect.height - data.rect.height;
-    if (!data.type) {
-      x =
-        (parentRect.left || parentRect.x) +
-        this.data.x +
-        data.rect.x -
-        (elemRect.width - data.rect.width) / 2;
-      y =
-        (parentRect.top || parentRect.y) +
-        this.data.y +
-        data.rect.ey -
-        elemRect.height -
-        data.rect.height;
-    }
+    let x = (parentRect.left || parentRect.x) - (elemRect.width - data.rect.width) / 2 + this.data.x;
+    let y = (parentRect.top || parentRect.y) - elemRect.height - data.rect.height + this.data.y;
+    x += !data.type ? data.rect.x : pos.x;
+    y += !data.type ? data.rect.ey : pos.y;
 
     if (y > 0) {
       this.tipMarkdownArrowUp.style.borderBottomColor = 'transparent';
       this.tipMarkdownArrowDown.style.borderTopColor = 'rgba(0,0,0,.6)';
     } else {
-      if (data.type) {
-        y = (parentRect.top || parentRect.y) + pos.y;
-      } else {
-        y = (parentRect.top || parentRect.y) + data.rect.ey + this.data.y;
-      }
-
+      y += elemRect.height + data.rect.height;
       this.tipMarkdownArrowUp.style.borderBottomColor = 'rgba(0,0,0,.6)';
       this.tipMarkdownArrowDown.style.borderTopColor = 'transparent';
     }
