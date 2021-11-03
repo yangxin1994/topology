@@ -3307,12 +3307,13 @@ export class Topology {
 
   willRender() {
     if (this.actionTimer) {
-      clearTimeout(this.actionTimer);
+      // 节流行为，保证每 100ms 执行一次
+      return;
     }
     this.actionTimer = setTimeout(() => {
       this.render();
       this.actionTimer = undefined;
-    }, 500);
+    }, 100);
   }
 
   setLineName(name: 'curve' | 'line' | 'polyline' | 'mind', render = true) {
