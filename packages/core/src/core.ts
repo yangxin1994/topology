@@ -1171,6 +1171,9 @@ export class Topology {
             arrow = this.moveIn.hoverLine.toArrow;
           }
           if (this.hoverLayer.line) {
+            arrow = this.hoverLayer.line.toArrow;
+          }
+          if (this.hoverLayer.line) {
             this.activeLayer.pens = [this.hoverLayer.line];
           }
           let toId = this.hoverLayer.line.to.id;
