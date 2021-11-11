@@ -147,6 +147,9 @@ export class Topology {
   private scrolling = false;
   private rendering = false;
   private actionTimer: any;
+
+  // true 已经复制
+  private alreadyCopy: boolean = false;
   constructor(parent: string | HTMLElement, options: Options = {}) {
     this._emitter = mitt();
     this.options = Object.assign({}, DefalutOptions, options);
@@ -1127,12 +1130,20 @@ export class Topology {
           if (this.activeLayer.locked() || this.data.locked) {
             break;
           }
-          const x = e.x - this.mouseDown.x;
-          const y = e.y - this.mouseDown.y;
-          if (x || y) {
-            const offset = this.getDockPos(x, y, e.ctrlKey || e.shiftKey || e.altKey);
-            this.activeLayer.move(offset.x ? offset.x : x, offset.y ? offset.y : y);
+          if(e.ctrlKey && !this.alreadyCopy){
+            // 按住 ctrl，复制一个新节点
+            this.alreadyCopy = true;
+            this.copy();
+            this.paste();
             this.needCache = true;
+          } else {
+            const x = e.x - this.mouseDown.x;
+            const y = e.y - this.mouseDown.y;
+            if (x || y) {
+              const offset = this.getDockPos(x, y, e.ctrlKey || e.shiftKey || e.altKey);
+              this.activeLayer.move(offset.x ? offset.x : x, offset.y ? offset.y : y);
+              this.needCache = true;
+            }
           }
           break;
         case MoveInType.ResizeCP: {
@@ -1437,6 +1448,7 @@ export class Topology {
     this.hoverLayer.dockLineX = 0;
     this.hoverLayer.dockLineY = 0;
     this.divLayer.canvas.style.cursor = 'default';
+    this.alreadyCopy = false;
 
     if (this.hoverLayer.dragRect) {
       this.getPensInRect(this.hoverLayer.dragRect);
