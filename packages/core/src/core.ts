@@ -25,6 +25,7 @@ import { MQTT } from './mqtt';
 import { Direction, EventType as SocketEventType } from './models';
 import { createCacheTable, getCache, isMobile, pushCache, spliceCache } from './utils';
 import pkg from './../package.json';
+import { Scroll } from './models/scroll';
 
 declare const window: any;
 
@@ -128,6 +129,7 @@ export class Topology {
 
   socket: Socket;
   mqtt: MQTT;
+  scrollDom: Scroll;
 
   // 内存中的 caches 数量
   get ramCaches() : number {
@@ -193,6 +195,7 @@ export class Topology {
     this.offscreen = new Offscreen(this.parentElem, this.options, id);
     this.canvas = new RenderLayer(this.parentElem, this.options, id);
     this.divLayer = new DivLayer(this.parentElem, this.options, id);
+    this.options.scroll && (this.scrollDom = new Scroll(this));
 
     this.input.style.position = 'absolute';
     this.input.style.zIndex = '-1';
@@ -457,6 +460,10 @@ export class Topology {
       this.mouseDown = undefined;
     };
     this.divLayer.canvas.onwheel = (event) => {
+      if (this.options.scroll && !event.ctrlKey && this.scrollDom) {
+        this.scrollDom.wheel(event.deltaY < 0);
+        return;
+      }
       if(this.data.locked === Lock.NoEvent) return;
       const timeNow = new Date().getTime();
       if (timeNow - this.touchStart < 20) {
@@ -575,6 +582,10 @@ export class Topology {
 
     this.render();
     this.dispatch('resize', size);
+
+    if (this.scrollDom && this.scrollDom.isShow) {
+      this.scrollDom.init();
+    }
   }
 
   dropNodes(jsonList: any[], offsetX: number, offsetY: number) {
@@ -787,6 +798,10 @@ export class Topology {
 
     this.doInitJS();
     this.dispatch('opened');
+
+    if (this.scrollDom && this.scrollDom.isShow) {
+      this.scrollDom.init();
+    }
   }
 
   /**
@@ -2973,6 +2988,10 @@ export class Topology {
     if (!noNotice) {
       this.dispatch('translate', { x, y });
     }
+
+    if (this.scrollDom && this.scrollDom.isShow) {
+      this.scrollDom.translate(x, y);
+    }
   }
 
   // scale for scaled canvas:
@@ -3465,6 +3484,7 @@ export class Topology {
   }
 
   destroy() {
+    this.scrollDom && this.scrollDom.destroy();
     this.subcribe.unsubscribe();
     this.subcribeRender.unsubscribe();
     this.subcribeImage.unsubscribe();

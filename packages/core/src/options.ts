@@ -70,6 +70,7 @@ export interface Options {
   ruleColor?: string;
   refresh?: number;
   on?: (event: string, data: any) => void;
+  scroll?: boolean;   // 是否启用滚动条
 }
 
 export const fontKeys = ['fontColor', 'fontFamily', 'fontSize', 'lineHeight', 'textAlign', 'textBaseline'];
@@ -101,4 +102,5 @@ export const DefalutOptions: Options = {
   gridSize: 10,
   gridColor: '#f3f3f3',
   ruleColor: '#888888',
+  scroll: true
 };
