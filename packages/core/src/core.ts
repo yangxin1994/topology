@@ -25,6 +25,7 @@ import { MQTT } from './mqtt';
 import { Direction, EventType as SocketEventType } from './models';
 import { createCacheTable, getCache, isMobile, pushCache, spliceCache } from './utils';
 import pkg from './../package.json';
+import { Scroll } from './models/scroll';
 
 declare const window: any;
 
@@ -128,6 +129,7 @@ export class Topology {
 
   socket: Socket;
   mqtt: MQTT;
+  scrollDom: Scroll;
 
   // 内存中的 caches 数量
   get ramCaches() : number {
@@ -147,6 +149,9 @@ export class Topology {
   private scrolling = false;
   private rendering = false;
   private actionTimer: any;
+
+  // true 已经复制
+  private alreadyCopy: boolean = false;
   constructor(parent: string | HTMLElement, options: Options = {}) {
     this._emitter = mitt();
     this.options = Object.assign({}, DefalutOptions, options);
@@ -190,6 +195,7 @@ export class Topology {
     this.offscreen = new Offscreen(this.parentElem, this.options, id);
     this.canvas = new RenderLayer(this.parentElem, this.options, id);
     this.divLayer = new DivLayer(this.parentElem, this.options, id);
+    this.options.scroll && (this.scrollDom = new Scroll(this));
 
     this.input.style.position = 'absolute';
     this.input.style.zIndex = '-1';
@@ -454,6 +460,10 @@ export class Topology {
       this.mouseDown = undefined;
     };
     this.divLayer.canvas.onwheel = (event) => {
+      if (this.options.scroll && !event.ctrlKey && this.scrollDom) {
+        this.scrollDom.wheel(event.deltaY < 0);
+        return;
+      }
       if(this.data.locked === Lock.NoEvent) return;
       const timeNow = new Date().getTime();
       if (timeNow - this.touchStart < 20) {
@@ -572,6 +582,10 @@ export class Topology {
 
     this.render();
     this.dispatch('resize', size);
+
+    if (this.scrollDom && this.scrollDom.isShow) {
+      this.scrollDom.init();
+    }
   }
 
   dropNodes(jsonList: any[], offsetX: number, offsetY: number) {
@@ -784,6 +798,10 @@ export class Topology {
 
     this.doInitJS();
     this.dispatch('opened');
+
+    if (this.scrollDom && this.scrollDom.isShow) {
+      this.scrollDom.init();
+    }
   }
 
   /**
@@ -1127,12 +1145,20 @@ export class Topology {
           if (this.activeLayer.locked() || this.data.locked) {
             break;
           }
-          const x = e.x - this.mouseDown.x;
-          const y = e.y - this.mouseDown.y;
-          if (x || y) {
-            const offset = this.getDockPos(x, y, e.ctrlKey || e.shiftKey || e.altKey);
-            this.activeLayer.move(offset.x ? offset.x : x, offset.y ? offset.y : y);
+          if(e.ctrlKey && !this.alreadyCopy){
+            // 按住 ctrl，复制一个新节点
+            this.alreadyCopy = true;
+            this.copy();
+            this.paste();
             this.needCache = true;
+          } else {
+            const x = e.x - this.mouseDown.x;
+            const y = e.y - this.mouseDown.y;
+            if (x || y) {
+              const offset = this.getDockPos(x, y, e.ctrlKey || e.shiftKey || e.altKey);
+              this.activeLayer.move(offset.x ? offset.x : x, offset.y ? offset.y : y);
+              this.needCache = true;
+            }
           }
           break;
         case MoveInType.ResizeCP: {
@@ -1437,6 +1463,7 @@ export class Topology {
     this.hoverLayer.dockLineX = 0;
     this.hoverLayer.dockLineY = 0;
     this.divLayer.canvas.style.cursor = 'default';
+    this.alreadyCopy = false;
 
     if (this.hoverLayer.dragRect) {
       this.getPensInRect(this.hoverLayer.dragRect);
@@ -2961,6 +2988,10 @@ export class Topology {
     if (!noNotice) {
       this.dispatch('translate', { x, y });
     }
+
+    if (this.scrollDom && this.scrollDom.isShow) {
+      this.scrollDom.translate(x, y);
+    }
   }
 
   // scale for scaled canvas:
@@ -3453,6 +3484,7 @@ export class Topology {
   }
 
   destroy() {
+    this.scrollDom && this.scrollDom.destroy();
     this.subcribe.unsubscribe();
     this.subcribeRender.unsubscribe();
     this.subcribeImage.unsubscribe();
