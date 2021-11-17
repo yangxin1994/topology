@@ -715,7 +715,11 @@ export class Topology {
     }
 
     if (this.data.scale !== 1) {
-      line.fontSize *= this.data.scale;
+      if (line.name !== 'lines') {
+        line.scale(this.data.scale, line.getCenter());
+      } else {
+        line.fontSize *= this.data.scale;
+      }
     }
     this.data.pens.push(line);
 
