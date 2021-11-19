@@ -715,7 +715,11 @@ export class Topology {
     }
 
     if (this.data.scale !== 1) {
-      line.fontSize *= this.data.scale;
+      if (line.name !== 'lines') {
+        line.scale(this.data.scale, line.getCenter());
+      } else {
+        line.fontSize *= this.data.scale;
+      }
     }
     this.data.pens.push(line);
 
@@ -1490,6 +1494,15 @@ export class Topology {
             this.moveIn.hoverNode.manualAnchors.push(point);
             this.moveIn.hoverNode.calcAnchors();
             this.needCache = true;
+          }
+          if (this.data.locked || this.moveIn.activeNode.locked) {
+            this.moveIn.activeNode.mouseUp();
+          }
+          break;
+        case MoveInType.Line:
+        case MoveInType.LineControlPoint:
+          if (this.data.locked || this.moveIn.hoverLine.locked) {
+            this.moveIn.hoverLine.mouseUp();
           }
           break;
 
