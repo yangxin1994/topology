@@ -417,6 +417,21 @@ export abstract class Pen {
     }
   }
 
+  mouseUp() {
+    if (!this.events) {
+      return;
+    }
+
+    for (const item of this.events) {
+      if (item.type !== EventType.MouseUp) {
+        continue;
+      }
+
+      this[eventFns[item.action]] &&
+        this[eventFns[item.action]](item.value, item.params);
+    }
+  }
+
   dblclick() {
     if (!this.events) {
       return;

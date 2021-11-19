@@ -1495,6 +1495,15 @@ export class Topology {
             this.moveIn.hoverNode.calcAnchors();
             this.needCache = true;
           }
+          if (this.data.locked || this.moveIn.activeNode.locked) {
+            this.moveIn.activeNode.mouseUp();
+          }
+          break;
+        case MoveInType.Line:
+        case MoveInType.LineControlPoint:
+          if (this.data.locked || this.moveIn.hoverLine.locked) {
+            this.moveIn.hoverLine.mouseUp();
+          }
           break;
 
         // Add the line.
