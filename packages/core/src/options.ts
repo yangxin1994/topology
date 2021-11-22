@@ -102,5 +102,4 @@ export const DefalutOptions: Options = {
   gridSize: 10,
   gridColor: '#f3f3f3',
   ruleColor: '#888888',
-  scroll: true
 };
