@@ -100,6 +100,7 @@ export class Scroll {
     }
 
     this.parent.render();
+    this.parent.divLayer.render();
   };
 
   private onMouseUp = (e: MouseEvent) => {
@@ -208,6 +209,7 @@ export class Scroll {
     this.parent.data.y -= (y * this.rect.height) / this.parent.parentElem.clientHeight;
 
     this.parent.render();
+    this.parent.divLayer.render();
   }
 
   destroy() {
