@@ -99,8 +99,10 @@ export class Scroll {
       this.parent.data.y = this.y - (y * this.rect.height) / this.parent.parentElem.clientHeight;
     }
 
-    this.parent.render();
-    this.parent.divLayer.render();
+    if (this.isDownH || this.isDownV) {
+      this.parent.render();
+      this.parent.divLayer.render();
+    }
   };
 
   private onMouseUp = (e: MouseEvent) => {
