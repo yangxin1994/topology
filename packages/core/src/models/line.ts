@@ -277,6 +277,10 @@ export class Line extends Pen {
   }
 
   calcTextRect() {
+    if (!this.from || this.to) {
+      this.textRect = undefined;
+      return;
+    }
     const center = this.getCenter();
     let width = Math.abs(this.from.x - this.to.x);
     if (width < 100) {

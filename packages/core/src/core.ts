@@ -2256,6 +2256,9 @@ export class Topology {
   showInput(item: Pen) {
     this.inputObj = item;
     const textRect = item.getTextRect();
+    if (!textRect) {
+      return;
+    }
     this.input.value = item.text || '';
     this.input.style.left = textRect.x + this.data.x + 'px';
     this.input.style.top = textRect.y + this.data.y + 'px';
