@@ -2439,7 +2439,7 @@ export class Topology {
     this.dispatch('redo', this.data);
   }
 
-  toImage(name: string, padding: Padding = 0, callback: any = undefined, img: HTMLImageElement): string {
+  toImage( padding: Padding = 0, callback: any = undefined, name?: string,img?: HTMLImageElement): string {
     let backRect: Rect;
     if (this.data.bkImageRect) {
       // 背景图片相对于画布的 rect
@@ -2507,7 +2507,7 @@ export class Topology {
     const a = document.createElement('a');
     a.setAttribute('download', name || 'le5le.topology.png');
     let tName = name ? name.split(".")[0] : "le5le";
-    a.setAttribute('href', this.toImage(tName, padding, undefined, img));
+    a.setAttribute('href', this.toImage(padding, undefined,tName, img));
     const evt = document.createEvent('MouseEvents');
     evt.initEvent('click', true, true);
     a.dispatchEvent(evt);
