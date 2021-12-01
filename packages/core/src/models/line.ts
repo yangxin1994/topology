@@ -30,7 +30,7 @@ export class Line extends Pen {
   isAnimate: boolean;
   animateFromSize: number;
   animateToSize: number;
-  animateDot: { x: number; y: number; };
+  animateDot: { x: number; y: number };
   animateDotSize: number;
 
   lineJoin: CanvasLineJoin;
@@ -55,7 +55,7 @@ export class Line extends Pen {
       animateFromSize: 0,
       animateToSize: 0,
       animateDotSize: 3,
-      textBackground: '#ffffff'
+      textBackground: '#ffffff',
     };
 
     this.fromData(defaultData, json);
@@ -115,7 +115,6 @@ export class Line extends Pen {
 
     this.textRect = undefined;
     if (this.from && this.to && drawLineFns[this.name]) {
-
       drawLineFns[this.name].controlPointsFn(this);
     }
   }
@@ -154,7 +153,7 @@ export class Line extends Pen {
       ctx.restore();
     }
 
-    switch(this.strokeType){
+    switch (this.strokeType) {
       case 1:
         this.strokeLinearGradient(ctx);
         break;
@@ -229,7 +228,7 @@ export class Line extends Pen {
     }
   }
 
-  pointIn(pt: { x: number; y: number; }) {
+  pointIn(pt: { x: number; y: number }) {
     return drawLineFns[this.name].pointIn(pt, this);
   }
 
@@ -290,9 +289,7 @@ export class Line extends Pen {
       this.text += '';
     }
     const height =
-      this.lineHeight *
-      this.fontSize *
-      (this.textMaxLine || (this.text && this.text.split('\n').length) || 1);
+      this.lineHeight * this.fontSize * (this.textMaxLine || (this.text && this.text.split('\n').length) || 1);
     this.textRect = new Rect(center.x - width / 2, center.y - height / 2, width, height);
   }
 
@@ -374,7 +371,7 @@ export class Line extends Pen {
           return this.getLinePtByPos(this.to, this.from, pos);
         } else {
           const points: Point[] = [];
-          this.controlPoints.forEach(item => {
+          this.controlPoints.forEach((item) => {
             points.unshift(item);
           });
           points.unshift(this.to);
@@ -426,7 +423,7 @@ export class Line extends Pen {
           width: 0,
           height: 0,
           rotate: 0,
-        }
+        };
       }
     } else {
       this.rectInParent = {
@@ -602,7 +599,7 @@ export class Line extends Pen {
     Store.set(this.generateStoreKey('pts-') + this.id, undefined);
   }
 
-  scale(scale: number, center: { x: number; y: number; }) {
+  scale(scale: number, center: { x: number; y: number }) {
     if (this.from) {
       this.from.x = center.x - (center.x - this.from.x) * scale;
       this.from.y = center.y - (center.y - this.from.y) * scale;
