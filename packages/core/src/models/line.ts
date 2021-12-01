@@ -417,15 +417,27 @@ export class Line extends Pen {
   calcRectInParent(parent: Pen) {
     const parentW = parent.rect.width - parent.paddingLeftNum - parent.paddingRightNum;
     const parentH = parent.rect.height - parent.paddingTopNum - parent.paddingBottomNum;
-    this.rectInParent = {
-      x: ((this.from.x - parent.rect.x - parent.paddingLeftNum) * 100) / parentW + '%',
-      y: ((this.from.y - parent.rect.y - parent.paddingTopNum) * 100) / parentH + '%',
-      width: 0,
-      height: 0,
-      rotate: 0,
-    };
+    if (this.name === 'lines') {
+      // 钢笔
+      if (Array.isArray(this.children) && this.children.length > 0) {
+        this.rectInParent = {
+          x: (((this.children[0] as Line).from.x - parent.rect.x - parent.paddingLeftNum) * 100) / parentW + '%',
+          y: (((this.children[0] as Line).from.y - parent.rect.y - parent.paddingTopNum) * 100) / parentH + '%',
+          width: 0,
+          height: 0,
+          rotate: 0,
+        }
+      }
+    } else {
+      this.rectInParent = {
+        x: ((this.from.x - parent.rect.x - parent.paddingLeftNum) * 100) / parentW + '%',
+        y: ((this.from.y - parent.rect.y - parent.paddingTopNum) * 100) / parentH + '%',
+        width: 0,
+        height: 0,
+        rotate: 0,
+      };
+    }
   }
-
   // 根据父节点rect计算自己（子节点）的rect
   calcRectByParent(parent: Pen) {
     if (!this.rectInParent) {
@@ -451,7 +463,15 @@ export class Line extends Pen {
       y -= abs(parentW, this.rectInParent.marginBottom);
     }
 
-    this.translate(x - this.from.x, y - this.from.y);
+    if (this.name === 'lines') {
+      if (Array.isArray(this.children) && this.children.length > 0) {
+        const fromX = (this.children[0] as Line).from.x;
+        const fromY = (this.children[0] as Line).from.y;
+        this.translate(x - fromX, y - fromY);
+      }
+    } else {
+      this.translate(x - this.from.x, y - this.from.y);
+    }
   }
 
   initAnimate() {
