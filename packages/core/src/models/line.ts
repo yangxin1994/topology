@@ -67,12 +67,13 @@ export class Line extends Pen {
         json.from.direction,
         json.from.anchorIndex,
         json.from.id,
+        json.from.hidden,
         json.autoAnchor
       );
     }
 
     if (json.to) {
-      this.to = new Point(json.to.x, json.to.y, json.to.direction, json.to.anchorIndex, json.to.id, json.autoAnchor);
+      this.to = new Point(json.to.x, json.to.y, json.to.direction, json.to.anchorIndex, json.to.id, json.to.hidden, json.autoAnchor);
     }
 
     // 暂时兼容老数据
