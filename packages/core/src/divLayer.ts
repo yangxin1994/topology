@@ -408,6 +408,7 @@ export class DivLayer extends Layer {
       elem.style.userSelect = 'none';
       elem.style.pointerEvents = 'none';
     }
+    node.globalAlpha <= 1 && (elem.style.opacity = String(node.globalAlpha));
   };
 
   removeDiv = (item: Node) => {
