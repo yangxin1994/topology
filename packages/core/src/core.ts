@@ -327,7 +327,7 @@ export class Topology {
       this.divLayer.canvas.ontouchmove = (event) => {
         event.stopPropagation();
 
-        const touches = event.changedTouches;
+        const touches = event.touches;
         const len = touches.length;
         if (!this.touchCenter && len > 1) {
           this.touchCenter = {
@@ -369,8 +369,8 @@ export class Topology {
         event.preventDefault();
 
         const pos = new Point(
-          event.changedTouches[0].pageX - window.scrollX - (this.canvasPos.left || this.canvasPos.x),
-          event.changedTouches[0].pageY - window.scrollY - (this.canvasPos.top || this.canvasPos.y)
+          event.touches[0].pageX - window.scrollX - (this.canvasPos.left || this.canvasPos.x),
+          event.touches[0].pageY - window.scrollY - (this.canvasPos.top || this.canvasPos.y)
         );
 
         this.onMouseMove({
@@ -385,6 +385,7 @@ export class Topology {
 
       this.divLayer.canvas.ontouchend = (event) => {
         this.touches = undefined;
+        this.touchCenter = undefined;
         this.ontouchend(event);
       };
     } else {
