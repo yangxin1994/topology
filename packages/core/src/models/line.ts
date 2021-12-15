@@ -277,7 +277,7 @@ export class Line extends Pen {
   }
 
   calcTextRect() {
-    if (!this.from || this.to) {
+    if (!this.from || !this.to) {
       this.textRect = undefined;
       return;
     }
