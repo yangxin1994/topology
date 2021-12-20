@@ -446,8 +446,9 @@ export class Topology {
           return;
         }
 
-        this.touchedNode.rect.x = event.pageX - window.scrollX - this.canvasPos.x - this.touchedNode.rect.width / 2;
-        this.touchedNode.rect.y = event.pageY - window.scrollY - this.canvasPos.y - this.touchedNode.rect.height / 2;
+        const {x, y} = this.data;
+        this.touchedNode.rect.x = event.pageX - window.scrollX - this.canvasPos.x - this.touchedNode.rect.width / 2 - x;
+        this.touchedNode.rect.y = event.pageY - window.scrollY - this.canvasPos.y - this.touchedNode.rect.height / 2 - y;
 
         const node = new Node(this.touchedNode);
         this.addNode(node, true);
@@ -556,10 +557,11 @@ export class Topology {
       return;
     }
 
+    const {x, y} = this.data;
     this.touchedNode.rect.x =
-      event.changedTouches[0].pageX - window.scrollX - this.canvasPos.x - this.touchedNode.rect.width / 2;
+      event.changedTouches[0].pageX - window.scrollX - this.canvasPos.x - this.touchedNode.rect.width / 2 - x;
     this.touchedNode.rect.y =
-      event.changedTouches[0].pageY - window.scrollY - this.canvasPos.y - this.touchedNode.rect.height / 2;
+      event.changedTouches[0].pageY - window.scrollY - this.canvasPos.y - this.touchedNode.rect.height / 2 - y;
 
     const node = new Node(this.touchedNode);
     this.addNode(node, true);
