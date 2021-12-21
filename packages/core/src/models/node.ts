@@ -1298,7 +1298,7 @@ export class Node extends Pen {
     n.elementRendered = false;
     n.elementLoaded = false;
     if (this.name !== 'div') {
-      n.elementId = '';
+      n.elementId = undefined;
     }
     return n;
   }
