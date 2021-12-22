@@ -202,6 +202,8 @@ export abstract class Pen {
   num2: number;
   num3: number;
 
+  hiddenText: boolean;   // 是否隐藏 text 
+
   fromData(defaultData: any, json: any) {
     if (!json) {
       json = {};

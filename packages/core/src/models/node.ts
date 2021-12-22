@@ -409,7 +409,7 @@ export class Node extends Pen {
     }
 
     // Draw text.
-    if (this.name !== 'text' && this.text) {
+    if (this.name !== 'text' && this.text && !this.hiddenText) {
       text(ctx, this);
     }
   }

@@ -221,7 +221,7 @@ export class Line extends Pen {
       ctx.restore();
     }
 
-    if (this.text && !this.isAnimate) {
+    if (this.text && !this.isAnimate && !this.hiddenText) {
       if (!this.textRect) {
         this.calcTextRect();
       }
