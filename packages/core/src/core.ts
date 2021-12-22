@@ -452,6 +452,7 @@ export class Topology {
 
         const node = new Node(this.touchedNode);
         this.addNode(node, true);
+        this.activeLayer.calcActiveRect();
         this.touchedNode = undefined;
       };
     }
@@ -565,6 +566,7 @@ export class Topology {
 
     const node = new Node(this.touchedNode);
     this.addNode(node, true);
+    this.activeLayer.calcActiveRect();
     this.touchedNode = undefined;
   }
 
