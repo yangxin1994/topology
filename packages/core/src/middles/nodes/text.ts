@@ -82,7 +82,7 @@ export function getLines(ctx: CanvasRenderingContext2D, pen: Pen) {
       if (!isNaN(textNum)) {
         lines[i] = textNum.toFixed(pen.displayFormat);
       }
-    })
+    });
   }
 
   return lines;
