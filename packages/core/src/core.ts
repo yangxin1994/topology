@@ -527,6 +527,9 @@ export class Topology {
         break;
       case KeydownType.Canvas:
         this.divLayer.canvas.addEventListener('keydown', this.onkeydown);
+        this.divLayer.canvas.addEventListener('keyup', () => {
+          this.spaceDown = false;
+        });
         break;
     }
   }
