@@ -137,9 +137,9 @@ export class Topology {
   }
 
   // 需要清除 elementId 的图形，复制时用
-  get clearElementIdPensName(): string[]{
-    return ['echarts', 'textbox'];
-  }
+  // get clearElementIdPensName(): string[]{
+  //   return ['echarts', 'textbox'];
+  // }
 
   private socketFn: Function;
 
@@ -327,7 +327,7 @@ export class Topology {
       this.divLayer.canvas.ontouchmove = (event) => {
         event.stopPropagation();
 
-        const touches = event.changedTouches;
+        const touches = event.touches;
         const len = touches.length;
         if (!this.touchCenter && len > 1) {
           this.touchCenter = {
@@ -369,8 +369,8 @@ export class Topology {
         event.preventDefault();
 
         const pos = new Point(
-          event.changedTouches[0].pageX - window.scrollX - (this.canvasPos.left || this.canvasPos.x),
-          event.changedTouches[0].pageY - window.scrollY - (this.canvasPos.top || this.canvasPos.y)
+          event.touches[0].pageX - window.scrollX - (this.canvasPos.left || this.canvasPos.x),
+          event.touches[0].pageY - window.scrollY - (this.canvasPos.top || this.canvasPos.y)
         );
 
         this.onMouseMove({
@@ -385,6 +385,7 @@ export class Topology {
 
       this.divLayer.canvas.ontouchend = (event) => {
         this.touches = undefined;
+        this.touchCenter = undefined;
         this.ontouchend(event);
       };
     } else {
@@ -445,11 +446,13 @@ export class Topology {
           return;
         }
 
-        this.touchedNode.rect.x = event.pageX - window.scrollX - this.canvasPos.x - this.touchedNode.rect.width / 2;
-        this.touchedNode.rect.y = event.pageY - window.scrollY - this.canvasPos.y - this.touchedNode.rect.height / 2;
+        const {x, y} = this.data;
+        this.touchedNode.rect.x = event.pageX - window.scrollX - this.canvasPos.x - this.touchedNode.rect.width / 2 - x;
+        this.touchedNode.rect.y = event.pageY - window.scrollY - this.canvasPos.y - this.touchedNode.rect.height / 2 - y;
 
         const node = new Node(this.touchedNode);
         this.addNode(node, true);
+        this.activeLayer.calcActiveRect();
         this.touchedNode = undefined;
       };
     }
@@ -555,13 +558,15 @@ export class Topology {
       return;
     }
 
+    const {x, y} = this.data;
     this.touchedNode.rect.x =
-      event.changedTouches[0].pageX - window.scrollX - this.canvasPos.x - this.touchedNode.rect.width / 2;
+      event.changedTouches[0].pageX - window.scrollX - this.canvasPos.x - this.touchedNode.rect.width / 2 - x;
     this.touchedNode.rect.y =
-      event.changedTouches[0].pageY - window.scrollY - this.canvasPos.y - this.touchedNode.rect.height / 2;
+      event.changedTouches[0].pageY - window.scrollY - this.canvasPos.y - this.touchedNode.rect.height / 2 - y;
 
     const node = new Node(this.touchedNode);
     this.addNode(node, true);
+    this.activeLayer.calcActiveRect();
     this.touchedNode = undefined;
   }
 
@@ -2685,10 +2690,10 @@ export class Topology {
           pt.y += offset;
         });
       }
-      // 若是 echarts 等 dom 元素 则清一下 elementId
-      if (this.clearElementIdPensName.includes(pen.name)) {
-        (pen as Node).elementId = undefined;
-      }
+      // // 若是 echarts 等 dom 元素 则清一下 elementId
+      // if (this.clearElementIdPensName.includes(pen.name)) {
+      //   (pen as Node).elementId = undefined;
+      // }
       (pen as Node).init();
     } else if (pen instanceof Line) {
       pen.id = s8();

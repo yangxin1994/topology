@@ -409,7 +409,7 @@ export class Node extends Pen {
     }
 
     // Draw text.
-    if (this.name !== 'text' && this.text) {
+    if (this.name !== 'text' && this.text && !this.hiddenText) {
       text(ctx, this);
     }
   }
@@ -1298,7 +1298,7 @@ export class Node extends Pen {
     n.elementRendered = false;
     n.elementLoaded = false;
     if (this.name !== 'div') {
-      n.elementId = '';
+      n.elementId = undefined;
     }
     return n;
   }

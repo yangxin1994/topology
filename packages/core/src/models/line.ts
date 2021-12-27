@@ -30,7 +30,7 @@ export class Line extends Pen {
   isAnimate: boolean;
   animateFromSize: number;
   animateToSize: number;
-  animateDot: { x: number; y: number; };
+  animateDot: { x: number; y: number };
   animateDotSize: number;
 
   lineJoin: CanvasLineJoin;
@@ -55,7 +55,7 @@ export class Line extends Pen {
       animateFromSize: 0,
       animateToSize: 0,
       animateDotSize: 3,
-      textBackground: '#ffffff'
+      textBackground: '#ffffff',
     };
 
     this.fromData(defaultData, json);
@@ -67,12 +67,13 @@ export class Line extends Pen {
         json.from.direction,
         json.from.anchorIndex,
         json.from.id,
+        json.from.hidden,
         json.autoAnchor
       );
     }
 
     if (json.to) {
-      this.to = new Point(json.to.x, json.to.y, json.to.direction, json.to.anchorIndex, json.to.id, json.autoAnchor);
+      this.to = new Point(json.to.x, json.to.y, json.to.direction, json.to.anchorIndex, json.to.id, json.to.hidden, json.autoAnchor);
     }
 
     // 暂时兼容老数据
@@ -115,7 +116,6 @@ export class Line extends Pen {
 
     this.textRect = undefined;
     if (this.from && this.to && drawLineFns[this.name]) {
-
       drawLineFns[this.name].controlPointsFn(this);
     }
   }
@@ -154,7 +154,7 @@ export class Line extends Pen {
       ctx.restore();
     }
 
-    switch(this.strokeType){
+    switch (this.strokeType) {
       case 1:
         this.strokeLinearGradient(ctx);
         break;
@@ -221,7 +221,7 @@ export class Line extends Pen {
       ctx.restore();
     }
 
-    if (this.text && !this.isAnimate) {
+    if (this.text && !this.isAnimate && !this.hiddenText) {
       if (!this.textRect) {
         this.calcTextRect();
       }
@@ -229,7 +229,7 @@ export class Line extends Pen {
     }
   }
 
-  pointIn(pt: { x: number; y: number; }) {
+  pointIn(pt: { x: number; y: number }) {
     return drawLineFns[this.name].pointIn(pt, this);
   }
 
@@ -277,7 +277,7 @@ export class Line extends Pen {
   }
 
   calcTextRect() {
-    if (!this.from || this.to) {
+    if (!this.from || !this.to) {
       this.textRect = undefined;
       return;
     }
@@ -290,9 +290,7 @@ export class Line extends Pen {
       this.text += '';
     }
     const height =
-      this.lineHeight *
-      this.fontSize *
-      (this.textMaxLine || (this.text && this.text.split('\n').length) || 1);
+      this.lineHeight * this.fontSize * (this.textMaxLine || (this.text && this.text.split('\n').length) || 1);
     this.textRect = new Rect(center.x - width / 2, center.y - height / 2, width, height);
   }
 
@@ -374,7 +372,7 @@ export class Line extends Pen {
           return this.getLinePtByPos(this.to, this.from, pos);
         } else {
           const points: Point[] = [];
-          this.controlPoints.forEach(item => {
+          this.controlPoints.forEach((item) => {
             points.unshift(item);
           });
           points.unshift(this.to);
@@ -417,15 +415,27 @@ export class Line extends Pen {
   calcRectInParent(parent: Pen) {
     const parentW = parent.rect.width - parent.paddingLeftNum - parent.paddingRightNum;
     const parentH = parent.rect.height - parent.paddingTopNum - parent.paddingBottomNum;
-    this.rectInParent = {
-      x: ((this.from.x - parent.rect.x - parent.paddingLeftNum) * 100) / parentW + '%',
-      y: ((this.from.y - parent.rect.y - parent.paddingTopNum) * 100) / parentH + '%',
-      width: 0,
-      height: 0,
-      rotate: 0,
-    };
+    if (this.name === 'lines') {
+      // 钢笔
+      if (Array.isArray(this.children) && this.children.length > 0) {
+        this.rectInParent = {
+          x: (((this.children[0] as Line).from.x - parent.rect.x - parent.paddingLeftNum) * 100) / parentW + '%',
+          y: (((this.children[0] as Line).from.y - parent.rect.y - parent.paddingTopNum) * 100) / parentH + '%',
+          width: 0,
+          height: 0,
+          rotate: 0,
+        };
+      }
+    } else {
+      this.rectInParent = {
+        x: ((this.from.x - parent.rect.x - parent.paddingLeftNum) * 100) / parentW + '%',
+        y: ((this.from.y - parent.rect.y - parent.paddingTopNum) * 100) / parentH + '%',
+        width: 0,
+        height: 0,
+        rotate: 0,
+      };
+    }
   }
-
   // 根据父节点rect计算自己（子节点）的rect
   calcRectByParent(parent: Pen) {
     if (!this.rectInParent) {
@@ -451,7 +461,15 @@ export class Line extends Pen {
       y -= abs(parentW, this.rectInParent.marginBottom);
     }
 
-    this.translate(x - this.from.x, y - this.from.y);
+    if (this.name === 'lines') {
+      if (Array.isArray(this.children) && this.children.length > 0) {
+        const fromX = (this.children[0] as Line).from.x;
+        const fromY = (this.children[0] as Line).from.y;
+        this.translate(x - fromX, y - fromY);
+      }
+    } else {
+      this.translate(x - this.from.x, y - this.from.y);
+    }
   }
 
   initAnimate() {
@@ -582,7 +600,7 @@ export class Line extends Pen {
     Store.set(this.generateStoreKey('pts-') + this.id, undefined);
   }
 
-  scale(scale: number, center: { x: number; y: number; }) {
+  scale(scale: number, center: { x: number; y: number }) {
     if (this.from) {
       this.from.x = center.x - (center.x - this.from.x) * scale;
       this.from.y = center.y - (center.y - this.from.y) * scale;

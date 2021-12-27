@@ -76,6 +76,15 @@ export function getLines(ctx: CanvasRenderingContext2D, pen: Pen) {
       break;
   }
 
+  if (pen.displayFormat || pen.displayFormat === 0) {
+    lines.forEach((text, i)=>{
+      const textNum = Number(text);
+      if (!isNaN(textNum)) {
+        lines[i] = textNum.toFixed(pen.displayFormat);
+      }
+    });
+  }
+
   return lines;
 }
 

@@ -394,7 +394,7 @@ export class DivLayer extends Layer {
     elem.style.width = node.rect.width + 'px';
     elem.style.height = node.rect.height + 'px';
     elem.style.display = node.visible ? 'inline' : 'none';   // 是否隐藏元素
-    if (node.rotate || node.offsetRotate) {
+    if (node.rotate != null || node.offsetRotate != null) {
       elem.style.transform = `rotate(${node.rotate + node.offsetRotate}deg)`;
     }
     if (node.video && videos[node.id] && videos[node.id].media) {
@@ -408,6 +408,7 @@ export class DivLayer extends Layer {
       elem.style.userSelect = 'none';
       elem.style.pointerEvents = 'none';
     }
+    node.globalAlpha <= 1 && (elem.style.opacity = String(node.globalAlpha));
   };
 
   removeDiv = (item: Node) => {
