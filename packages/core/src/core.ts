@@ -527,6 +527,9 @@ export class Topology {
         break;
       case KeydownType.Canvas:
         this.divLayer.canvas.addEventListener('keydown', this.onkeydown);
+        this.divLayer.canvas.addEventListener('keyup', () => {
+          this.spaceDown = false;
+        });
         break;
     }
   }
@@ -2634,11 +2637,21 @@ export class Topology {
 
     const idMaps = {};
     for (const pen of this.clipboard.pens) {
-      this.pastePen(pen, idMaps, 20);
+      // 先粘贴节点
+      if (!pen.type) {
+        this.pastePen(pen, idMaps, 20);
+        this.data.pens.push(pen);
+        this.activeLayer.add(pen);
+      }
+    }
 
-      this.data.pens.push(pen);
-
-      this.activeLayer.add(pen);
+    for (const pen of this.clipboard.pens) {
+      // 后粘贴线
+      if (pen.type) {
+        this.pastePen(pen, idMaps, 20);
+        this.data.pens.push(pen);
+        this.activeLayer.add(pen);
+      }
     }
 
     this.render();
