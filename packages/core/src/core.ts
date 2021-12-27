@@ -2634,11 +2634,21 @@ export class Topology {
 
     const idMaps = {};
     for (const pen of this.clipboard.pens) {
-      this.pastePen(pen, idMaps, 20);
+      // 先粘贴节点
+      if (!pen.type) {
+        this.pastePen(pen, idMaps, 20);
+        this.data.pens.push(pen);
+        this.activeLayer.add(pen);
+      }
+    }
 
-      this.data.pens.push(pen);
-
-      this.activeLayer.add(pen);
+    for (const pen of this.clipboard.pens) {
+      // 后粘贴线
+      if (pen.type) {
+        this.pastePen(pen, idMaps, 20);
+        this.data.pens.push(pen);
+        this.activeLayer.add(pen);
+      }
     }
 
     this.render();
