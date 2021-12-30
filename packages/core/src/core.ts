@@ -440,15 +440,21 @@ export class Topology {
           altKey: event.altKey,
           button: event.button,
         };
+        const dragRect = this.hoverLayer.dragRect;
         this.onmouseup(e);
 
         if (!this.touchedNode) {
           return;
         }
 
-        const {x, y} = this.data;
-        this.touchedNode.rect.x = event.pageX - window.scrollX - this.canvasPos.x - this.touchedNode.rect.width / 2 - x;
-        this.touchedNode.rect.y = event.pageY - window.scrollY - this.canvasPos.y - this.touchedNode.rect.height / 2 - y;
+        if (!dragRect) {
+          const {x, y} = this.data;
+          this.touchedNode.rect.x = event.pageX - window.scrollX - this.canvasPos.x - this.touchedNode.rect.width / 2 - x;
+          this.touchedNode.rect.y = event.pageY - window.scrollY - this.canvasPos.y - this.touchedNode.rect.height / 2 - y;
+        } else {
+          // 重新赋值，不影响原值
+          this.touchedNode = {...this.touchedNode, rect: dragRect};
+        }
 
         const node = new Node(this.touchedNode);
         this.addNode(node, true);
@@ -547,7 +553,7 @@ export class Topology {
       event.changedTouches[0].pageX - window.scrollX - (this.canvasPos.left || this.canvasPos.x),
       event.changedTouches[0].pageY - window.scrollY - (this.canvasPos.top || this.canvasPos.y)
     );
-
+    const dragRect = this.hoverLayer.dragRect;
     this.onmouseup({
       x: pos.x,
       y: pos.y,
@@ -561,12 +567,16 @@ export class Topology {
       return;
     }
 
-    const {x, y} = this.data;
-    this.touchedNode.rect.x =
-      event.changedTouches[0].pageX - window.scrollX - this.canvasPos.x - this.touchedNode.rect.width / 2 - x;
-    this.touchedNode.rect.y =
-      event.changedTouches[0].pageY - window.scrollY - this.canvasPos.y - this.touchedNode.rect.height / 2 - y;
-
+    if (!dragRect) {
+      const {x, y} = this.data;
+      this.touchedNode.rect.x =
+        event.changedTouches[0].pageX - window.scrollX - this.canvasPos.x - this.touchedNode.rect.width / 2 - x;
+      this.touchedNode.rect.y =
+        event.changedTouches[0].pageY - window.scrollY - this.canvasPos.y - this.touchedNode.rect.height / 2 - y;
+    } else {
+      // 重新赋值，不影响原值
+      this.touchedNode = {...this.touchedNode, rect: dragRect};
+    }
     const node = new Node(this.touchedNode);
     this.addNode(node, true);
     this.activeLayer.calcActiveRect();
