@@ -443,7 +443,7 @@ export class Topology {
         const dragRect = this.hoverLayer.dragRect;
         this.onmouseup(e);
 
-        if (!this.touchedNode) {
+        if (!this.touchedNode || this.data.locked) {
           return;
         }
 
@@ -563,7 +563,7 @@ export class Topology {
       button: 0,
     });
 
-    if (!this.touchedNode) {
+    if (!this.touchedNode || this.data.locked) {
       return;
     }
 
