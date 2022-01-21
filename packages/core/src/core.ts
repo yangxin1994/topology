@@ -440,15 +440,21 @@ export class Topology {
           altKey: event.altKey,
           button: event.button,
         };
+        const dragRect = this.hoverLayer.dragRect;
         this.onmouseup(e);
 
-        if (!this.touchedNode) {
+        if (!this.touchedNode || this.data.locked) {
           return;
         }
 
-        const {x, y} = this.data;
-        this.touchedNode.rect.x = event.pageX - window.scrollX - this.canvasPos.x - this.touchedNode.rect.width / 2 - x;
-        this.touchedNode.rect.y = event.pageY - window.scrollY - this.canvasPos.y - this.touchedNode.rect.height / 2 - y;
+        if (!dragRect) {
+          const {x, y} = this.data;
+          this.touchedNode.rect.x = event.pageX - window.scrollX - this.canvasPos.x - this.touchedNode.rect.width / 2 - x;
+          this.touchedNode.rect.y = event.pageY - window.scrollY - this.canvasPos.y - this.touchedNode.rect.height / 2 - y;
+        } else {
+          // 重新赋值，不影响原值
+          this.touchedNode = {...this.touchedNode, rect: dragRect};
+        }
 
         const node = new Node(this.touchedNode);
         this.addNode(node, true);
@@ -527,6 +533,9 @@ export class Topology {
         break;
       case KeydownType.Canvas:
         this.divLayer.canvas.addEventListener('keydown', this.onkeydown);
+        this.divLayer.canvas.addEventListener('keyup', () => {
+          this.spaceDown = false;
+        });
         break;
     }
   }
@@ -544,7 +553,7 @@ export class Topology {
       event.changedTouches[0].pageX - window.scrollX - (this.canvasPos.left || this.canvasPos.x),
       event.changedTouches[0].pageY - window.scrollY - (this.canvasPos.top || this.canvasPos.y)
     );
-
+    const dragRect = this.hoverLayer.dragRect;
     this.onmouseup({
       x: pos.x,
       y: pos.y,
@@ -554,16 +563,20 @@ export class Topology {
       button: 0,
     });
 
-    if (!this.touchedNode) {
+    if (!this.touchedNode || this.data.locked) {
       return;
     }
 
-    const {x, y} = this.data;
-    this.touchedNode.rect.x =
-      event.changedTouches[0].pageX - window.scrollX - this.canvasPos.x - this.touchedNode.rect.width / 2 - x;
-    this.touchedNode.rect.y =
-      event.changedTouches[0].pageY - window.scrollY - this.canvasPos.y - this.touchedNode.rect.height / 2 - y;
-
+    if (!dragRect) {
+      const {x, y} = this.data;
+      this.touchedNode.rect.x =
+        event.changedTouches[0].pageX - window.scrollX - this.canvasPos.x - this.touchedNode.rect.width / 2 - x;
+      this.touchedNode.rect.y =
+        event.changedTouches[0].pageY - window.scrollY - this.canvasPos.y - this.touchedNode.rect.height / 2 - y;
+    } else {
+      // 重新赋值，不影响原值
+      this.touchedNode = {...this.touchedNode, rect: dragRect};
+    }
     const node = new Node(this.touchedNode);
     this.addNode(node, true);
     this.activeLayer.calcActiveRect();
@@ -2645,11 +2658,21 @@ export class Topology {
 
     const idMaps = {};
     for (const pen of this.clipboard.pens) {
-      this.pastePen(pen, idMaps, 20);
+      // 先粘贴节点
+      if (!pen.type) {
+        this.pastePen(pen, idMaps, 20);
+        this.data.pens.push(pen);
+        this.activeLayer.add(pen);
+      }
+    }
 
-      this.data.pens.push(pen);
-
-      this.activeLayer.add(pen);
+    for (const pen of this.clipboard.pens) {
+      // 后粘贴线
+      if (pen.type) {
+        this.pastePen(pen, idMaps, 20);
+        this.data.pens.push(pen);
+        this.activeLayer.add(pen);
+      }
     }
 
     this.render();
