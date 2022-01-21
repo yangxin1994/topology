@@ -63,6 +63,9 @@ const defaultPen: any = {
   textAlign: 'center',
   textBaseline: 'middle',
   textBackground: '',
+  textDecoration: '',
+  textDecorationDash: 0,
+  textDecorationColor: '',
   animateCycleIndex: 0,
   events: [],
   dash: 0,
@@ -110,6 +113,9 @@ export abstract class Pen {
   textAlign: string;
   textBaseline: string;
   textBackground: string;
+  textDecoration: string;
+  textDecorationDash: number;
+  textDecorationColor: string;
 
   text: string;
   textMaxLine: number;
@@ -202,7 +208,7 @@ export abstract class Pen {
   num2: number;
   num3: number;
 
-  hiddenText: boolean;   // 是否隐藏 text 
+  hiddenText: boolean;   // 是否隐藏 text
   displayFormat?: number;    // undefined 显示原内容；0 显示整数
 
   fromData(defaultData: any, json: any) {

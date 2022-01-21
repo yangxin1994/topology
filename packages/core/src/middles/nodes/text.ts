@@ -146,7 +146,10 @@ export function fillText(
   height: number,
   lineHeight: number,
   maxLineLen?: number,
-  bk?: string
+  bk?: string,
+  decoration?: string,
+  decorationDash?: number,
+  decorationColor?: string,
 ) {
   if (!maxLineLen || maxLineLen > lines.length) {
     maxLineLen = lines.length;
@@ -159,6 +162,9 @@ export function fillText(
       textBk(ctx, lines[i], x, y + i * lineHeight, lineHeight, bk);
     }
     ctx.fillText(lines[i], x, y + i * lineHeight);
+    if(decoration === 'underline'){
+      underline(ctx, lines[i], x, y + i * lineHeight, decorationDash, decorationColor);
+    }
   }
 
   if (maxLineLen < lines.length) {
@@ -170,14 +176,70 @@ export function fillText(
       textBk(ctx, str, x, y + (maxLineLen - 1) * lineHeight, lineHeight, bk);
     }
     ctx.fillText(str, x, y + (maxLineLen - 1) * lineHeight);
+    if(decoration === 'underline'){
+      underline(ctx, str, x, y + (maxLineLen - 1) * lineHeight, decorationDash, decorationColor);
+    }
   } else {
     if (bk) {
       textBk(ctx, lines[maxLineLen - 1], x, y + (maxLineLen - 1) * lineHeight, lineHeight, bk);
     }
     ctx.fillText(lines[maxLineLen - 1], x, y + (maxLineLen - 1) * lineHeight);
+    if(decoration === 'underline'){
+      underline(ctx, lines[maxLineLen - 1], x, y + (maxLineLen - 1) * lineHeight, decorationDash, decorationColor);
+    }
   }
 }
-
+function underline(ctx:CanvasRenderingContext2D, text: string, x: number, y: number, decorationDash: number, decorationColor: string){
+  let metrics = measureText(ctx, text);
+  let fontSize = Math.floor(metrics.actualHeight * 1.4); // 140% the height
+  switch (ctx.textAlign) {
+      case "center":
+        x -= (metrics.width / 2);
+    break;
+      case "right":
+        x -= metrics.width;
+    break;
+  }
+  switch (ctx.textBaseline){
+      case "top":
+        y += (fontSize);
+    break;
+      case "middle":
+        y += (fontSize / 2);
+    break;
+  }
+  ctx.save();
+  ctx.beginPath();
+  ctx.strokeStyle = decorationColor ? decorationColor: ctx.fillStyle;
+  ctx.lineWidth = 1;
+  // ctx.lineWidth = Math.ceil(fontSize * 0.08);
+  ctx.moveTo(x, y);
+  switch (decorationDash) {
+    case 1:
+      ctx.setLineDash([5, 5]);
+      break;
+    case 2:
+      ctx.setLineDash([10, 10]);
+      break;
+    case 3:
+      ctx.setLineDash([10, 10, 2, 10]);
+      break;
+    case 4:
+      ctx.setLineDash([1, 16]);
+      break;
+  }
+  ctx.lineTo(x + metrics.width, y);
+  ctx.stroke();
+  ctx.restore();
+}
+export function measureText (ctx: CanvasRenderingContext2D, text: string){
+  let metrics = ctx.measureText(text);
+  return {
+    width: Math.floor(metrics.width),
+    height: Math.floor(metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent),
+    actualHeight: Math.floor(metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent)
+  };
+}
 export function text(ctx: CanvasRenderingContext2D, node: Pen) {
   if (!node.text) {
     return;
@@ -243,7 +305,10 @@ export function text(ctx: CanvasRenderingContext2D, node: Pen) {
     textRect.height,
     lineHeight,
     maxLineLen,
-    node.textBackground
+    node.textBackground,
+    node.textDecoration,
+    node.textDecorationDash,
+    node.textDecorationColor
   );
   ctx.restore();
 }
