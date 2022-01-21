@@ -2457,9 +2457,9 @@ export class Topology {
     this.dispatch('redo', this.data);
   }
 
-  toImage( padding: Padding = 0, callback: any = undefined, name?: string,img?: HTMLImageElement): string {
+  toImage(padding: Padding = 0, callback: any = undefined): string {
     let backRect: Rect;
-    if (this.data.bkImageRect) {
+    if(this.data.bkImageRect){
       // 背景图片相对于画布的 rect
       backRect = new Rect(this.data.bkImageRect.x - this.data.x, this.data.bkImageRect.y - this.data.y, this.data.bkImageRect.width, this.data.bkImageRect.height);
     }
@@ -2487,16 +2487,6 @@ export class Topology {
     if (this.data.bkImage && backRect) {
       ctx.drawImage(this.canvas.bkImg, backRect.x - rect.x, backRect.y - rect.y, backRect.width, backRect.height);
     }
-    if (img) {
-      // 绘制LOGO
-      ctx.drawImage(img, 0, 0, img.naturalWidth * 0.6, img.naturalHeight * 0.6);
-    }
-    if (name) {
-      // 绘制Title
-      ctx.fillStyle = '#000000';
-      ctx.font = 'bold 64px Arial';
-      ctx.fillText(name, rect.width / 2 - name.length / 2 * 70, 240);
-    }
 
     for (const item of this.data.pens) {
       let pen: Pen;
@@ -2521,11 +2511,10 @@ export class Topology {
     return canvas.toDataURL('image/png', 1);
   }
 
-  saveAsImage(name?: string, padding: Padding = 0, img?: HTMLImageElement) {
+  saveAsImage(name?: string, padding: Padding = 0) {
     const a = document.createElement('a');
     a.setAttribute('download', name || 'le5le.topology.png');
-    let tName = name ? name.split(".")[0] : "le5le";
-    a.setAttribute('href', this.toImage(padding, undefined,tName, img));
+    a.setAttribute('href', this.toImage(padding));
     const evt = document.createEvent('MouseEvents');
     evt.initEvent('click', true, true);
     a.dispatchEvent(evt);
