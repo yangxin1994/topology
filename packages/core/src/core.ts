@@ -696,15 +696,7 @@ export class Topology {
     this.data.pens.push(node);
 
     if (focus) {
-      // fix bug: add echart
-      if (node.name === 'echarts') {
-        setTimeout(() => {
-          this.activeLayer.pens = [node];
-          this.render();
-        }, 50);
-      } else {
-        this.activeLayer.pens = [node];
-      }
+      this.activeLayer.pens = [node];
     }
 
     if (node.name !== 'graffiti' || !node.doing) {
