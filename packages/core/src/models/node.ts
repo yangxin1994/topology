@@ -321,7 +321,7 @@ export class Node extends Pen {
   }
 
   addToDiv() {
-    if (this.audio || this.video || this.iframe || this.elementId || this.gif) {
+    if (this.audio || this.video || this.iframe || this.elementId || this.gif || this.imageLoading) {
       Store.set(this.generateStoreKey('LT:addDiv'), this);
     }
   }
@@ -576,6 +576,8 @@ export class Node extends Pen {
 
         }
         ctx.restore();
+        this.imageLoading = false;
+        Store.set(this.generateStoreKey('LT:addDiv'), this);
         return;
       } else if (images[this.image]) {
         this.img = images[this.image].img;
@@ -598,6 +600,8 @@ export class Node extends Pen {
     }
 
     const img = new Image();
+    this.imageLoading = true;
+    Store.set(this.generateStoreKey('LT:addDiv'), this);
     img.crossOrigin = 'anonymous';
     img.src = this.image;
     img.onload = () => {
@@ -609,6 +613,8 @@ export class Node extends Pen {
         img,
       };
       Store.set(this.generateStoreKey('LT:imageLoaded'), true);
+      this.imageLoading = false;
+      Store.set(this.generateStoreKey('LT:addDiv'), this);
       if (!this.gif && gif) {
         this.gif = true;
         if (this.TID) {
@@ -617,6 +623,32 @@ export class Node extends Pen {
         }
       }
     };
+    img.onerror = () => {
+      // 加载一个默认图片
+      const normalImg = new Image();
+      normalImg.crossOrigin = 'anonymous';
+      const errorImageSrc = this.errorImage || '/img/error.png';
+      normalImg.src = errorImageSrc;
+      normalImg.onload = () => {
+        // image 与 lastImage 都设置成 errorImage
+        this.image = errorImageSrc;
+        this.lastImage = errorImageSrc;;
+        this.imgNaturalWidth = normalImg.naturalWidth;
+        this.imgNaturalHeight = normalImg.naturalHeight;
+        this.img = normalImg;
+        images[errorImageSrc] = {
+          img: normalImg,
+        };
+        Store.set(this.generateStoreKey('LT:imageLoaded'), true);
+        this.imageLoading = false;
+        Store.set(this.generateStoreKey('LT:addDiv'), this);
+      }
+
+      normalImg.onerror = () => {
+        this.imageLoading = false;
+        Store.set(this.generateStoreKey('LT:addDiv'), this);
+      }
+    }
   }
 
   calcAnchors() {

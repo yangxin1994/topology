@@ -71,6 +71,7 @@ export interface Options {
   refresh?: number;
   on?: (event: string, data: any) => void;
   scroll?: boolean;   // 是否启用滚动条
+  scaleCache?: boolean;  // 是否启用缩放缓存
 }
 
 export const fontKeys = ['fontColor', 'fontFamily', 'fontSize', 'lineHeight', 'textAlign', 'textBaseline'];
@@ -102,4 +103,5 @@ export const DefalutOptions: Options = {
   gridSize: 10,
   gridColor: '#f3f3f3',
   ruleColor: '#888888',
+  scaleCache: true  // 默认缩放会缓存
 };

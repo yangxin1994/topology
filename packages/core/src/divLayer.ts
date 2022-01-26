@@ -5,6 +5,7 @@ import { Lock } from './models/status';
 import { images, PenType } from './models/pen';
 import { Layer } from './layer';
 import { find } from './utils';
+import { Loading } from '..';
 
 let videos: { [key: string]: { player: HTMLElement; current: HTMLElement; media: HTMLMediaElement; }; } = {};
 
@@ -153,6 +154,18 @@ export class DivLayer extends Layer {
         }
         this.setElemPosition(node, this.gifs[node.id] || this.addGif(node));
       }
+    }
+
+    if (node.imageLoading) {
+      // 图片加载中
+      if (!node.imageLoadingDom) {
+        node.imageLoadingDom = new Loading(this);
+      }
+      // 需要计算中心点传入
+      const center = node.rect.center;
+      node.imageLoadingDom.show(center.x + this.data.x, center.y + this.data.y);
+    } else {
+      node.imageLoadingDom?.hide();
     }
 
     if (node.children) {
@@ -437,6 +450,10 @@ export class DivLayer extends Layer {
     if (item.gif) {
       this.canvas.removeChild(this.gifs[item.id]);
       this.gifs[item.id] = undefined;
+    }
+
+    if (item.imageLoadingDom) {
+      this.canvas.removeChild(item.imageLoadingDom.dom);
     }
 
     if (item.children) {
