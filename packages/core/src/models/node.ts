@@ -632,7 +632,7 @@ export class Node extends Pen {
       normalImg.onload = () => {
         // image 与 lastImage 都设置成 errorImage
         this.image = errorImageSrc;
-        this.lastImage = errorImageSrc;;
+        this.lastImage = errorImageSrc;
         this.imgNaturalWidth = normalImg.naturalWidth;
         this.imgNaturalHeight = normalImg.naturalHeight;
         this.img = normalImg;
@@ -642,13 +642,13 @@ export class Node extends Pen {
         Store.set(this.generateStoreKey('LT:imageLoaded'), true);
         this.imageLoading = false;
         Store.set(this.generateStoreKey('LT:addDiv'), this);
-      }
+      };
 
       normalImg.onerror = () => {
         this.imageLoading = false;
         Store.set(this.generateStoreKey('LT:addDiv'), this);
-      }
-    }
+      };
+    };
   }
 
   calcAnchors() {
