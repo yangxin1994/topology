@@ -6,6 +6,7 @@ import { EventType, EventAction } from './event';
 
 import { deepClone } from '../utils/clone';
 import { Lock } from './status';
+import { Loading } from './loading';
 
 export enum PenType {
   Node,
@@ -210,6 +211,10 @@ export abstract class Pen {
 
   hiddenText: boolean;   // 是否隐藏 text
   displayFormat?: number;    // undefined 显示原内容；0 显示整数
+
+  imageLoading: boolean;  // 图片加载中
+  imageLoadingDom: Loading;  // 图片加载中的dom
+  errorImage: string;  // 图片加载失败的图片
 
   fromData(defaultData: any, json: any) {
     if (!json) {

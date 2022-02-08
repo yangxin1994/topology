@@ -353,7 +353,7 @@ export class Topology {
                   this.touches[0].pageY - this.touches[1].pageY
                 );
             event.preventDefault();
-            this.scaleTo(scale * this.touchScale, this.touchCenter);
+            this.scaleTo(scale * this.touchScale, this.touchCenter, this.options.scaleCache);
           } else if (len === 3) {
             const pos = new Point(
               touches[0].pageX - window.scrollX - (this.canvasPos.left || this.canvasPos.x),
@@ -518,7 +518,7 @@ export class Topology {
       } else {
         scale -= 0.1;
       }
-      this.scaleTo(scale, pos);
+      this.scaleTo(scale, pos, this.options.scaleCache);
       this.divLayer.canvas.focus();
 
       return false;
@@ -1159,15 +1159,16 @@ export class Topology {
           if (this.activeLayer.locked() || this.data.locked) {
             break;
           }
-          if(e.ctrlKey && !this.alreadyCopy){
+          const x = e.x - this.mouseDown.x;
+          const y = e.y - this.mouseDown.y;
+          const shake = 20;
+          if (e.ctrlKey && !this.alreadyCopy && (Math.abs(x) >= shake || Math.abs(y) >= shake)) {
             // 按住 ctrl，复制一个新节点
             this.alreadyCopy = true;
             this.copy();
             this.paste();
             this.needCache = true;
           } else {
-            const x = e.x - this.mouseDown.x;
-            const y = e.y - this.mouseDown.y;
             if (x || y) {
               const offset = this.getDockPos(x, y, e.ctrlKey || e.shiftKey || e.altKey);
               this.activeLayer.move(offset.x ? offset.x : x, offset.y ? offset.y : y);
@@ -3033,7 +3034,7 @@ export class Topology {
   // scale for scaled canvas:
   //   > 1, expand
   //   < 1, reduce
-  scale(scale: number, center?: { x: number; y: number }) {
+  scale(scale: number, center?: { x: number; y: number }, cache = true) {
     if (this.data.scale * scale < this.options.minScale) {
       scale = this.options.minScale / this.data.scale;
       this.data.scale = this.options.minScale;
@@ -3058,14 +3059,14 @@ export class Topology {
     Store.set(this.generateStoreKey('LT:scale'), this.data.scale);
 
     this.render();
-    this.cache();
+    cache && this.cache();
 
     this.dispatch('scale', this.data.scale);
   }
 
   // scale for origin canvas:
-  scaleTo(scale: number, center?: { x: number; y: number }) {
-    this.scale(scale / this.data.scale, center);
+  scaleTo(scale: number, center?: { x: number; y: number }, cache = true) {
+    this.scale(scale / this.data.scale, center, cache);
   }
 
   round() {
@@ -3420,8 +3421,8 @@ export class Topology {
   }
 
   pureData() {
-    const data = JSON.parse(JSON.stringify(this.data));
-    data.pens.forEach((pen: any) => {
+    const data: TopologyData = JSON.parse(JSON.stringify(this.data));
+    data.pens.forEach((pen: Pen) => {
       for (const key in pen) {
         if (pen[key] === undefined || pen[key] === undefined) {
           delete pen[key];
@@ -3430,23 +3431,25 @@ export class Topology {
 
       delete pen.TID;
       delete pen.animateCycleIndex;
-      delete pen.img;
-      delete pen.lastImage;
+      delete (pen as Node).img;
+      delete (pen as Node).lastImage;
       delete pen.fillImg;
       delete pen.strokeImg;
       delete pen.lastFillImage;
       delete pen.lastStrokeImage;
-      delete pen.imgNaturalWidth;
-      delete pen.imgNaturalHeight;
-      delete pen.anchors;
-      delete pen.rotatedAnchors;
-      delete pen.dockWatchers;
-      delete pen.elementLoaded;
-      delete pen.elementRendered;
-      delete pen.animateReady;
+      delete (pen as Node).imgNaturalWidth;
+      delete (pen as Node).imgNaturalHeight;
+      delete (pen as Node).anchors;
+      delete (pen as Node).rotatedAnchors;
+      delete (pen as Node).dockWatchers;
+      delete (pen as Node).elementLoaded;
+      delete (pen as Node).elementRendered;
+      delete (pen as Node).animateReady;
+      delete pen.imageLoading;
+      delete pen.imageLoadingDom;
 
-      if (pen.animateFrames && pen.animateFrames.length) {
-        for (const item of pen.animateFrames) {
+      if ((pen as Node).animateFrames && (pen as Node).animateFrames.length) {
+        for (const item of (pen as Node).animateFrames) {
           if (item.initState) {
             delete item.initState.TID;
             delete item.initState.animateCycleIndex;
