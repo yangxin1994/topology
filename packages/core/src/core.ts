@@ -724,6 +724,12 @@ export class Topology {
       line.calcControlPoints(true);
     }
 
+    fontKeys.forEach((key: string) => {
+      if (!line[key]) {
+        line[key] = this.options[key];
+      }
+    });
+
     if (this.data.scale !== 1) {
       if (line.name !== 'lines') {
         line.scale(this.data.scale, line.getCenter());
