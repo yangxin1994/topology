@@ -1694,7 +1694,7 @@ export class Topology {
         break;
       case 'a':
       case 'A':
-        this.activeLayer.setPens(this.data.pens);
+        this.activeLayer.setPens([...this.data.pens]);
         done = true;
         break;
       case 'Delete':
