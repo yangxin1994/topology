@@ -724,6 +724,12 @@ export class Topology {
       line.calcControlPoints(true);
     }
 
+    fontKeys.forEach((key: string) => {
+      if (!line[key]) {
+        line[key] = this.options[key];
+      }
+    });
+
     if (this.data.scale !== 1) {
       if (line.name !== 'lines') {
         line.scale(this.data.scale, line.getCenter());
@@ -1688,7 +1694,7 @@ export class Topology {
         break;
       case 'a':
       case 'A':
-        this.activeLayer.setPens(this.data.pens);
+        this.activeLayer.setPens([...this.data.pens]);
         done = true;
         break;
       case 'Delete':
@@ -2450,7 +2456,7 @@ export class Topology {
     this.dispatch('redo', this.data);
   }
 
-  toImage(padding: Padding = 0, callback: any = undefined): string {
+  toImageCanvas(padding: Padding = 0): HTMLCanvasElement {
     let backRect: Rect;
     if(this.data.bkImageRect){
       // 背景图片相对于画布的 rect
@@ -2472,6 +2478,7 @@ export class Topology {
     canvas.width = rect.width;
     canvas.height = rect.height;
     const ctx = canvas.getContext('2d');
+    ctx.save();
 
     if (this.data.bkColor || this.options.bkColor) {
       ctx.fillStyle = this.data.bkColor || this.options.bkColor;
@@ -2498,6 +2505,12 @@ export class Topology {
       pen.render(ctx);
     }
     ctx.scale(1 / dpi, 1 / dpi);
+    ctx.restore();
+    return canvas;
+  }
+
+  toImage(padding: Padding = 0, callback: any = undefined): string {
+    const canvas = this.toImageCanvas(padding);
     if (callback) {
       canvas.toBlob(callback);
     }
