@@ -1177,7 +1177,7 @@ export class Topology {
           } else {
             if (x || y) {
               const offset = this.getDockPos(x, y, e.ctrlKey || e.shiftKey || e.altKey);
-              this.activeLayer.move(offset.x ? offset.x : x, offset.y ? offset.y : y);
+              this.activeLayer.move(offset.x != undefined ? offset.x : x, offset.y != undefined ? offset.y : y);
               this.needCache = true;
             }
           }
@@ -1188,8 +1188,8 @@ export class Topology {
           if (x || y) {
             const offset = this.getDockPos(x, y, e.ctrlKey || e.shiftKey || e.altKey);
             const offsetE = Object.assign({}, e);
-            offset.x && (offsetE.x = offset.x + this.mouseDown.x);
-            offset.y && (offsetE.y = offset.y + this.mouseDown.y);
+            offset.x != undefined && (offsetE.x = offset.x + this.mouseDown.x);
+            offset.y != undefined && (offsetE.y = offset.y + this.mouseDown.y);
             this.activeLayer.resize(this.moveIn.activeAnchorIndex, this.mouseDown, offsetE);
             this.dispatch('resizePens', this.activeLayer.pens);
             this.needCache = true;
@@ -2308,8 +2308,8 @@ export class Topology {
     this.hoverLayer.dockLineY = 0;
 
     const offset = {
-      x: 0,
-      y: 0,
+      x: undefined,
+      y: undefined,
     };
 
     if (noDock || this.options.disableDockLine) {
