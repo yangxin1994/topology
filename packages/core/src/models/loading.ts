@@ -23,7 +23,7 @@ export class Loading {
     parent.canvas.appendChild(this.dom);
     this.dom.style.position = 'absolute';
 
-    let sheet: CSSStyleSheet;
+    let sheet: any;
     for (let i = 0; i < document.styleSheets.length; i++) {
       if (document.styleSheets[i].title === 'le5le/loading') {
         sheet = document.styleSheets[i];
