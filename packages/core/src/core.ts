@@ -461,6 +461,17 @@ export class Topology {
         this.activeLayer.calcActiveRect();
         this.touchedNode = undefined;
       };
+      this.divLayer.canvas.onmouseleave = (event: MouseEvent) => {
+        if (![this.tipMarkdown, this.divLayer.player, this.input].includes((event as any).toElement)) {
+          // mousemove 存在延时器，导致 mouseleave 可能在 mousemove 前执行
+          // 因此需要延时执行
+          setTimeout(() => {
+            this.hideTip();
+            this.moveIn.hoverLine = undefined;
+            this.moveIn.hoverNode = undefined;
+          }, 50);
+        }
+      }
     }
 
     this.divLayer.canvas.ondblclick = this.ondblclick;
@@ -3153,6 +3164,11 @@ export class Topology {
     this.tipMarkdown.style.zIndex = '-1';
     this.tipMarkdown.style.left = '-9999px';
     this.tipMarkdown.style.padding = '8px 0';
+    this.tipMarkdown.onmouseleave = () => {
+      this.hideTip();
+      this.moveIn.hoverLine = undefined;
+      this.moveIn.hoverNode = undefined;
+    };
 
     this.tipMarkdownContent = document.createElement('div');
     this.tipMarkdownContent.style.maxWidth = '320px';
