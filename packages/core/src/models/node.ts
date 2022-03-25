@@ -53,7 +53,7 @@ export class Node extends Pen {
   imageHeight: number;
   imageRatio = true;
   imageAlign: string;
-  imageHide:boolean;
+  imageHide: boolean;
   img: HTMLImageElement;
 
   // 0 - 纯色；1 - 线性渐变；2 - 径向渐变
@@ -82,15 +82,12 @@ export class Node extends Pen {
 
   // nodes移动时，停靠点的参考位置
   // dockWatchers: Point[];
-  
-  get dockWatchers() : Point[] {
+
+  get dockWatchers(): Point[] {
     return [this.rect.center, ...this.rect.toPoints()];
   }
   // 不做任何处理，兼容以前版本中节点属性存在该值的
-  set dockWatchers(v : Point[]) {
-  }
-  
-  
+  set dockWatchers(v: Point[]) {}
 
   animateDuration = 0;
   animateFrames: {
@@ -321,7 +318,14 @@ export class Node extends Pen {
   }
 
   addToDiv() {
-    if (this.audio || this.video || this.iframe || this.elementId || this.gif || this.imageLoading) {
+    if (
+      this.audio ||
+      this.video ||
+      this.iframe ||
+      this.elementId ||
+      this.gif ||
+      this.imageLoading
+    ) {
       Store.set(this.generateStoreKey('LT:addDiv'), this);
     }
   }
@@ -387,12 +391,11 @@ export class Node extends Pen {
         break;
     }
 
-    switch(this.strokeType){
+    switch (this.strokeType) {
       case 1:
         this.strokeLinearGradient(ctx);
         break;
     }
-
 
     // Draw shape.
     drawNodeFns[this.name](ctx, this);
@@ -569,11 +572,10 @@ export class Node extends Pen {
           ctx.rotate((this.iconRotate * Math.PI) / 180);
           ctx.translate(-rect.center.x, -rect.center.y);
         }
-        if(this.imageHide){
+        if (this.imageHide) {
           //  在业务层面去自定义绘制图片
-        }else{
+        } else {
           ctx.drawImage(this.img, x, y, w, h);
-
         }
         ctx.restore();
         this.imageLoading = false;
@@ -599,11 +601,24 @@ export class Node extends Pen {
       return;
     }
 
+    if (
+      navigator.userAgent.includes('Firefox') &&
+      this.image.endsWith('.svg')
+    ) {
+      // 火狐浏览器 svg 图片需要特殊处理
+      this.firefoxLoadSvg();
+      return;
+    }
+
     const img = new Image();
     this.imageLoading = true;
     Store.set(this.generateStoreKey('LT:addDiv'), this);
     img.crossOrigin = 'anonymous';
     img.src = this.image;
+    this.loadImage(img, gif);
+  }
+
+  loadImage(img: HTMLImageElement, gif = false) {
     img.onload = () => {
       this.lastImage = this.image;
       this.imgNaturalWidth = img.naturalWidth;
@@ -649,6 +664,46 @@ export class Node extends Pen {
         Store.set(this.generateStoreKey('LT:addDiv'), this);
       };
     };
+  }
+
+  /**
+   * 火狐浏览器无法绘制 svg 不存在 width height 的问题
+   * 此方法手动添加 width 和 height 解决火狐浏览器绘制 svg
+   * @param pen
+   */
+  private firefoxLoadSvg() {
+    const img = new Image();
+    // request the XML of your svg file
+    const request = new XMLHttpRequest();
+    request.open('GET', this.image, true);
+
+    request.onload = () => {
+      // once the request returns, parse the response and get the SVG
+      const parser = new DOMParser();
+      const result = parser.parseFromString(request.responseText, 'text/xml');
+      const inlineSVG = result.getElementsByTagName('svg')[0];
+
+      const { width, height } = this.rect;
+      // add the attributes Firefox needs. These should be absolute values, not relative
+      inlineSVG.setAttribute('width', `${width}px`);
+      inlineSVG.setAttribute('height', `${height}px`);
+
+      // convert the SVG to a data uri
+      const svg64 = btoa(
+        unescape(
+          encodeURIComponent(new XMLSerializer().serializeToString(inlineSVG))
+        )
+      );
+      const image64 = 'data:image/svg+xml;base64,' + svg64;
+
+      // set that as your image source
+      img.src = image64;
+
+      // do your canvas work
+      this.loadImage(img);
+    };
+    // send the request
+    request.send();
   }
 
   calcAnchors() {
