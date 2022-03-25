@@ -268,11 +268,11 @@ export class Topology {
         return;
       }
       try {
+        event.preventDefault();
+        event.stopPropagation();
         const json = event.dataTransfer.getData('Topology') || event.dataTransfer.getData('Text');
         if (!json) return;
         const obj = JSON.parse(json);
-        event.preventDefault();
-
         const pt = this.calibrateMouse({x: event.offsetX, y: event.offsetY});
         this.dropNodes(
           Array.isArray(obj) ? obj : [obj],
