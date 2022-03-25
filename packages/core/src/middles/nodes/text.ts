@@ -40,7 +40,7 @@ export function getWrapLines(ctx: CanvasRenderingContext2D, words: string[], max
   for (let i = 1; i < words.length; ++i) {
     const word = words[i] || '';
     const text = currentLine + word;
-    const chinese = text.match(/[\u4e00-\u9fa5]/g) || '';
+    const chinese = text.match(/[^\x00-\xff]/g) || '';
     const chineseLen = chinese.length;
     if ((text.length - chineseLen) * fontSize * 0.5 + chineseLen * fontSize < maxWidth) {
       currentLine += word;

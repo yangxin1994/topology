@@ -471,7 +471,7 @@ export class Topology {
             this.moveIn.hoverNode = undefined;
           }, 50);
         }
-      }
+      };
     }
 
     this.divLayer.canvas.ondblclick = this.ondblclick;
