@@ -18,6 +18,7 @@ input-diagram 在 le5le-topology 中使用原生输入框的第三方图形
     height: 50
   },
   text: 'love',
+  data: {},    // 必要
 }
 ```
 

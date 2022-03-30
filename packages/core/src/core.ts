@@ -1492,8 +1492,8 @@ export class Topology {
     this.lastTranlated.x = 0;
     this.lastTranlated.y = 0;
     this.hoverLayer.dockAnchor = undefined;
-    this.hoverLayer.dockLineX = 0;
-    this.hoverLayer.dockLineY = 0;
+    this.hoverLayer.dockLineX = undefined;
+    this.hoverLayer.dockLineY = undefined;
     this.divLayer.canvas.style.cursor = 'default';
     this.alreadyCopy = false;
 
@@ -2315,8 +2315,8 @@ export class Topology {
 
   // Get a dock rect for moving nodes.
   getDockPos(offsetX: number, offsetY: number, noDock?: boolean) {
-    this.hoverLayer.dockLineX = 0;
-    this.hoverLayer.dockLineY = 0;
+    this.hoverLayer.dockLineX = undefined;
+    this.hoverLayer.dockLineY = undefined;
 
     const offset = {
       x: undefined,
