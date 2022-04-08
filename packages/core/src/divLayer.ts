@@ -158,7 +158,7 @@ export class DivLayer extends Layer {
 
     if (node.imageLoading) {
       // 图片加载中
-      if (!node.imageLoadingDom) {
+      if (!(node.imageLoadingDom instanceof Loading)) {
         node.imageLoadingDom = new Loading(this);
       }
       // 需要计算中心点传入
