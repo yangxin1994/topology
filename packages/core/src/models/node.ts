@@ -1308,10 +1308,11 @@ export class Node extends Pen {
       if (!this.rect.y || this.rect.y > p.y) {
         this.rect.y = p.y;
       }
-      if (this.rect.ex < p.x) {
+      // ex 初始为 0 ，而 p.x 可能小于 0
+      if (!this.rect.ex || this.rect.ex < p.x) {
         this.rect.ex = p.x;
       }
-      if (this.rect.ey < p.y) {
+      if (!this.rect.ey || this.rect.ey < p.y) {
         this.rect.ey = p.y;
       }
     });
