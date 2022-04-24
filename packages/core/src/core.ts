@@ -634,9 +634,10 @@ export class Topology {
         return;
       } else if (json.name === 'lines') {
         this.addLine(json);
+        // offsetX 已计算 data.x 此处反算
         this.mouseDown = {
-          x: offsetX,
-          y: offsetY,
+          x: offsetX + this.data.x,
+          y: offsetY + this.data.y,
         };
         this.onmouseup(this.mouseDown);
         return;
@@ -990,6 +991,9 @@ export class Topology {
     this.inputObj = undefined;
   }
 
+  /**
+   * e.x e.y 需要传入未计算 data.x data.y 的值
+   */
   onMouseMove = (e: {
     x: number;
     y: number;
@@ -1312,6 +1316,9 @@ export class Topology {
     });
   };
 
+  /**
+   * e.x e.y 需要传入未计算 data.x data.y 的值
+   */
   onmousedown = (e: {
     x: number;
     y: number;
@@ -1478,6 +1485,9 @@ export class Topology {
     this.render();
   };
 
+  /**
+  * e.x e.y 需要传入未计算 data.x data.y 的值
+  */
   onmouseup = (e: {
     x: number;
     y: number;
