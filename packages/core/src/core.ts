@@ -817,7 +817,8 @@ export class Topology {
     this.caches.dbIndex = -1;
     this.cache();
 
-    this.divLayer.clear();
+    // not remove images 
+    this.divLayer.clear(true);
     this.animateLayer.stop();
     this.render(true);
 
