@@ -165,7 +165,7 @@ export class DivLayer extends Layer {
       const center = node.rect.center;
       node.imageLoadingDom.show(center.x + this.data.x, center.y + this.data.y);
     } else {
-      node.imageLoadingDom?.hide();
+      node.imageLoadingDom?.hide?.();
     }
 
     if (node.children) {
