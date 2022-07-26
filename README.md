@@ -1,4 +1,6 @@
-Please follow the topology-v1 that will better！
+# This repo is for topology 0.x.x
+
+The new version 1.0 is [topology.js](https://github.com/le5le-com/topology.js) ！
 
 English | [简体中文](./README.CN.md)
 
