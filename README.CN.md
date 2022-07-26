@@ -1,5 +1,9 @@
 [English](./README.md) | 简体中文
 
+# 这里是0.x.x的老版本
+
+一个全新的更好的1.0版本在这里： https://github.com/le5le-com/topology.js
+
 # Le5le-topology
 
 Le5le-topology 是一个可视化在线绘图工具，使用 Canvas + Typescript。支持 topology, UML、微服务架构、动态流量、SCADA 场景等。
