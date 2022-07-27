@@ -49,7 +49,7 @@ enum MoveInType {
 
 interface ICaches {
   index: number;
-  dbIndex: number;   // indexDB 中实际的 index
+  dbIndex: number; // indexDB 中实际的 index
   list: TopologyData[];
 }
 
@@ -66,7 +66,7 @@ export class Topology {
     list: [],
   };
   options: Options;
-  cacheTimer:any;
+  cacheTimer: any;
 
   parentElem: HTMLElement;
   canvas: RenderLayer;
@@ -132,7 +132,7 @@ export class Topology {
   scrollDom: Scroll;
 
   // 内存中的 caches 数量
-  get ramCaches() : number {
+  get ramCaches(): number {
     return 5;
   }
 
@@ -149,9 +149,11 @@ export class Topology {
   private scrolling = false;
   private rendering = false;
   private actionTimer: any;
+  private mouseDownTime = 0;
 
   // true 已经复制
   private alreadyCopy: boolean = false;
+
   constructor(parent: string | HTMLElement, options: Options = {}) {
     this._emitter = mitt();
     this.options = Object.assign({}, DefalutOptions, options);
@@ -273,14 +275,10 @@ export class Topology {
         const json = event.dataTransfer.getData('Topology') || event.dataTransfer.getData('Text');
         if (!json) return;
         const obj = JSON.parse(json);
-        const pt = this.calibrateMouse({x: event.offsetX, y: event.offsetY});
-        this.dropNodes(
-          Array.isArray(obj) ? obj : [obj],
-          pt.x,
-          pt.y
-        );
+        const pt = this.calibrateMouse({ x: event.offsetX, y: event.offsetY });
+        this.dropNodes(Array.isArray(obj) ? obj : [obj], pt.x, pt.y);
         this.activeLayer.calcActiveRect();
-      } catch { }
+      } catch {}
     };
 
     if (isMobile()) {
@@ -307,7 +305,7 @@ export class Topology {
           return;
         }
 
-        const pt = this.calibrateMouse({x: pos.x, y: pos.y});
+        const pt = this.calibrateMouse({ x: pos.x, y: pos.y });
         this.getMoveIn(pt);
         this.hoverLayer.node = this.moveIn.hoverNode;
         this.hoverLayer.line = this.moveIn.hoverLine;
@@ -390,7 +388,7 @@ export class Topology {
       };
     } else {
       this.divLayer.canvas.onmousedown = (event: MouseEvent) => {
-        if((event.target as any).nodeName ==='INPUT' && (event.target as any).type ==='range' && this.data.locked){
+        if ((event.target as any).nodeName === 'INPUT' && (event.target as any).type === 'range' && this.data.locked) {
           return;
         }
 
@@ -412,8 +410,8 @@ export class Topology {
           shiftKey: event.shiftKey,
           altKey: event.altKey,
           button: event.button,
-          pageX:event.pageX,
-          pageY:event.pageY
+          pageX: event.pageX,
+          pageY: event.pageY,
         };
         this.lastTranlated.x = e.x;
         this.lastTranlated.y = e.y;
@@ -448,12 +446,14 @@ export class Topology {
         }
 
         if (!dragRect) {
-          const {x, y} = this.data;
-          this.touchedNode.rect.x = event.pageX - window.scrollX - this.canvasPos.x - this.touchedNode.rect.width / 2 - x;
-          this.touchedNode.rect.y = event.pageY - window.scrollY - this.canvasPos.y - this.touchedNode.rect.height / 2 - y;
+          const { x, y } = this.data;
+          this.touchedNode.rect.x =
+            event.pageX - window.scrollX - this.canvasPos.x - this.touchedNode.rect.width / 2 - x;
+          this.touchedNode.rect.y =
+            event.pageY - window.scrollY - this.canvasPos.y - this.touchedNode.rect.height / 2 - y;
         } else {
           // 重新赋值，不影响原值
-          this.touchedNode = {...this.touchedNode, rect: dragRect};
+          this.touchedNode = { ...this.touchedNode, rect: dragRect };
         }
 
         const node = new Node(this.touchedNode);
@@ -484,7 +484,7 @@ export class Topology {
         this.scrollDom.wheel(event.deltaY < 0);
         return;
       }
-      if(this.data.locked === Lock.NoEvent) return;
+      if (this.data.locked === Lock.NoEvent) return;
       const timeNow = new Date().getTime();
       if (timeNow - this.touchStart < 20) {
         event.preventDefault();
@@ -579,14 +579,14 @@ export class Topology {
     }
 
     if (!dragRect) {
-      const {x, y} = this.data;
+      const { x, y } = this.data;
       this.touchedNode.rect.x =
         event.changedTouches[0].pageX - window.scrollX - this.canvasPos.x - this.touchedNode.rect.width / 2 - x;
       this.touchedNode.rect.y =
         event.changedTouches[0].pageY - window.scrollY - this.canvasPos.y - this.touchedNode.rect.height / 2 - y;
     } else {
       // 重新赋值，不影响原值
-      this.touchedNode = {...this.touchedNode, rect: dragRect};
+      this.touchedNode = { ...this.touchedNode, rect: dragRect };
     }
     const node = new Node(this.touchedNode);
     this.addNode(node, true);
@@ -781,17 +781,17 @@ export class Topology {
     }
     this.rendering = true;
     // 获取 ctx 对象
-    const ctx= this.offscreen.canvas.getContext('2d');
-    ctx.clearRect(0,0,this.offscreen.canvas.width,this.offscreen.canvas.height);
+    const ctx = this.offscreen.canvas.getContext('2d');
+    ctx.clearRect(0, 0, this.offscreen.canvas.width, this.offscreen.canvas.height);
     ctx.save();
-    ctx.translate(this.data.x,this.data.y);
+    ctx.translate(this.data.x, this.data.y);
     this.offscreen.render();
     ctx.restore();
     this.canvas.render();
     this.rendering = false;
   }
 
-  calibrateMouse = (pt: {x : number, y: number}) => {
+  calibrateMouse = (pt: { x: number; y: number }) => {
     pt.x -= this.data.x;
     pt.y -= this.data.y;
 
@@ -813,11 +813,11 @@ export class Topology {
     this.lock(this.data.locked);
 
     this.caches.list = [];
-    createCacheTable();  // 清空数据
+    createCacheTable(); // 清空数据
     this.caches.dbIndex = -1;
     this.cache();
 
-    // not remove images 
+    // not remove images
     this.divLayer.clear(true);
     this.animateLayer.stop();
     this.render(true);
@@ -1009,6 +1009,13 @@ export class Topology {
       return;
     }
 
+    if (this.options.mousemoveDebounce > 0) {
+      const now = performance.now();
+      if (now - this.mouseDownTime < this.options.mousemoveDebounce) {
+        return;
+      }
+    }
+
     // https://caniuse.com/#feat=mdn-api_mouseevent_buttons
     if (this.mouseDown && !this.mouseDown.restore && e.buttons !== 1 && e.buttons !== 2) {
       // 防止异常情况导致mouseup事件没有触发
@@ -1064,7 +1071,8 @@ export class Topology {
       this.raf = undefined;
 
       const pt = this.calibrateMouse({ x: e.x, y: e.y });
-      if (this.moveIn.type === MoveInType.Lines) {  // 钢笔工具
+      if (this.moveIn.type === MoveInType.Lines) {
+        // 钢笔工具
         if (this.hoverLayer.line) {
           this.hoverLayer.lineTo(new Point(pt.x, pt.y), '');
           if (e.shiftKey || e.ctrlKey || e.altKey || e.buttons == 2) {
@@ -1100,12 +1108,15 @@ export class Topology {
             this.moveIn.hoverNode.moveIn();
 
             // Send a move event.
-            this.dispatch('moveInNode', Object.assign(this.moveIn.hoverNode, {
-              evs: {
-                x: e.pageX,
-                y: e.pageY,
-              }
-            }));
+            this.dispatch(
+              'moveInNode',
+              Object.assign(this.moveIn.hoverNode, {
+                evs: {
+                  x: e.pageX,
+                  y: e.pageY,
+                },
+              })
+            );
 
             this.showTip(this.moveIn.hoverNode, pt);
           }
@@ -1120,12 +1131,15 @@ export class Topology {
           if (this.moveIn.hoverLine) {
             this.hoverLayer.line = this.moveIn.hoverLine;
             this.moveIn.hoverLine.moveIn();
-            this.dispatch('moveInLine', Object.assign(this.moveIn.hoverLine,{
-              evs: {
-                x: e.pageX,
-                y: e.pageY,
-              }
-            }));
+            this.dispatch(
+              'moveInLine',
+              Object.assign(this.moveIn.hoverLine, {
+                evs: {
+                  x: e.pageX,
+                  y: e.pageY,
+                },
+              })
+            );
 
             this.showTip(this.moveIn.hoverLine, pt);
           }
@@ -1150,10 +1164,8 @@ export class Topology {
       }
 
       // Move out parent element.
-      const moveOutX =
-        e.x + 50 > this.parentElem.clientWidth + this.parentElem.scrollLeft;
-      const moveOutY =
-        e.y + 50 > this.parentElem.clientHeight + this.parentElem.scrollTop;
+      const moveOutX = e.x + 50 > this.parentElem.clientWidth + this.parentElem.scrollLeft;
+      const moveOutY = e.y + 50 > this.parentElem.clientHeight + this.parentElem.scrollTop;
       if (!this.options.disableMoveOutParent && (moveOutX || moveOutY)) {
         this.dispatch('moveOutParent', e);
 
@@ -1184,7 +1196,12 @@ export class Topology {
           const x = e.x - this.mouseDown.x;
           const y = e.y - this.mouseDown.y;
           const shake = 20;
-          if (e.ctrlKey && !this.alreadyCopy && (Math.abs(x) >= shake || Math.abs(y) >= shake)) {
+          if (
+            e.ctrlKey &&
+            this.options.ctrlCopy !== false &&
+            !this.alreadyCopy &&
+            (Math.abs(x) >= shake || Math.abs(y) >= shake)
+          ) {
             // 按住 ctrl，复制一个新节点
             this.alreadyCopy = true;
             this.copy();
@@ -1284,12 +1301,8 @@ export class Topology {
           }
           break;
         case MoveInType.LineControlPoint:
-          this.moveIn.hoverLine.controlPoints[
-            this.moveIn.lineControlPoint.id
-          ].x = pt.x;
-          this.moveIn.hoverLine.controlPoints[
-            this.moveIn.lineControlPoint.id
-          ].y = pt.y;
+          this.moveIn.hoverLine.controlPoints[this.moveIn.lineControlPoint.id].x = pt.x;
+          this.moveIn.hoverLine.controlPoints[this.moveIn.lineControlPoint.id].y = pt.y;
           this.moveIn.hoverLine.textRect = undefined;
           if (drawLineFns[this.moveIn.hoverLine.name] && drawLineFns[this.moveIn.hoverLine.name].dockControlPointFn) {
             drawLineFns[this.moveIn.hoverLine.name].dockControlPointFn(
@@ -1327,12 +1340,13 @@ export class Topology {
     ctrlKey?: boolean;
     shiftKey?: boolean;
     altKey?: boolean;
-    pageX?:number,
-    pageY?:number
+    pageX?: number;
+    pageY?: number;
   }) => {
     if (e.button !== 0 && e.button !== 2) return;
 
     this.mouseDown = e;
+    this.mouseDownTime = performance.now();
     if (e.altKey) {
       this.divLayer.canvas.style.cursor = 'move';
     }
@@ -1358,11 +1372,11 @@ export class Topology {
           this.activeLayer.pens = [this.moveIn.hoverLine];
           this.dispatch(
             'line' + (e.button === 2 ? 'RightClick' : ''),
-            Object.assign(this.moveIn.hoverLine,{
+            Object.assign(this.moveIn.hoverLine, {
               evs: {
                 x: e.pageX,
                 y: e.pageY,
-              }
+              },
             })
           );
         }
@@ -1458,11 +1472,11 @@ export class Topology {
           this.activeLayer.setPens([this.moveIn.activeNode]);
           this.dispatch(
             'node' + (e.button === 2 ? 'RightClick' : ''),
-            Object.assign(this.moveIn.activeNode,{
+            Object.assign(this.moveIn.activeNode, {
               evs: {
                 x: e.pageX,
                 y: e.pageY,
-              }
+              },
             })
           );
         }
@@ -1472,7 +1486,7 @@ export class Topology {
         }
         this.activeLayer.calcActiveRect();
         break;
-      case MoveInType.Graffiti:  // 涂鸦起点
+      case MoveInType.Graffiti: // 涂鸦起点
         const pt = this.calibrateMouse({ x: e.x, y: e.y });
         this.moveIn.hoverNode.pushPoint(new Point(pt.x, pt.y));
         break;
@@ -1487,8 +1501,8 @@ export class Topology {
   };
 
   /**
-  * e.x e.y 需要传入未计算 data.x data.y 的值
-  */
+   * e.x e.y 需要传入未计算 data.x data.y 的值
+   */
   onmouseup = (e: {
     x: number;
     y: number;
@@ -1564,7 +1578,7 @@ export class Topology {
                 willAddLine = lines.length <= 1;
               }
               // 判断是否是当前锚点连接当前锚点
-              if(from.id === to.id && from.anchorIndex === to.anchorIndex){
+              if (from.id === to.id && from.anchorIndex === to.anchorIndex) {
                 willAddLine = false;
               }
             } else {
@@ -1618,11 +1632,14 @@ export class Topology {
             this.activeLayer.clear();
             this.data.pens.splice(this.findIndex(this.hoverLayer.line), 1);
           }
-         if(this.hoverLayer.line.from.id && this.hoverLayer.line.to.id){
-            this.dispatch('lineOn', Object.assign(this.hoverLayer.line,{
-              lineOnDirection: this.moveIn.type
-            }));
-          }
+          if (this.hoverLayer.line.from.id && this.hoverLayer.line.to.id) {
+            this.dispatch(
+              'lineOn',
+              Object.assign(this.hoverLayer.line, {
+                lineOnDirection: this.moveIn.type,
+              })
+            );
+          }
           break;
         case MoveInType.Graffiti:
           if (!this.moveIn.hoverNode.points || this.moveIn.hoverNode.points.length < 2) {
@@ -1663,13 +1680,13 @@ export class Topology {
           }
           this.moveIn.hoverLine.children.push(line);
           this.hoverLayer.line = line;
-          this.dispatch('addLineInLines', {previous, line} );
+          this.dispatch('addLineInLines', { previous, line });
       }
     }
 
     this.hoverLayer.dragRect = undefined;
-    this.activeLayer.lastOffsetX = 0;
-    this.activeLayer.lastOffsetY = 0;
+    this.activeLayer.lastOffsetX = 0;
+    this.activeLayer.lastOffsetY = 0;
     this.render();
 
     if (this.needCache) {
@@ -2321,7 +2338,7 @@ export class Topology {
     }
 
     const rect = getRect(pens);
-    return new Rect(rect.x + this.data.x, rect.y + this.data.y, rect.width , rect.height);
+    return new Rect(rect.x + this.data.x, rect.y + this.data.y, rect.width, rect.height);
   }
 
   // Get a dock rect for moving nodes.
@@ -2388,7 +2405,7 @@ export class Topology {
     }
 
     this.caches.index = this.caches.list.length - 1;
-    this.caches.dbIndex++;  // 向后移动
+    this.caches.dbIndex++; // 向后移动
   }
 
   cacheReplace(pens: Pen[]) {
@@ -2425,7 +2442,7 @@ export class Topology {
 
     this.divLayer.clear(true);
     this.animateLayer.stop();
-    this.caches.dbIndex--;  // 数据库中的位置前移
+    this.caches.dbIndex--; // 数据库中的位置前移
     this.data = createData(this.caches.list[--this.caches.index], this.id);
     this.render(true);
     this.divLayer.render();
@@ -2436,10 +2453,10 @@ export class Topology {
       spliceCache(this.caches.dbIndex);
     }
     // 当 index 到 list 中间时，开始向左侧添加 indexDB 中的内容
-    if(this.caches.index <= this.caches.list.length / 2 - 1){
-      const sub = this.caches.index - 0 + 1;  // 距离左侧前一个的差距
-      getCache(this.caches.dbIndex - sub).then(data=>{
-        if(data){
+    if (this.caches.index <= this.caches.list.length / 2 - 1) {
+      const sub = this.caches.index - 0 + 1; // 距离左侧前一个的差距
+      getCache(this.caches.dbIndex - sub).then((data) => {
+        if (data) {
           this.caches.list.pop();
           this.caches.list.unshift(data);
           this.caches.index++;
@@ -2458,16 +2475,16 @@ export class Topology {
       return;
     }
     this.divLayer.clear(true);
-    this.caches.dbIndex++;  // 向后移动
+    this.caches.dbIndex++; // 向后移动
     this.data = createData(this.caches.list[++this.caches.index], this.id);
     this.render(true);
     this.divLayer.render();
 
     // 当 index 到 list 中间时，开始向右侧加
-    if(this.caches.index >= this.caches.list.length / 2){
-      const add = this.caches.list.length - this.caches.index;  // 距离右侧的差距
-      getCache(this.caches.dbIndex + add).then(data=>{
-        if(data){
+    if (this.caches.index >= this.caches.list.length / 2) {
+      const add = this.caches.list.length - this.caches.index; // 距离右侧的差距
+      getCache(this.caches.dbIndex + add).then((data) => {
+        if (data) {
           this.caches.list.shift();
           this.caches.list.push(data);
           this.caches.index--;
@@ -2480,9 +2497,14 @@ export class Topology {
 
   toImageCanvas(padding: Padding = 0): HTMLCanvasElement {
     let backRect: Rect;
-    if(this.data.bkImageRect){
+    if (this.data.bkImageRect) {
       // 背景图片相对于画布的 rect
-      backRect = new Rect(this.data.bkImageRect.x - this.data.x, this.data.bkImageRect.y - this.data.y, this.data.bkImageRect.width, this.data.bkImageRect.height);
+      backRect = new Rect(
+        this.data.bkImageRect.x - this.data.x,
+        this.data.bkImageRect.y - this.data.y,
+        this.data.bkImageRect.width,
+        this.data.bkImageRect.height
+      );
     }
     const rect = getMoreRect(getRect(this.data.pens), backRect);
     const p = formatPadding(padding || 0);
