@@ -6,6 +6,7 @@ import { EventType, EventAction } from './event';
 
 import { deepClone } from '../utils/clone';
 import { Lock } from './status';
+import { Loading } from './loading';
 
 export enum PenType {
   Node,
@@ -53,16 +54,12 @@ const defaultPen: any = {
   tags: [],
   visible: true,
   rect: new Rect(0, 0, 0, 0),
-  fontColor: '',
-  fontFamily:
-    '"Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial',
-  fontSize: 12,
-  lineHeight: 1.5,
   fontStyle: 'normal',
   fontWeight: 'normal',
-  textAlign: 'center',
-  textBaseline: 'middle',
   textBackground: '',
+  textDecoration: '',
+  textDecorationDash: 0,
+  textDecorationColor: '',
   animateCycleIndex: 0,
   events: [],
   dash: 0,
@@ -110,6 +107,9 @@ export abstract class Pen {
   textAlign: string;
   textBaseline: string;
   textBackground: string;
+  textDecoration: string;
+  textDecorationDash: number;
+  textDecorationColor: string;
 
   text: string;
   textMaxLine: number;
@@ -202,8 +202,12 @@ export abstract class Pen {
   num2: number;
   num3: number;
 
-  hiddenText: boolean;   // 是否隐藏 text 
+  hiddenText: boolean;   // 是否隐藏 text
   displayFormat?: number;    // undefined 显示原内容；0 显示整数
+
+  imageLoading: boolean;  // 图片加载中
+  imageLoadingDom: Loading;  // 图片加载中的dom
+  errorImage: string;  // 图片加载失败的图片
 
   fromData(defaultData: any, json: any) {
     if (!json) {

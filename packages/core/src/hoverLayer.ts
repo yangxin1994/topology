@@ -21,8 +21,8 @@ export class HoverLayer extends Layer {
 
   hoverAnchorIndex = -1;
 
-  dockLineX = 0;
-  dockLineY = 0;
+  dockLineX: number = undefined;
+  dockLineY: number = undefined;
 
   root: Node;
   dragRect: Rect;
@@ -207,19 +207,19 @@ export class HoverLayer extends Layer {
     ctx.strokeStyle = rgba(0.5, this.options.hoverColor);
     ctx.lineWidth = 1;
 
-    if (this.dockLineX > 0) {
+    if (this.dockLineX != undefined) {
       const size = Store.get(this.generateStoreKey('LT:size'));
       ctx.beginPath();
       ctx.moveTo(this.dockLineX, -this.data.y);
-      ctx.lineTo(this.dockLineX, size.height);
+      ctx.lineTo(this.dockLineX, size.height - this.data.y);
       ctx.stroke();
     }
 
-    if (this.dockLineY > 0) {
+    if (this.dockLineY != undefined) {
       const size = Store.get(this.generateStoreKey('LT:size'));
       ctx.beginPath();
       ctx.moveTo(-this.data.x, this.dockLineY);
-      ctx.lineTo(size.width, this.dockLineY);
+      ctx.lineTo(size.width - this.data.x, this.dockLineY);
       ctx.stroke();
     }
 
