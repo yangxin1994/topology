@@ -2599,10 +2599,10 @@ export class Topology {
     this.input.style.width = textRect.width + 'px';
     this.input.style.height = textRect.height + 'px';
     this.input.style.zIndex = '1000';
-    if (item.rotate / 360) {
+    if (item.rotate % 360) {
       this.input.style.transform = `rotate(${item.rotate}deg)`;
     } else {
-      this.input.style.transform = undefined;
+      this.input.style.transform = null;
     }
     // 为 textarea 添加 class
     this.input.classList.add('set-text-input');
