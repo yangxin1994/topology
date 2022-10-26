@@ -7,7 +7,13 @@ import { Layer } from './layer';
 import { find } from './utils';
 import { Loading } from '..';
 
-let videos: { [key: string]: { player: HTMLElement; current: HTMLElement; media: HTMLMediaElement; }; } = {};
+let videos: {
+  [key: string]: {
+    player: HTMLElement;
+    current: HTMLElement;
+    media: HTMLMediaElement;
+  };
+} = {};
 
 export class DivLayer extends Layer {
   canvas = document.createElement('div');
@@ -19,15 +25,25 @@ export class DivLayer extends Layer {
   progress: HTMLElement;
   loop: HTMLElement;
   media: HTMLMediaElement;
-  audios: { [key: string]: { player: HTMLElement; current: HTMLElement; media: HTMLMediaElement; }; } = {};
-  iframes: { [key: string]: HTMLIFrameElement; } = {};
-  elements: { [key: string]: HTMLElement; } = {};
-  gifs: { [key: string]: HTMLImageElement; } = {};
+  audios: {
+    [key: string]: {
+      player: HTMLElement;
+      current: HTMLElement;
+      media: HTMLMediaElement;
+    };
+  } = {};
+  iframes: { [key: string]: HTMLIFrameElement } = {};
+  elements: { [key: string]: HTMLElement } = {};
+  gifs: { [key: string]: HTMLImageElement } = {};
 
   private subcribeDiv: Observer;
   private subcribePlay: Observer;
   private subcribeNode: Observer;
-  constructor(public parentElem: HTMLElement, public options: Options = {}, TID: string) {
+  constructor(
+    public parentElem: HTMLElement,
+    public options: Options = {},
+    TID: string
+  ) {
     super(TID);
     if (!this.options.playIcon) {
       this.options.playIcon = 't-icon t-play';
@@ -50,38 +66,51 @@ export class DivLayer extends Layer {
     parentElem.appendChild(this.canvas);
     parentElem.appendChild(this.player);
     this.createPlayer();
-    this.subcribeDiv = Store.subscribe(this.generateStoreKey('LT:addDiv'), this.addDiv);
-    this.subcribeDiv = Store.subscribe(this.generateStoreKey('LT:removeDiv'), this.removeDiv);
-    this.subcribePlay = Store.subscribe(this.generateStoreKey('LT:play'), (e: { pen: Node; pause?: boolean; }) => {
-      this.playOne(e.pen, e.pause);
-    });
-
-    this.subcribeNode = Store.subscribe(this.generateStoreKey('LT:activeNode'), (node: Node) => {
-      if (!node || (!node.video && !node.audio)) {
-        this.player.style.top = '-99999px';
-        return;
+    this.subcribeDiv = Store.subscribe(
+      this.generateStoreKey('LT:addDiv'),
+      this.addDiv
+    );
+    this.subcribeDiv = Store.subscribe(
+      this.generateStoreKey('LT:removeDiv'),
+      this.removeDiv
+    );
+    this.subcribePlay = Store.subscribe(
+      this.generateStoreKey('LT:play'),
+      (e: { pen: Node; pause?: boolean }) => {
+        this.playOne(e.pen, e.pause);
       }
+    );
 
-      if (node.audio && this.audios[node.id]) {
-        this.media = this.audios[node.id].media;
-      } else if (node.video && videos[node.id]) {
-        this.media = videos[node.id].media;
-      } else {
-        return;
-      }
+    this.subcribeNode = Store.subscribe(
+      this.generateStoreKey('LT:activeNode'),
+      (node: Node) => {
+        if (!node || (!node.video && !node.audio)) {
+          this.player.style.top = '-99999px';
+          return;
+        }
 
-      this.curNode = node;
-      const rect = this.parentElem.getBoundingClientRect();
-      this.player.style.top = rect.top + this.parentElem.clientHeight - 40 + 'px';
-      this.player.style.left = rect.left + 'px';
-      this.player.style.width = this.parentElem.clientWidth + 'px';
-      this.getMediaCurrent();
-      if (this.media.paused) {
-        this.playBtn.className = this.options.playIcon;
-      } else {
-        this.playBtn.className = this.options.pauseIcon;
+        if (node.audio && this.audios[node.id]) {
+          this.media = this.audios[node.id].media;
+        } else if (node.video && videos[node.id]) {
+          this.media = videos[node.id].media;
+        } else {
+          return;
+        }
+
+        this.curNode = node;
+        const rect = this.parentElem.getBoundingClientRect();
+        this.player.style.top =
+          rect.top + this.parentElem.clientHeight - 40 + 'px';
+        this.player.style.left = rect.left + 'px';
+        this.player.style.width = this.parentElem.clientWidth + 'px';
+        this.getMediaCurrent();
+        if (this.media.paused) {
+          this.playBtn.className = this.options.playIcon;
+        } else {
+          this.playBtn.className = this.options.pauseIcon;
+        }
       }
-    });
+    );
 
     document.addEventListener('fullscreenchange', (e) => {
       if (!this.media) {
@@ -101,11 +130,18 @@ export class DivLayer extends Layer {
 
   addDiv = (node: Node) => {
     if (node.audio) {
-      if (this.audios[node.id] && this.audios[node.id].media.src !== node.audio) {
+      if (
+        this.audios[node.id] &&
+        this.audios[node.id].media.src !== node.audio
+      ) {
         this.audios[node.id].media.src = node.audio;
       }
       setTimeout(() => {
-        this.setElemPosition(node, (this.audios[node.id] && this.audios[node.id].player) || this.addMedia(node, 'audio'));
+        this.setElemPosition(
+          node,
+          (this.audios[node.id] && this.audios[node.id].player) ||
+            this.addMedia(node, 'audio')
+        );
       });
     }
     if (node.video) {
@@ -113,7 +149,11 @@ export class DivLayer extends Layer {
         videos[node.id].media.src = node.video;
       }
       setTimeout(() => {
-        this.setElemPosition(node, (videos[node.id] && videos[node.id].player) || this.addMedia(node, 'video'));
+        this.setElemPosition(
+          node,
+          (videos[node.id] && videos[node.id].player) ||
+            this.addMedia(node, 'video')
+        );
       });
     }
 
@@ -149,8 +189,12 @@ export class DivLayer extends Layer {
         this.canvas.removeChild(this.gifs[node.id]);
         this.gifs[node.id] = undefined;
       } else if (node.img) {
-        if (this.gifs[node.id] && this.gifs[node.id].src !== node.image) {
+        if (
+          this.gifs[node.id] &&
+          this.gifs[node.id].dataset.saveSrc !== node.image
+        ) {
           this.gifs[node.id].src = node.image;
+          this.gifs[node.id].dataset.saveSrc = node.image;
         }
         this.setElemPosition(node, this.gifs[node.id] || this.addGif(node));
       }
@@ -248,7 +292,8 @@ export class DivLayer extends Layer {
     };
 
     this.progress.onclick = (e: MouseEvent) => {
-      this.media.currentTime = (e.offsetX / this.progress.clientWidth) * this.media.duration;
+      this.media.currentTime =
+        (e.offsetX / this.progress.clientWidth) * this.media.duration;
     };
 
     this.loop.onclick = () => {
@@ -271,9 +316,13 @@ export class DivLayer extends Layer {
       return;
     }
     this.currentTime.innerText =
-      this.formatSeconds(this.media.currentTime) + ' / ' + this.formatSeconds(this.media.duration);
+      this.formatSeconds(this.media.currentTime) +
+      ' / ' +
+      this.formatSeconds(this.media.duration);
     this.progressCurrent.style.width =
-      (this.media.currentTime / this.media.duration) * this.progress.clientWidth + 'px';
+      (this.media.currentTime / this.media.duration) *
+        this.progress.clientWidth +
+      'px';
   };
 
   addMedia = (node: Node, type: string) => {
@@ -307,7 +356,8 @@ export class DivLayer extends Layer {
     }
     media.loop = node.playLoop;
     media.ontimeupdate = () => {
-      current.style.width = (media.currentTime / media.duration) * node.rect.width + 'px';
+      current.style.width =
+        (media.currentTime / media.duration) * node.rect.width + 'px';
       this.getMediaCurrent();
       if (this.media === media) {
         if (node.playLoop) {
@@ -406,7 +456,7 @@ export class DivLayer extends Layer {
     elem.style.top = node.rect.y + this.data.y + 'px';
     elem.style.width = node.rect.width + 'px';
     elem.style.height = node.rect.height + 'px';
-    elem.style.display = node.visible ? 'inline' : 'none';   // 是否隐藏元素
+    elem.style.display = node.visible ? 'inline' : 'none'; // 是否隐藏元素
     if (node.rotate != null || node.offsetRotate != null) {
       elem.style.transform = `rotate(${node.rotate + node.offsetRotate}deg)`;
     }
@@ -502,7 +552,7 @@ export class DivLayer extends Layer {
     return txt;
   }
 
-  resize(size?: { width: number; height: number; }) {
+  resize(size?: { width: number; height: number }) {
     if (size) {
       this.canvas.style.width = size.width + 'px';
       this.canvas.style.height = size.height + 'px';
