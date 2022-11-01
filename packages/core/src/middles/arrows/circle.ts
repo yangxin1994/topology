@@ -1,7 +1,13 @@
 import { Store } from 'le5le-store';
 import { Point } from '../../models/point';
 
-export function circleSolid(ctx: CanvasRenderingContext2D, from: Point, to: Point, size: number, fillStyle?: string) {
+export function circleSolid(
+  ctx: CanvasRenderingContext2D,
+  from: Point,
+  to: Point,
+  size: number,
+  fillStyle?: string
+) {
   size += ctx.lineWidth * 3;
   const r = size / 2;
   if (ctx.lineWidth < 2) {
@@ -10,7 +16,7 @@ export function circleSolid(ctx: CanvasRenderingContext2D, from: Point, to: Poin
   ctx.translate(to.x, to.y);
   ctx.rotate(Math.atan2(to.y - from.y, to.x - from.x));
   ctx.translate(-to.x, -to.y - ctx.lineWidth / 10);
-  ctx.arc(to.x - r - ctx.lineWidth / 2, to.y, r, 0, 2 * Math.PI);
+  ctx.arc(to.x, to.y, r, 0, 2 * Math.PI);
   ctx.stroke();
   if (fillStyle) {
     ctx.fillStyle = fillStyle;
@@ -20,6 +26,11 @@ export function circleSolid(ctx: CanvasRenderingContext2D, from: Point, to: Poin
   ctx.fill();
 }
 
-export function circle(ctx: CanvasRenderingContext2D, from: Point, to: Point, size: number) {
+export function circle(
+  ctx: CanvasRenderingContext2D,
+  from: Point,
+  to: Point,
+  size: number
+) {
   circleSolid(ctx, from, to, size, Store.get('LT:bkColor') || '#fff');
 }
