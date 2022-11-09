@@ -140,6 +140,7 @@ export class Node extends Pen {
 
     this.fromData(defaultData, json);
     this.type = PenType.Node;
+    this.elementId = undefined;
     if (!cloneState) {
       delete this.elementLoaded;
       delete this.elementRendered;
@@ -1386,6 +1387,9 @@ export class Node extends Pen {
     n.elementRendered = false;
     n.elementLoaded = false;
     if (this.name !== 'div') {
+      n.elementId = undefined;
+    }
+    if (this.name !== 'textInput') {
       n.elementId = undefined;
     }
     return n;
